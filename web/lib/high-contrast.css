@@ -1,0 +1,235 @@
+/* web/lib/high-contrast.css */
+
+body.high-contrast-theme {
+    --bg-main: #000000;
+    --bg-sidebar: #000000;
+    --bg-glass: #000000;
+    --border-glass: #FFFF00;
+    --text-primary: #FFFF00;
+    --text-secondary: #FFFF00;
+    --accent-1: #FFFF00;
+    --accent-2: #FFFF00;
+    --success: #00FF00;
+    --warning: #FFFF00;
+    --danger: #FF0000;
+    font-size: 17px !important;
+}
+
+body.high-contrast-theme * {
+    color: #FFFF00 !important;
+}
+
+/* Sidebar Logo Header */
+body.high-contrast-theme .logo {
+    background: none !important;
+    -webkit-text-fill-color: #FFFF00 !important;
+}
+
+/* Ajustes da Sidebar */
+body.high-contrast-theme .sidebar {
+    width: 330px !important;
+    border: 2px solid #FFFF00 !important;
+    background: #000000 !important;
+}
+body.high-contrast-theme .logo-icon-img {
+    box-shadow: none !important;
+}
+
+/* Modo Duelo e Conversa (Toggle) */
+body.high-contrast-theme .mode-btn {
+    border: 2px solid #FFFF00 !important;
+    background: transparent !important;
+    color: #FFFF00 !important;
+}
+body.high-contrast-theme .mode-btn.active,
+body.high-contrast-theme .mode-btn.active * {
+    background: #FFFF00 !important;
+    color: #000000 !important;
+}
+
+/* Placeholders em Amarelo */
+body.high-contrast-theme input::placeholder,
+body.high-contrast-theme textarea::placeholder {
+    color: #FFFF00 !important;
+    opacity: 0.8 !important;
+}
+
+/* Baloes de Mensagem (Usuario e Bot) */
+body.high-contrast-theme .message.user {
+    background: #000000 !important;
+    border: 2px solid #FFFF00 !important;
+    box-shadow: none !important;
+}
+
+body.high-contrast-theme .message.ia {
+    background: #000000 !important;
+    border: 2px solid #FFFF00 !important;
+}
+
+
+
+/* Inputs gerais */
+body.high-contrast-theme input, 
+body.high-contrast-theme select,
+body.high-contrast-theme textarea {
+    border: 2px solid #FFFF00 !important;
+    background: #000000 !important;
+}
+
+
+
+/* Botoes especificos com borda */
+body.high-contrast-theme .btn-primary,
+body.high-contrast-theme .btn-new-chat,
+body.high-contrast-theme .suggestion-btn {
+    background: transparent !important;
+    border: 2px solid #FFFF00 !important;
+    font-weight: bold;
+}
+
+/* Botoes Modal Sobre */
+body.high-contrast-theme #aboutModal button {
+    background: #000000 !important;
+    border: 2px solid #FFFF00 !important;
+    color: #FFFF00 !important;
+}
+
+/* Botoes menores SEM borda */
+body.high-contrast-theme button:not(.btn-primary):not(.btn-new-chat):not(.suggestion-btn):not(.dialog-btn):not(.mode-btn) {
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Icones SVG em amarelo */
+body.high-contrast-theme svg {
+    stroke: #FFFF00 !important;
+}
+body.high-contrast-theme svg[fill="currentColor"] {
+    fill: #FFFF00 !important;
+}
+
+/* Modal Sobre (aboutModal) - Removemos bordas originais inline para ficar limpo */
+body.high-contrast-theme #aboutModal div[style*="border"],
+body.high-contrast-theme #aboutModal span[style*="border"] {
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Remove a bordinha roxa do icone central e ajusta tamanho */
+body.high-contrast-theme .empty-icon-glow {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+body.high-contrast-theme .empty-icon {
+    width: 120px !important;
+    height: 120px !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+/* Fix btn-new-chat glow and hover */
+body.high-contrast-theme .btn-new-chat {
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+body.high-contrast-theme .btn-new-chat:hover {
+    background: #FFFF00 !important;
+    color: #000000 !important;
+}
+
+
+
+/* Remove a borda da caixa de texto interna para evitar borda dupla */
+body.high-contrast-theme #userInput,
+body.high-contrast-theme #userInputDuel,
+body.high-contrast-theme #spotlightInput {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+}
+
+
+
+/* Caixa principal de digitacao com borda amarela */
+body.high-contrast-theme .input-container {
+    border: 2px solid #FFFF00 !important;
+    background: #000000 !important;
+}
+
+/* Remove a borda dupla do input interno */
+body.high-contrast-theme .input-container input,
+body.high-contrast-theme .input-container textarea {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Botoes internos sem borda (para nao criar caixas dentro da caixa) */
+body.high-contrast-theme .input-container .icon-btn {
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Checkboxes Customizados */
+body.high-contrast-theme input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px !important;
+    height: 20px !important;
+    background: #000000 !important;
+    border: 2px solid #FFFF00 !important;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+}
+body.high-contrast-theme input[type="checkbox"]:checked {
+    background: #FFFF00 !important;
+}
+body.high-contrast-theme input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid #000000;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+/* Fix "Salvar Alteracoes" do modal Settings */
+body.high-contrast-theme .dialog-btn.confirm {
+    background: #FFFF00 !important;
+    color: #000000 !important;
+    border: 2px solid #FFFF00 !important;
+}
+
+/* Sessões Recentes (Barra Lateral) */
+body.high-contrast-theme .session-item.active {
+    background: rgba(255, 255, 0, 0.15) !important;
+    border-left: 3px solid #FFFF00 !important;
+}
+
+body.high-contrast-theme .session-item:hover {
+    background: rgba(255, 255, 0, 0.15) !important;
+}
+
+/* Remover bordas fantasmas de botoes das sessoes para evitar bug de lagura */
+body.high-contrast-theme .session-actions .s-action-btn {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+}
+
+/* Previne pulos de layout */
+body.high-contrast-theme .session-item {
+    box-sizing: border-box !important;
+    overflow: hidden;
+}
+body.high-contrast-theme .session-actions {
+    flex-shrink: 0;
+}

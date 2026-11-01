@@ -1,0 +1,45 @@
+================================================================================
+               CONTRATO DE LICENÇA DE USUÁRIO FINAL (EULA)
+                           CROMAK BRIDGE VOX
+================================================================================
+Versão: 1.3.5 | Matrix Core
+Atualização: Novembro de 2026
+
+IMPORTANTE: LEIA ATENTAMENTE ESTE CONTRATO ANTES DE USAR O SOFTWARE.
+
+1. CONCESSÃO DE LICENÇA
+A Cromak Technology concede a você uma licença pessoal, não exclusiva, gratuita
+e intransferível para usar o software Cromak Bridge Vox e seus componentes
+estritamente para uso pessoal ou interno de sua organização.
+
+2. GRATUITO PARA USO (FREEWARE / BYOK)
+O Cromak Bridge Vox é fornecido de forma 100% gratuita. O software opera sob a
+arquitetura BYOK (Bring Your Own Key), permitindo que o usuário conecte suas
+próprias chaves de API oficiais (Groq, Google Gemini, OpenAI, Anthropic Claude,
+Alibaba Qwen). A Cromak Technology não cobra mensalidades e não processa pagamentos.
+
+3. MODO AGENTE E AUTO-CODER (AVISO DE OPERAÇÃO)
+O Cromak Bridge Vox possui recursos avançados ("Modo Agente" / "Auto-Coder") que
+permitem à Inteligência Artificial executar scripts, alterar, criar e excluir 
+arquivos e pastas em seu sistema local a pedido do usuário. O uso destes recursos 
+é feito sob responsabilidade do usuário. A Cromak Technology não se responsabiliza
+por perda acidental de dados decorrentes de comandos executados a pedido do usuário.
+
+4. ACESSIBILIDADE E IMPACTO SOCIAL
+O Cromak Bridge Vox foi desenvolvido com foco prioritário em impacto social,
+inclusão digital e acessibilidade para pessoas com deficiência visual (baixa 
+visão e cegueira total), contando com a consultoria e validação técnica do 
+jornalista e especialista Gustavo Torniero.
+
+5. ISENÇÃO DE GARANTIAS
+O Software é fornecido "no estado em que se encontra" (AS IS), sem garantias 
+implícitas de adequação comercial a propósitos específicos.
+
+6. PRIVACIDADE E SOBERANIA DE DADOS
+O funcionamento local do aplicativo garante que seus dados de chat, credenciais 
+de API, arquivos de projeto e e-mails não sejam coletados, armazenados ou 
+monitorados pela Cromak Technology. Todas as comunicações ocorrem diretamente 
+entre o seu computador e as APIs oficiais dos provedores.
+
+Ao utilizar o Cromak Bridge Vox, você concorda com estes termos.
+================================================================================

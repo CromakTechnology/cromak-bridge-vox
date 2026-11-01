@@ -1,0 +1,133 @@
+/* vox-mode.css - Alto Contraste para Acessibilidade */
+
+body.vox-body {
+    margin: 0;
+    padding: 0;
+    background-color: #000000;
+    color: #FFFF00; /* Amarelo puro sobre preto puro = Maior contraste possivel */
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    overflow: hidden; /* Sem barras de rolagem globais */
+    display: flex;
+    flex-direction: column;
+}
+
+.vox-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 40px;
+}
+
+/* Cabecalho */
+.vox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 4px solid #333333;
+}
+
+.vox-logo {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.vox-settings-btn {
+    background: transparent;
+    border: none;
+    color: #FFFFFF;
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.vox-settings-btn:hover {
+    transform: scale(1.1);
+    color: #FFFF00;
+}
+
+/* Microfone Area */
+.vox-mic-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+    cursor: pointer;
+}
+
+.vox-mic-circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: #222222;
+    border: 8px solid #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: #FFFFFF;
+    transition: all 0.3s ease;
+}
+
+.vox-mic-circle.listening {
+    background-color: #FF0000;
+    border-color: #FF0000;
+    color: #FFFFFF;
+    animation: pulse 1.5s infinite;
+}
+
+.vox-mic-circle.thinking {
+    background-color: #FFFF00;
+    border-color: #FFFF00;
+    color: #000000;
+    animation: spin-pulse 2s infinite;
+}
+
+.vox-status {
+    margin-top: 30px;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+/* Area de Texto Gigante */
+.vox-text-area {
+    flex: 1;
+    margin-top: 40px;
+    background-color: #111111;
+    border: 4px solid #333333;
+    border-radius: 16px;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+#voxTextOutput {
+    font-size: 3.5rem;
+    line-height: 1.4;
+    font-weight: 600;
+    margin: 0;
+    color: #FFFF00;
+}
+
+/* Animacoes */
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 30px rgba(255, 0, 0, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+@keyframes spin-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Protegendo o Modal de Configuracoes para continuar igual ao style.css */
+.modal-overlay {
+    /* Ja estilizado no style.css, mas garantimos z-index alto */
+    z-index: 9999;
+}

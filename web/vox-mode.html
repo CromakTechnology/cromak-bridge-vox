@@ -1,0 +1,348 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cromak Bridge - VOX</title>
+    <!-- Reaproveitamos as fontes e icones do painel principal -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS do painel principal PARA as configuracoes -->
+    <link rel="stylesheet" href="lib/style.css">
+    <!-- CSS do Modo Vox (sobrescreve e estiliza a tela principal) -->
+    <link rel="stylesheet" href="vox-mode.css">
+</head>
+<body class="vox-body">
+
+    <!-- Tela Principal de Alto Contraste -->
+    <div class="vox-container">
+        
+        <!-- Cabecalho simples -->
+        <div class="vox-header">
+            <div class="vox-logo"><i class="fa-solid fa-eye-low-vision"></i> Modo Acessibilidade</div>
+            <button class="vox-settings-btn" onclick="abrirConfiguracoes()"><i class="fa-solid fa-gear"></i></button>
+        </div>
+
+        <!-- Centro: Microfone Gigante -->
+        <div class="vox-mic-area" id="voxMicBtn" onclick="toggleMicrofone()">
+            <div class="vox-mic-circle" id="micCircle">
+                <i class="fa-solid fa-microphone"></i>
+            </div>
+            <div class="vox-status" id="voxStatus">Pressione ESPAÇO para falar</div>
+        </div>
+
+        <!-- Area de Texto Gigante -->
+        <div class="vox-text-area">
+            <p id="voxTextOutput">Aguardando comando...</p>
+        </div>
+
+    </div>
+
+    
+
+    <div class="settings-modal" id="settingsModal" style="display: none;">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2 style="font-size: 1.2rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                     Configurações e Preferências</h2>
+                <button class="close-btn" onclick="fecharConfiguracoes()">&times;</button>
+            </div>
+            
+            <div class="settings-modal-wrapper">
+                <div class="settings-sidebar">
+                    <button class="tab-btn active" onclick="switchSettingsTab(event, 'geral')">Geral</button>
+                    <button class="tab-btn" onclick="switchSettingsTab(event, 'apis')">Chaves de API</button>
+                    <button class="tab-btn" onclick="switchSettingsTab(event, 'comportamento')">Comportamento</button>
+                    <button class="tab-btn" onclick="switchSettingsTab(event, 'ambiente')">Ambiente de Trabalho</button>
+                    <button class="tab-btn" onclick="switchSettingsTab(event, 'email')">E-mail</button>
+                    <button class="tab-btn" onclick="switchSettingsTab(event, 'atalhos')">Atalhos</button>
+                </div>
+                
+                <div class="settings-content-area">
+
+            <!-- ABA 1: GERAL -->
+            <div id="tab-geral" class="settings-tab">
+                
+                <!-- GRUPO: MODELO E IDIOMA -->
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Interface e Idioma</div>
+                    
+                    <label class="settings-label">Modelo de Interface (Exige reinício)</label>
+                    <select id="configInterfaceMode" class="settings-input" style="margin-bottom: 16px;">
+                        <option value="normal">Bridge (Padrão Multimodal)</option>
+                        <option value="high_contrast">Bridge Vox Auto Contraste (Para Baixa Visão)</option>
+                        <option value="vox">Bridge Vox Somente Microfone (Para Cegos)</option>
+                    </select>
+
+                    <label class="settings-label">Idioma da Interface</label>
+                    <select id="configLanguage" class="settings-input" style="margin-bottom: 0;">
+                        <option value="pt_BR">Português (Brasil)</option>
+                        <option value="en_US">English (US)</option>
+                        <option value="es_ES">Español</option>
+                    </select>
+                </div>
+
+                <!-- GRUPO: RECURSOS -->
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Recursos de IA e Voz</div>
+
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configAgente" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Modo Agente (Auto-Coder) - Permite à IA ler e editar arquivos
+                    </label>
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configAutoVoz" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Resposta por Voz Automática (A IA responde falando)
+                    </label>
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configBridgeVox" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Modo Always-Voice (Escuta o microfone diretamente)
+                    </label>
+                </div>
+
+                <!-- GRUPO: COMPORTAMENTO -->
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 10px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Comportamento do Sistema</div>
+
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configStartup" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Iniciar Cromak Bridge junto com o Windows
+                    </label>
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configTray" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Minimizar para a bandeja do sistema ao fechar (Tray)
+                    </label>
+                </div>
+            </div>
+            
+            <!-- ABA 2: CHAVES DE API -->
+            <div id="tab-apis" class="settings-tab" style="display: none;">
+                <label class="settings-label">Provedor de IA Ativo</label>
+                <select id="configProvider" class="settings-input" style="margin-bottom: 20px; border-color: var(--accent-1);">
+                    <option value="gemini">Google Gemini</option>
+                    <option value="qwen">Alibaba Qwen Cloud</option>
+                    <option value="openai">OpenAI (ChatGPT)</option>
+                    <option value="claude">Anthropic Claude</option>
+                </select>
+
+                <!-- Gemini -->
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Google Gemini API Key</span> <a href="#" onclick="pywebview.api.abrir_link('https://aistudio.google.com/app/api-keys')" style="font-size: 0.75rem; color: var(--accent-1); text-decoration: none; font-weight: normal; margin-bottom: 4px;">Gerar nova API...</a></label>
+                <div class="api-input-group">
+                    <input type="password" id="keyGemini" class="settings-input" placeholder="AIzaSy...">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyGemini')" title="Colar Área de Transferência">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyGemini')" title="Mostrar/Ocultar">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Qwen -->
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Alibaba Qwen API Key</span> <a href="#" onclick="pywebview.api.abrir_link('https://home.qwencloud.com/api-keys')" style="font-size: 0.75rem; color: var(--accent-1); text-decoration: none; font-weight: normal; margin-bottom: 4px;">Gerar nova API...</a></label>
+                <div class="api-input-group">
+                    <input type="password" id="keyQwen" class="settings-input" placeholder="sk-...">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyQwen')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyQwen')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- OpenAI -->
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>OpenAI API Key</span> <a href="#" onclick="pywebview.api.abrir_link('https://platform.openai.com/api-keys')" style="font-size: 0.75rem; color: var(--accent-1); text-decoration: none; font-weight: normal; margin-bottom: 4px;">Gerar nova API...</a></label>
+                <div class="api-input-group">
+                    <input type="password" id="keyOpenai" class="settings-input" placeholder="sk-...">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyOpenai')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyOpenai')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Claude -->
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Anthropic Claude API Key</span> <a href="#" onclick="pywebview.api.abrir_link('https://platform.claude.com/settings/workspaces/default/keys')" style="font-size: 0.75rem; color: var(--accent-1); text-decoration: none; font-weight: normal; margin-bottom: 4px;">Gerar nova API...</a></label>
+                <div class="api-input-group">
+                    <input type="password" id="keyClaude" class="settings-input" placeholder="sk-ant-...">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyClaude')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyClaude')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.8rem; color: var(--text-secondary); text-align: left;">As chaves são salvas localmente no seu dispositivo.</p>
+            </div>
+
+            <!-- ABA 3: COMPORTAMENTO -->
+            <div id="tab-comportamento" class="settings-tab" style="display: none;">
+                <label class="settings-label">Perfil de Resposta (Predefinições)</label>
+                <select id="presetComportamento" class="settings-input" style="margin-bottom: 16px;" onchange="aplicarPresetComportamento()">
+                    <option value="">Personalizado (Escreva abaixo)</option>
+                    <option value="assistente">Assistente Padrão (Objetivo e direto)</option>
+                    <option value="programador">Programador Sênior (Foco em Clean Code)</option>
+                    <option value="escritor">Escritor Criativo (Foco em Copywriting e Persuasão)</option>
+                </select>
+
+                <label class="settings-label">Instruções Customizadas (System Prompt)</label>
+                <textarea id="configSystemPrompt" class="settings-input" style="height: 120px; resize: none; font-family: inherit;" placeholder="Defina regras globais de comportamento para a IA responder..."></textarea>
+                
+            </div>
+            
+            <!-- ABA: AMBIENTE DE TRABALHO -->
+            <div id="tab-ambiente" class="settings-tab" style="display: none;">
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: var(--text-primary); font-size: 1.1rem; margin-bottom: 4px;">Rotas Locais do Usuário</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Defina o caminho exato das suas pastas. Isso impede que a IA cometa erros ao salvar arquivos ou tente encontrar arquivos em partições incorretas (como 'C:\' em vez de 'D:\').</p>
+                </div>
+                
+                <label class="settings-label">Pasta Área de Trabalho (Desktop)</label>
+                <input type="text" id="pathDesktop" class="settings-input" style="margin-bottom: 16px;" placeholder="Ex: D:\Users\Marcos\Área de Trabalho">
+                
+                <label class="settings-label">Pasta Documentos</label>
+                <input type="text" id="pathDocuments" class="settings-input" style="margin-bottom: 16px;" placeholder="Ex: D:\Users\Marcos\Documentos">
+                
+                <label class="settings-label">Pasta Downloads</label>
+                <input type="text" id="pathDownloads" class="settings-input" style="margin-bottom: 16px;" placeholder="Ex: D:\Users\Marcos\Downloads">
+            </div>
+
+            
+            <!-- ABA: AMBIENTE DE TRABALHO -->
+            <div id="tab-ambiente" class="settings-tab" style="display: none;">
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: var(--text-primary); font-size: 1.1rem; margin-bottom: 4px;">Rotas Locais do Usuário</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Defina o caminho exato das suas pastas. Isso impede que a IA cometa erros ao salvar arquivos ou tente encontrar arquivos em partições incorretas.</p>
+                </div>
+                
+                <label class="settings-label">Pasta Área de Trabalho (Desktop)</label>
+                <input type="text" id="pathDesktop" class="settings-input" style="margin-bottom: 16px;" placeholder="Ex: D:\Users\Marcos\Área de Trabalho">
+                
+                <label class="settings-label">Pasta Documentos</label>
+                <input type="text" id="pathDocuments" class="settings-input" style="margin-bottom: 16px;" placeholder="Ex: D:\Users\Marcos\Documentos">
+                
+                <label class="settings-label">Pasta Downloads</label>
+                <input type="text" id="pathDownloads" class="settings-input" style="margin-bottom: 16px;" placeholder="Ex: D:\Users\Marcos\Downloads">
+            </div>
+
+            <!-- ABA 4: E-MAIL -->
+            <div id="tab-email" class="settings-tab" style="display: none;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <div style="width: 60px; height: 60px; background: var(--surface-2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 1px solid var(--border-glass); box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </div>
+                    <h3 style="color: var(--text-primary); font-size: 1.1rem; margin-bottom: 4px;">Configuração de E-mail</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); max-width: 80%; margin: 0 auto;">Preencha para permitir que a IA envie e leia e-mails ocultamente na sua conta.</p>
+                </div>
+                
+                <label class="settings-label">Seu E-mail (Gmail)</label>
+                <div class="api-input-group" style="margin-bottom: 16px;">
+                    <input type="email" id="keyEmail" class="settings-input" placeholder="seuemail@gmail.com">
+                </div>
+
+                <label class="settings-label">Senha de Aplicativo (16 dígitos)</label>
+                <div class="api-input-group">
+                    <input type="password" id="keyEmailPass" class="settings-input" placeholder="xxxx xxxx xxxx xxxx">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyEmailPass')" title="Colar">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyEmailPass')" title="Mostrar">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: ATALHOS -->
+            <div id="tab-atalhos" class="settings-tab" style="display: none; max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Atalhos Principais</div>
+                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 16px;">Clique no campo e pressione a tecla desejada.</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label class="settings-label">Ligar Microfone</label>
+                            <input type="text" id="shortMic" class="settings-input shortcut-input" readonly value="F2">
+                        </div>
+                        <div>
+                            <label class="settings-label">Parar Áudio (Calar boca)</label>
+                            <input type="text" id="shortStop" class="settings-input shortcut-input" readonly value="Escape">
+                        </div>
+                        <div>
+                            <label class="settings-label">Ajuda Contextual</label>
+                            <input type="text" id="shortHelp" class="settings-input shortcut-input" readonly value="F1">
+                        </div>
+                        <div>
+                            <label class="settings-label">Encerrar Sistema</label>
+                            <input type="text" id="shortExit" class="settings-input shortcut-input" readonly value="F4">
+                        </div>
+                        <div>
+                            <label class="settings-label">Limpar Chat</label>
+                            <input type="text" id="shortClear" class="settings-input shortcut-input" readonly value="F5">
+                        </div>
+                        <div>
+                            <label class="settings-label">Abrir Configurações</label>
+                            <input type="text" id="shortConfig" class="settings-input shortcut-input" readonly value="F10">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Atalhos de Acesso Rápido (Vox Mode)</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label class="settings-label">Editor de Texto</label>
+                            <input type="text" id="shortTxt" class="settings-input shortcut-input" readonly value="T">
+                        </div>
+                        <div>
+                            <label class="settings-label">E-mail</label>
+                            <input type="text" id="shortMail" class="settings-input shortcut-input" readonly value="R">
+                        </div>
+                        <div>
+                            <label class="settings-label">Pesquisa Web</label>
+                            <input type="text" id="shortWeb" class="settings-input shortcut-input" readonly value="I">
+                        </div>
+                        <div>
+                            <label class="settings-label">Arquivos</label>
+                            <input type="text" id="shortFiles" class="settings-input shortcut-input" readonly value="A">
+                        </div>
+                        <div>
+                            <label class="settings-label">Calculadora</label>
+                            <input type="text" id="shortCalc" class="settings-input shortcut-input" readonly value="C">
+                        </div>
+                        <div>
+                            <label class="settings-label">WhatsApp</label>
+                            <input type="text" id="shortWhats" class="settings-input shortcut-input" readonly value="Z">
+                        </div>
+                    </div>
+                    <button class="dialog-btn cancel" onclick="resetShortcuts()" style="margin-top: 20px; width: 100%;">Restaurar Todos os Padrões</button>
+                </div>
+            </div>
+
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: auto; padding-top: 24px;">
+                <button class="dialog-btn cancel" onclick="fecharConfiguracoes()">Cancelar</button>
+                <button class="dialog-btn confirm" onclick="salvarConfiguracoes()">Salvar Alterações</button>
+            </div>
+            </div> <!-- Fim de settings-content-area -->
+        </div>
+    </div>
+</div>
+
+    <!-- Scripts -->
+    <!-- Dependencias (Markdown) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="lib/vox-mode.js"></script>
+</body>
+</html>

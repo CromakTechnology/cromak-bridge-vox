@@ -1,0 +1,9 @@
+{
+    "app_name": "Cromak Bridge Assistant",
+    "welcome_message": "Olá! Como posso ajudar no seu código hoje?",
+    "btn_send": "Enviar",
+    "btn_settings": "Configurações",
+    "error_api_key": "Erro: Chave de API não configurada.",
+    "status_listening": "Ouvindo...",
+    "status_reading_file": "Analisando arquivo: {file_name}"
+}

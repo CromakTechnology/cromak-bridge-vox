@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cromak Bridge</title>
+    
+    <link href="lib/fonts.googleapis.css" rel="stylesheet">
+    <script src="lib/marked.min.js"></script>
+    <link rel="stylesheet" href="lib/tokyo-night-dark.min.css">
+    <script src="lib/highlight.min.js"></script>
+
+    <link rel="stylesheet" href="lib/style.css">
+    <link rel="stylesheet" href="lib/high-contrast.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Região ao vivo invisível para o NVDA / Leitor de Telas anunciar novas respostas automaticamente -->
+    <div id="a11yLiveAnnouncer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+    <div class="api-setup-overlay" id="apiSetupOverlay">
+        <div class="api-setup-box" style="position: relative; max-width: 550px; text-align: left;">
+            <button onclick="document.getElementById('apiSetupOverlay').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                <div class="empty-icon-glow" style="width: 100px; height: 100px; margin-bottom: 0;">
+                    <img src="cromak-bridge.png" alt="Cromak Bridge" style="width: 98px; height: 98px; object-fit: contain;" onerror="this.style.display='none'">
+                </div>
+            </div>
+            <h2 style="text-align: center; margin-bottom: 8px;">Bem-vindo ao Cromak Bridge</h2>
+            <p style="text-align: center; margin-bottom: 24px; font-size: 0.95rem; color: var(--text-secondary);">
+                O motor inteligente do seu desktop. Configure seu provedor preferido e adicione pelo menos uma chave de API para começar (tudo fica salvo localmente).
+            </p>
+            
+            <label class="settings-label" id="lblSetupInterface">Modelo de Interface</label>
+            <select id="setupInterfaceMode" class="settings-input" style="margin-bottom: 12px;" aria-labelledby="lblSetupInterface" aria-label="Escolha a aparência e acessibilidade da interface">
+                <option value="normal">Bridge (Padrão Multimodal - Texto, Voz e Leitura de Imagens)</option>
+                <option value="high_contrast">Bridge Vox Alto Contraste (Para Baixa Visão - Cores em Preto e Amarelo)</option>
+            </select>
+            
+            <label class="settings-label" id="lblSetupProvider">Provedor Principal de Inteligência Artificial</label>
+            <select id="setupProvider" class="settings-input" onchange="atualizarProvedorSetup()" aria-labelledby="lblSetupProvider" aria-label="Selecione o motor de inteligência artificial principal: Google Gemini, OpenAI ChatGPT, Anthropic Claude ou Alibaba Qwen">
+                <option value="gemini">Google Gemini (Gratuito e Rápido)</option>
+                <option value="groq">Groq (Ultra-Rápido / LPU Instantâneo)</option>
+                <option value="openai">OpenAI (ChatGPT)</option>
+                <option value="claude">Anthropic Claude</option>
+                <option value="qwen">Alibaba Qwen Cloud</option>
+            </select>
+
+            <div id="setupKeysContainer" style="margin-top: 16px;">
+                <div id="setupBox_gemini">
+                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Google Gemini API Key</span> 
+                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('gemini')" aria-label="Abrir site oficial do Google AI Studio no navegador para gerar sua chave de API gratuita">Gerar nova API...</button>
+                    </label>
+                    <input type="password" id="setupKeyGemini" class="settings-input" placeholder="AIzaSy..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API do Google Gemini. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
+                </div>
+                <div id="setupBox_openai" style="display: none;">
+                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>OpenAI API Key</span> 
+                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('openai')" aria-label="Abrir plataforma da OpenAI no navegador para gerar sua chave de API do ChatGPT">Gerar nova API...</button>
+                    </label>
+                    <input type="password" id="setupKeyOpenai" class="settings-input" placeholder="sk-..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API da OpenAI ChatGPT. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
+                </div>
+                <div id="setupBox_claude" style="display: none;">
+                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Anthropic Claude API Key</span> 
+                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('claude')" aria-label="Abrir console da Anthropic no navegador para gerar sua chave de API do Claude">Gerar nova API...</button>
+                    </label>
+                    <input type="password" id="setupKeyClaude" class="settings-input" placeholder="sk-ant-..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API da Anthropic Claude. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
+                </div>
+                <div id="setupBox_qwen" style="display: none;">
+                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Alibaba Qwen API Key</span> 
+                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('qwen')" aria-label="Abrir console da Alibaba Qwen no navegador para gerar sua chave de API">Gerar nova API...</button>
+                    </label>
+                    <input type="password" id="setupKeyQwen" class="settings-input" placeholder="sk-..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API da Alibaba Qwen. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
+                </div>
+                <div id="setupBox_groq" style="display: none;">
+                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Groq API Key</span> 
+                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('groq')" aria-label="Abrir console da Groq no navegador para gerar sua chave de API gratuita">Gerar nova API...</button>
+                    </label>
+                    <input type="password" id="setupKeyGroq" class="settings-input" placeholder="gsk_..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API da Groq. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
+                </div>
+            </div>
+            
+            <script>
+                function atualizarProvedorSetup() {
+                    const provider = document.getElementById('setupProvider').value;
+                    const boxes = ['gemini', 'openai', 'claude', 'qwen'];
+                    boxes.forEach(b => {
+                        document.getElementById('setupBox_' + b).style.display = (b === provider) ? 'block' : 'none';
+                    });
+                }
+            </script>
+
+            <button class="btn-new-chat" onclick="salvarConfiguracaoInicial()" style="margin-top: 24px; height: 50px; font-size: 1.05rem;">
+                Conectar e Iniciar
+            </button>
+        </div>
+    </div>
+
+    <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
+        <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+    </button>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="cromak-bridge.png" alt="Cromak Bridge" class="logo-icon-img">
+                Cromak Bridge
+            </div>
+
+            <!-- NOVO: Seletor de Modos -->
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="btnConversa" onclick="alternarModo('conversa')">Conversa</button>
+                <button class="mode-btn" id="btnDuelo" onclick="alternarModo('duelo')">Modo Duelo</button>
+            </div>
+
+            
+            <button class="btn-new-chat" onclick="criarSessao()" aria-label="Iniciar nova conversa">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Nova Conversa
+            </button>
+            
+            <div class="search-container">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="search-bar" id="searchSession" placeholder="Pesquisar sessão..." autocomplete="off" onkeyup="filtrarSessoes()" aria-label="Pesquisar histórico de conversas">
+            </div>
+            
+            <div style="font-size: 0.75rem; color: #52525b; font-weight: 600; text-transform: uppercase; margin: 16px 0 8px 4px; letter-spacing: 0.5px;">Recentes</div>
+            <div class="session-list" id="sessionList" role="navigation" aria-label="Histórico de conversas recentes"></div>
+            
+            <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-glass); position: relative;">
+                
+                <!-- O Menu Pop-up Escondido -->
+                <div class="settings-popup" id="settingsPopup" role="menu" aria-label="Menu de opções">
+                    <button onclick="abrirPreferencias()" role="menuitem">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        Preferências
+                    </button>
+                    <button onclick="abrirAjuda()" role="menuitem">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        Ajuda
+                    </button>
+                    <div class="popup-divider"></div>
+                    <button onclick="abrirSobre()" role="menuitem">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Sobre
+                    </button>
+                </div>
+
+                <!-- O Botão Principal que abre o Pop-up -->
+                <button class="settings-btn" id="btnMainConfig" onclick="toggleSettingsMenu(event)" aria-label="Abrir menu de configurações">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    Configurações
+                </button>
+            </div>
+        </aside>
+
+        <!-- CHAT PADRÃO -->
+        <main class="chat-area" id="mainConversa">
+            <div class="drag-overlay">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Solte o arquivo aqui
+            </div>
+            <header class="chat-header">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="s-action-btn" id="toggleDesktopSidebarBtn" onclick="toggleSidebarDesktop()" style="padding: 6px; margin-right: 2px;" title="Alternar Painel Lateral">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                        </svg>
+                    </button>
+                    <select id="quickProviderSelector" class="model-dropdown" style="border-color: var(--accent-1); color: var(--accent-1);" onchange="mudarProvedorRapido()">
+                        <option value="gemini">Google Gemini</option>
+                        <option value="groq">Groq (Ultra-Rápido)</option>
+                        <option value="qwen">Alibaba Qwen</option>
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="claude">Anthropic Claude</option>
+                    </select>
+                    <select id="modelSelector" class="model-dropdown" onchange="mudarModelo()" aria-label="Selecione o modelo de Inteligência Artificial">
+                        <option value="gemini-2.5-flash">GEMINI 2.5 FLASH</option>
+                        <option value="gemini-2.5-pro">GEMINI 2.5 PRO</option>
+                        <option value="gemini-1.5-flash">GEMINI 1.5 FLASH</option>
+                        <option value="gemini-1.5-pro">GEMINI 1.5 PRO</option>
+                    </select>
+                </div>
+                <div style="color: var(--success); font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success);"></span> Conectado
+                </div>
+            </header>
+
+            <div class="messages-container" id="messagesContainer"></div>
+
+            <footer class="input-area">
+                <div id="imagePreview" style="display: none; margin-bottom: 12px; padding: 0 10px;">
+                    <div style="display: inline-flex; align-items: center; background: rgba(99, 102, 241, 0.1); color: var(--text-primary); font-size: 0.85rem; font-weight: 500; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.3);">
+                        <!-- Ícone de Anexo -->
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        
+                        <span id="imageName" style="margin-right: 12px;"></span>
+                        
+                        <!-- Botão Remover SVG -->
+                        <button onclick="removerImagem()" title="Remover anexo" style="background: transparent; border: none; color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.15)'" onmouseout="this.style.background='transparent'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="input-container" style="position: relative;">
+                    <!-- Menu Flutuante de Anexos -->
+                    <div class="attachment-menu" id="attachmentMenu" role="menu" aria-label="Opções de anexo e envio">
+                        <div class="attachment-menu-header" aria-hidden="true">Enviar</div>
+                        <button onclick="selecionarProjeto()" role="menuitem" aria-label="Pasta de Projeto: Anexar uma pasta de projeto inteira para contexto da IA">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            Pasta de Projeto (Contexto)
+                        </button>
+                        <button onclick="capturarTela()" role="menuitem" aria-label="Capturar Tela: Tirar uma foto do seu monitor atual para a IA analisar">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            Capturar Tela
+                        </button>
+                        <button onclick="anexarArquivo('imagem')" role="menuitem" aria-label="Imagem: Anexar uma foto, print ou arquivo PNG e JPEG">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            Imagem
+                        </button>
+                        <button onclick="anexarArquivo('documento')" role="menuitem" aria-label="Documento: Anexar arquivo de texto, PDF, DOCX ou Word">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            Documento
+                        </button>
+                        <button onclick="anexarArquivo('codigo')" role="menuitem" aria-label="Código Fonte: Anexar script Python, JavaScript, HTML ou outro arquivo de código">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Código Fonte
+                        </button>
+                    </div>
+
+                    <button class="icon-btn" id="btnAttachment" onclick="toggleAttachmentMenu(event)" title="Anexar Arquivo" aria-label="Anexar arquivo ou capturar tela">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                    </button>
+                    <input type="text" placeholder="Envie uma mensagem..." id="userInput" onkeypress="handleEnter(event)" autocomplete="off" autofocus aria-label="Digite sua mensagem para a inteligência artificial">
+                    <button class="icon-btn" id="micBtn" onclick="toggleAudio()" title="Entrada por voz" aria-label="Gravar áudio pelo microfone">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    </button>
+                    <button class="btn-stop" id="stopBtn" onclick="interromperIA()" title="Interromper geração" aria-label="Interromper resposta da IA" style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>
+                    </button>
+                    <button class="btn-send" id="sendBtn" onclick="sendMessage()" title="Enviar" aria-label="Enviar mensagem">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </footer>
+        </main>
+
+        <!-- MODO DUELO (NOVA TELA) -->
+        <main class="chat-area" id="mainDuelo" style="display: none;">
+            <header class="chat-header">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="s-action-btn" onclick="toggleSidebarDesktop()" style="padding: 6px; margin-right: 2px;" title="Alternar Painel Lateral">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 8px; flex: 1; padding-right: 32px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin: 0;">Pergunte a Outros Modelos</h3>
+                </div>
+            </header>
+
+            <div class="duel-board">
+                <!-- Coluna IA 1 -->
+                <div class="duel-column">
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-glass); text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                        <select id="duelProv1" class="model-dropdown" style="border-color: var(--accent-1); color: var(--text-primary); font-size: 0.9rem; padding: 4px 10px; width: 80%;" onchange="carregarModelosDuelo(1)">
+                            <option value="gemini" selected>Google Gemini</option>
+                            <option value="qwen">Alibaba Qwen</option>
+                            <option value="openai">OpenAI (ChatGPT)</option>
+                            <option value="claude">Anthropic Claude</option>
+                        </select>
+                        <select id="duelMod1" class="model-dropdown" onchange="salvarDueloLocal()" style="border-color: var(--border-glass); color: var(--text-secondary); font-size: 0.8rem; padding: 2px 8px; width: 80%;">
+                            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; padding: 16px; overflow-y: auto; color: var(--text-secondary); display: flex; align-items: center; justify-content: center;">Aguardando prompt...</div>
+                </div>
+
+                <!-- Coluna IA 2 -->
+                <div class="duel-column">
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-glass); text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                        <select id="duelProv2" class="model-dropdown" style="border-color: var(--accent-1); color: var(--text-primary); font-size: 0.9rem; padding: 4px 10px; width: 80%;" onchange="carregarModelosDuelo(2)">
+                            <option value="gemini">Google Gemini</option>
+                            <option value="qwen">Alibaba Qwen</option>
+                            <option value="openai">OpenAI (ChatGPT)</option>
+                            <option value="claude" selected>Anthropic Claude</option>
+                        </select>
+                        <select id="duelMod2" class="model-dropdown" onchange="salvarDueloLocal()" style="border-color: var(--border-glass); color: var(--text-secondary); font-size: 0.8rem; padding: 2px 8px; width: 80%;">
+                            <option value="claude-3-5-sonnet-20240620">claude-3-5-sonnet-20240620</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; padding: 16px; overflow-y: auto; color: var(--text-secondary); display: flex; align-items: center; justify-content: center;">Aguardando prompt...</div>
+                </div>
+            </div>
+
+            <footer class="input-area">
+                <div id="imagePreviewDuel" style="display: none; margin-bottom: 12px; padding: 0 10px;">
+                    <div style="display: inline-flex; align-items: center; background: rgba(99, 102, 241, 0.1); color: var(--text-primary); font-size: 0.85rem; font-weight: 500; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.3);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span id="imageNameDuel" style="margin-right: 12px;"></span>
+                        <button onclick="removerImagemDuelo()" title="Remover anexo" style="background: transparent; border: none; color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.15)'" onmouseout="this.style.background='transparent'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-container" style="position: relative;">
+                    <div class="attachment-menu" id="attachmentMenuDuel">
+                        <div class="attachment-menu-header">Enviar</div>
+                        <button onclick="capturarTelaDuelo()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            Capturar Tela
+                        </button>
+                        <button onclick="anexarArquivoDuelo('imagem')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            Imagem
+                        </button>
+                        <button onclick="anexarArquivoDuelo('documento')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            Documento
+                        </button>
+                        <button onclick="anexarArquivoDuelo('codigo')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Código Fonte
+                        </button>
+                    </div>
+                    
+                    <button class="icon-btn" onclick="toggleAttachmentMenuDuel(event)" id="btnAttachmentDuel" title="Anexar Arquivo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                    </button>
+                    <input type="text" placeholder="Pergunte às IAs simultaneamente..." id="duelInput" autocomplete="off" onkeypress="if(event.key === 'Enter') enviarDuelo()">
+                    <button class="icon-btn" onclick="toggleAudioDuel()" title="Entrada por voz">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    </button>
+                    <button class="btn-send" title="Disparar para todos" onclick="enviarDuelo()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Modal de Visualização de Imagem em Tela Cheia -->
+    <div id="imageModal" onclick="fecharImageModal()">
+        <img id="imageModalSrc" src="">
+    </div>
+
+    <!-- Dialog Customizado (Confirm/Prompt) -->
+    <div class="custom-dialog-overlay" id="customDialog">
+        <div class="custom-dialog-box">
+            <h3 id="dialogTitle">Título</h3>
+            <p id="dialogMessage">Mensagem</p>
+            <input type="text" id="dialogInput" class="settings-input" style="display: none; margin-top: 15px;">
+            <div class="dialog-actions">
+                <button class="dialog-btn cancel" onclick="closeCustomDialog(false)">Cancelar</button>
+                <button class="dialog-btn confirm" id="dialogConfirmBtn" onclick="closeCustomDialog(true)">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu de Contexto (Botão Direito) -->
+    <div id="customContextMenu" style="display: none; position: fixed; background: var(--bg-glass); backdrop-filter: blur(12px); border: 1px solid var(--border-glass); border-radius: 8px; padding: 6px; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+        <button onclick="copiarTextoSelecionado()" style="background: transparent; border: none; color: var(--text-primary); padding: 8px 16px; cursor: pointer; border-radius: 6px; width: 100%; text-align: left; display: flex; gap: 8px; align-items: center; font-size: 0.9rem; transition: 0.2s;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Copiar Texto
+        </button>
+    </div>
+
+    <!-- Janela de Configurações Aprimorada -->
+    <div class="settings-modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2 id="settingsModalTitle" style="font-size: 1.2rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                     Configurações e Preferências</h2>
+                <button class="close-btn" onclick="fecharConfiguracoes()" aria-label="Fechar configurações">&times;</button>
+            </div>
+            
+            <div class="settings-modal-wrapper">
+                <div class="settings-sidebar" role="tablist" aria-label="Seções de configurações">
+                    <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchSettingsTab(event, 'geral')">Geral</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchSettingsTab(event, 'apis')">Chaves de API</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchSettingsTab(event, 'comportamento')">Comportamento</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchSettingsTab(event, 'ambiente')">Ambiente de Trabalho</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchSettingsTab(event, 'email')">E-mail</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchSettingsTab(event, 'atalhos')">Atalhos</button>
+                </div>
+                
+                <div class="settings-content-area">
+
+            <!-- ABA 1: GERAL -->
+            <div id="tab-geral" class="settings-tab">
+                
+                <!-- GRUPO: MODELO E IDIOMA -->
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Interface e Idioma</div>
+                    
+                    <label class="settings-label">Modelo de Interface (Exige reinício)</label>
+                    <select id="configInterfaceMode" class="settings-input" style="margin-bottom: 16px;">
+                        <option value="normal">Bridge (Padrão Multimodal)</option>
+                        <option value="high_contrast">Bridge Vox Alto Contraste (Para Baixa Visão)</option>
+                    </select>
+
+                    <label class="settings-label">Idioma da Interface</label>
+                    <select id="configLanguage" class="settings-input" style="margin-bottom: 0;">
+                        <option value="pt_BR">Português (Brasil)</option>
+                        <option value="en_US">English (US)</option>
+                        <option value="es_ES">Español</option>
+                    </select>
+                </div>
+
+                <!-- GRUPO: RECURSOS -->
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Recursos de IA e Voz</div>
+
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configAgente" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Modo Agente (Auto-Coder) - Permite à IA ler e editar arquivos
+                    </label>
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configAutoVoz" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Resposta por Voz Automática (A IA responde falando)
+                    </label>
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configBridgeVox" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Modo Always-Voice (Escuta o microfone diretamente)
+                    </label>
+                </div>
+
+                <!-- GRUPO: COMPORTAMENTO -->
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 10px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Comportamento do Sistema</div>
+
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configFullscreen" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Sempre iniciar o Bridge em tela cheia (F11 para alternar)
+                    </label>
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configStartup" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Iniciar Cromak Bridge junto com o Windows
+                    </label>
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configTray" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Minimizar para a bandeja do sistema ao fechar (Tray)
+                    </label>
+                </div>
+            </div>
+            
+            <!-- ABA 2: CHAVES DE API -->
+            <div id="tab-apis" class="settings-tab" style="display: none;">
+                <label class="settings-label">Provedor de IA Ativo</label>
+                <select id="configProvider" class="settings-input" style="margin-bottom: 20px; border-color: var(--accent-1);">
+                    <option value="gemini">Google Gemini</option>
+                    <option value="groq">Groq (Ultra-Rápido)</option>
+                    <option value="qwen">Alibaba Qwen Cloud</option>
+                    <option value="openai">OpenAI (ChatGPT)</option>
+                    <option value="claude">Anthropic Claude</option>
+                </select>
+
+                <!-- Gemini -->
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Google Gemini API Key</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('gemini')" aria-label="Abrir site oficial do Google AI Studio para gerar sua chave de API do Gemini">Gerar nova API...</button></label>
+                <div class="api-input-group">
+                    <input type="password" id="keyGemini" class="settings-input" placeholder="AIzaSy...">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyGemini')" title="Colar Área de Transferência">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyGemini')" title="Mostrar/Ocultar">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Qwen -->
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Alibaba Qwen API Key</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('qwen')" aria-label="Abrir console da Alibaba Qwen para gerar sua chave de API">Gerar nova API...</button></label>
+                <div class="api-input-group">
+                    <input type="password" id="keyQwen" class="settings-input" placeholder="sk-...">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyQwen')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyQwen')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- OpenAI -->
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>OpenAI API Key</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('openai')" aria-label="Abrir site da OpenAI para gerar sua chave de API do ChatGPT">Gerar nova API...</button></label>
+                <div class="api-input-group">
+                    <input type="password" id="keyOpenai" class="settings-input" placeholder="sk-...">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyOpenai')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyOpenai')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Groq -->
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Groq API Key (Ultra-Rápido)</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('groq')" aria-label="Abrir console da Groq para gerar sua chave de API">Gerar nova API...</button></label>
+                <div class="api-input-group">
+                    <input type="password" id="keyGroq" class="settings-input" placeholder="gsk_...">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyGroq')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyGroq')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Claude -->
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Anthropic Claude API Key</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('claude')" aria-label="Abrir console da Anthropic para gerar sua chave de API do Claude">Gerar nova API...</button></label>
+                <div class="api-input-group">
+                    <input type="password" id="keyClaude" class="settings-input" placeholder="sk-ant-...">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyClaude')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyClaude')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.8rem; color: var(--text-secondary); text-align: left;">As chaves são salvas localmente no seu dispositivo.</p>
+            </div>
+
+            <!-- ABA 3: COMPORTAMENTO -->
+            <div id="tab-comportamento" class="settings-tab" style="display: none;">
+                <label class="settings-label">Perfil de Resposta (Predefinições)</label>
+                <select id="presetComportamento" class="settings-input" style="margin-bottom: 16px;" onchange="aplicarPresetComportamento()">
+                    <option value="">Personalizado (Escreva abaixo)</option>
+                    <option value="assistente">Assistente Padrão (Objetivo e direto)</option>
+                    <option value="programador">Programador Sênior (Foco em Clean Code)</option>
+                    <option value="escritor">Escritor Criativo (Foco em Copywriting e Persuasão)</option>
+                </select>
+
+                <label class="settings-label">Instruções Customizadas (System Prompt)</label>
+                <textarea id="configSystemPrompt" class="settings-input" style="height: 120px; resize: none; font-family: inherit;" placeholder="Defina regras globais de comportamento para a IA responder..."></textarea>
+                
+            </div>
+            
+            <!-- ABA: AMBIENTE DE TRABALHO -->
+            <div id="tab-ambiente" class="settings-tab" style="display: none;">
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: var(--text-primary); font-size: 1.1rem; margin-bottom: 4px;">Rotas Locais do Usuário (Escopo Seguro / Sandboxed)</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">O Bridge detecta automaticamente as pastas reais do seu Windows (mesmo em outras partições como D: ou E:). A busca inteligente de arquivos da IA atua exclusivamente dentro dessas 6 pastas para máxima velocidade e segurança.</p>
+                </div>
+                
+                <label class="settings-label" for="pathDesktop">Pasta Área de Trabalho (Desktop)</label>
+                <input type="text" id="pathDesktop" class="settings-input" style="margin-bottom: 14px;" placeholder="Ex: D:\Users\Marcos\Área de Trabalho">
+                
+                <label class="settings-label" for="pathDocuments">Pasta Documentos</label>
+                <input type="text" id="pathDocuments" class="settings-input" style="margin-bottom: 14px;" placeholder="Ex: D:\Users\Marcos\Documentos">
+                
+                <label class="settings-label" for="pathDownloads">Pasta Downloads</label>
+                <input type="text" id="pathDownloads" class="settings-input" style="margin-bottom: 14px;" placeholder="Ex: D:\Users\Marcos\Downloads">
+
+                <label class="settings-label" for="pathMusic">Pasta Músicas</label>
+                <input type="text" id="pathMusic" class="settings-input" style="margin-bottom: 14px;" placeholder="Ex: E:\Users\Marcos\Músicas">
+
+                <label class="settings-label" for="pathPictures">Pasta Imagens</label>
+                <input type="text" id="pathPictures" class="settings-input" style="margin-bottom: 14px;" placeholder="Ex: D:\Users\Marcos\Imagens">
+
+                <label class="settings-label" for="pathVideos">Pasta Vídeos</label>
+                <input type="text" id="pathVideos" class="settings-input" style="margin-bottom: 14px;" placeholder="Ex: E:\Users\Marcos\Vídeos">
+            </div>
+
+            <!-- ABA 4: E-MAIL -->
+            <div id="tab-email" class="settings-tab" style="display: none;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <div style="width: 60px; height: 60px; background: var(--surface-2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 1px solid var(--border-glass); box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </div>
+                    <h3 style="color: var(--text-primary); font-size: 1.1rem; margin-bottom: 4px;">Configuração de E-mail</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); max-width: 80%; margin: 0 auto;">Preencha para permitir que a IA envie e leia e-mails ocultamente na sua conta.</p>
+                </div>
+                
+                <label class="settings-label">Seu E-mail (Gmail)</label>
+                <div class="api-input-group" style="margin-bottom: 16px;">
+                    <input type="email" id="keyEmail" class="settings-input" placeholder="seuemail@gmail.com">
+                </div>
+
+                <label class="settings-label">Senha de Aplicativo (16 dígitos)</label>
+                <div class="api-input-group">
+                    <input type="password" id="keyEmailPass" class="settings-input" placeholder="xxxx xxxx xxxx xxxx">
+                    <div class="api-actions">
+                        <button type="button" class="inline-icon-btn" onclick="colarTexto('keyEmailPass')" title="Colar">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('keyEmailPass')" title="Mostrar">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: ATALHOS -->
+            <div id="tab-atalhos" class="settings-tab" style="display: none; max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Atalhos Principais</div>
+                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 16px;">Clique no campo e pressione a tecla desejada.</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label class="settings-label">Ligar Microfone</label>
+                            <input type="text" id="shortMic" class="settings-input shortcut-input" readonly value="F2">
+                        </div>
+                        <div>
+                            <label class="settings-label">Parar Áudio (Calar boca)</label>
+                            <input type="text" id="shortStop" class="settings-input shortcut-input" readonly value="Escape">
+                        </div>
+                        <div>
+                            <label class="settings-label">Ajuda Contextual</label>
+                            <input type="text" id="shortHelp" class="settings-input shortcut-input" readonly value="F1">
+                        </div>
+                        <div>
+                            <label class="settings-label">Encerrar Sistema</label>
+                            <input type="text" id="shortExit" class="settings-input shortcut-input" readonly value="F4">
+                        </div>
+                        <div>
+                            <label class="settings-label">Limpar Chat</label>
+                            <input type="text" id="shortClear" class="settings-input shortcut-input" readonly value="F5">
+                        </div>
+                        <div>
+                            <label class="settings-label">Abrir Configurações</label>
+                            <input type="text" id="shortConfig" class="settings-input shortcut-input" readonly value="F10">
+                        </div>
+                        <div>
+                            <label class="settings-label">Restaurar da Bandeja (Global)</label>
+                            <input type="text" class="settings-input" readonly value="Ctrl + Espaço / Alt + Espaço" style="color: var(--accent-1); font-weight: bold; background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15);">
+                        </div>
+                        <div>
+                            <label class="settings-label">Reler Resposta da IA (NVDA)</label>
+                            <input type="text" class="settings-input" readonly value="F3 / Ctrl + L" style="color: var(--accent-1); font-weight: bold; background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15);">
+                        </div>
+                        <div>
+                            <label class="settings-label">Alternar Tela Cheia</label>
+                            <input type="text" class="settings-input" readonly value="F11" style="color: var(--accent-1); font-weight: bold; background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15);">
+                        </div>
+                        <div>
+                            <label class="settings-label">Navegar no Chat (NVDA)</label>
+                            <input type="text" class="settings-input" readonly value="Seta Cima / Baixo" style="color: var(--accent-1); font-weight: bold; background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15);">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Atalhos de Acesso Rápido (Vox Mode)</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label class="settings-label">Editor de Texto</label>
+                            <input type="text" id="shortTxt" class="settings-input shortcut-input" readonly value="T">
+                        </div>
+                        <div>
+                            <label class="settings-label">E-mail</label>
+                            <input type="text" id="shortMail" class="settings-input shortcut-input" readonly value="R">
+                        </div>
+                        <div>
+                            <label class="settings-label">Pesquisa Web</label>
+                            <input type="text" id="shortWeb" class="settings-input shortcut-input" readonly value="I">
+                        </div>
+                        <div>
+                            <label class="settings-label">Arquivos</label>
+                            <input type="text" id="shortFiles" class="settings-input shortcut-input" readonly value="A">
+                        </div>
+                        <div>
+                            <label class="settings-label">Calculadora</label>
+                            <input type="text" id="shortCalc" class="settings-input shortcut-input" readonly value="C">
+                        </div>
+                        <div>
+                            <label class="settings-label">WhatsApp</label>
+                            <input type="text" id="shortWhats" class="settings-input shortcut-input" readonly value="Z">
+                        </div>
+                    </div>
+                    <button class="dialog-btn cancel" onclick="resetShortcuts()" style="margin-top: 20px; width: 100%;">Restaurar Todos os Padrões</button>
+                </div>
+            </div>
+
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: auto; padding-top: 24px;">
+                <button class="dialog-btn cancel" onclick="fecharConfiguracoes()">Cancelar</button>
+                <button class="dialog-btn confirm" onclick="salvarConfiguracoes()">Salvar Alterações</button>
+            </div>
+            </div> <!-- Fim de settings-content-area -->
+        </div>
+    </div>
+</div>
+
+    <!-- SPOTLIGHT OVERLAY -->
+    <div id="spotlightOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 100000; align-items: flex-start; justify-content: center; padding-top: 15vh;">
+        <div style="background: rgba(15, 15, 20, 0.9); border: 1px solid var(--border-glass); border-radius: 12px; width: 90%; max-width: 700px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden;">
+            <div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border-glass);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 16px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="spotlightInput" placeholder="Faça uma pergunta rápida para o Cromak Bridge..." style="flex: 1; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none;" onkeydown="handleSpotlightKey(event)" autocomplete="off">
+                <button onclick="fecharSpotlight()" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div id="spotlightResult" style="padding: 0; max-height: 50vh; overflow-y: auto; color: var(--text-primary); font-size: 1rem; line-height: 1.5; display: none;">
+                <!-- Conteúdo da resposta será injetado aqui -->
+            </div>
+        </div>
+    </div>
+
+
+        <!-- ABOUT MODAL -->
+    <div id="aboutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; align-items: flex-start; justify-content: center; padding-top: 10vh;">
+        <div style="background: rgba(15, 15, 20, 0.95); border: 1px solid var(--border-glass); border-radius: 12px; width: 680px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; position: relative;">
+            <div style="padding: 30px; display: flex; flex-direction: column; gap: 24px;">
+                <button onclick="document.getElementById('aboutModal').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                
+                <div style="display: flex; gap: 24px;">
+                    <!-- Info -->
+                    <div style="flex: 1;">
+                        <h2 style="margin: 0 0 5px 0; font-size: 1.8rem; color: var(--text-primary); font-weight: 600; letter-spacing: -0.5px;">CROMAK Bridge</h2>
+                        <p id="aboutAppVersion" style="margin: 0 0 20px 0; color: var(--text-secondary); font-size: 0.9rem;">Version 1.3.5 (build 2026.10) | Matrix Core</p>
+                        
+                        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; align-items: center;">
+                            <div style="color: var(--text-secondary);">License:</div>
+                            <div><span id="aboutStatusLicenca" style="background: rgba(34, 197, 94, 0.2); color: #22c55e; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; border: 1px solid rgba(34, 197, 94, 0.3);">Grátis para Usar</span></div>
+                            
+                            <div style="color: var(--text-secondary);">Registered to:</div>
+                            <div style="color: #a1a1aa; font-weight: bold;">Unregistered</div>
+                            
+                            <div style="color: var(--text-secondary);">Serial Number:</div>
+                            <div><input type="text" id="aboutSerialKey" class="settings-input" style="padding: 6px; font-size: 0.85rem; width: 220px; text-align: center; font-family: monospace; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); color: #a1a1aa;" value="NO-KEY-REGISTERED" readonly></div>
+                        </div>
+                        
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 15px;">O Cromak Bridge é o motor de IA onipresente da suíte Matrix Core. Projetado para integração avançada de fluxo de trabalho, o sistema atua na camada estrutural do Windows, oferecendo execução autônoma de scripts (Auto-Coder) e iteração multimodal através das APIs mais avançadas do mundo.</p>
+                        <p style="font-size: 0.8rem; color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); text-align: center; margin-bottom: 25px;">Aviso: A execução de comandos do Modo Agente atua diretamente no sistema hospedeiro. Verifique as configurações de segurança recomendadas.</p>
+
+                        <div style="margin-top: 14px; margin-bottom: 20px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                            <strong style="color: var(--accent-1); display: block; margin-bottom: 4px;">Validação Técnica e Acessibilidade</strong>
+                            Agradecimento especial a <strong style="color: var(--text-primary);"><a href="https://torniero.com.br" target="_blank" style="color: inherit; text-decoration: underline;">Gustavo Torniero</a></strong> (Jornalista e Consultor em Acessibilidade Digital) pelo suporte técnico voluntário na validação prática da navegação por leitor de telas (NVDA) no Bridge Vox 1.3.5.
+                        </div>
+                        
+                                                <!-- Buttons -->
+                        <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+                            <button class="dialog-btn" style="flex: 1; padding: 10px; font-size: 0.85rem; border-color: var(--accent-1); color: var(--accent-1); background: rgba(255, 255, 0, 0.1);" onclick="pywebview.api.abrir_link('https://cromaktechnology.github.io/pt/donate.html')">Apoiar Projeto / Doações</button>
+                            <button id="btnVerificarUpdate" class="dialog-btn" style="flex: 1; padding: 10px; font-size: 0.85rem; background: #27272a; color: #e4e4e7; border-color: #3f3f46;" onclick="verificarAtualizacaoOnline()" aria-label="Verificar se há atualizações do Cromak Bridge online">Verificar Atualizações</button>
+                            <button class="dialog-btn" style="flex: 1; padding: 10px; font-size: 0.85rem; background: #27272a; color: #e4e4e7; border-color: #3f3f46;" onclick="pywebview.api.abrir_link('https://cromaktechnology.github.io/pt/suporte.html')">Suporte Técnico</button>
+                        </div>
+                        
+                        <!-- Links -->
+                        <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 25px;">
+                            <a href="#" onclick="pywebview.api.abrir_arquivo('docs/eula.txt')" style="color: var(--accent-2); text-decoration: underline; font-size: 0.9rem;">EULA</a>
+                            <a href="#" onclick="pywebview.api.abrir_arquivo('docs/privacy.txt')" style="color: var(--accent-2); text-decoration: underline; font-size: 0.9rem;">Privacy Policy</a>
+                            <a href="#" onclick="pywebview.api.abrir_arquivo('docs/readme.txt')" style="color: var(--accent-2); text-decoration: underline; font-size: 0.9rem;">Readme File</a>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div style="font-size: 0.8rem; color: #52525b; border-top: 1px solid var(--border-glass); padding-top: 15px;">
+                            © 2026 Cromak Technology. All rights reserved.
+                        </div>
+                    </div>
+
+                    <!-- Logo -->
+                    <div style="width: 110px; height: 110px; flex-shrink: 0;">
+                        <img src="cromak-bridge.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.3));">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="lib/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Ambientes Virtuais
+.venv/
+venv/
+ENV/
+env/
+
+# Builds e Executáveis
+dist/
+build/
+Output/
+*.exe
+*.spec
+
+# Arquivos de Configuração Locais e Chaves de API
+config*.json
+config/
+*.key
+*.pem
+
+# Backups e Logs locais
+backup/
+*.log
+*.tmp
+*.bak
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema Operacional
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

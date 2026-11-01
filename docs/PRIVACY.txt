@@ -1,0 +1,45 @@
+================================================================================
+                        POLÍTICA DE PRIVACIDADE
+                           CROMAK BRIDGE VOX
+================================================================================
+Versão: 1.3.5 | Matrix Core
+Atualização: Novembro de 2026
+
+A Cromak Technology leva a sua privacidade e soberania de dados com o mais alto 
+rigor técnico. O Cromak Bridge Vox foi construído sob a premissa de que os seus 
+dados pertencem exclusivamente a você.
+
+1. PROCESSAMENTO LOCAL (LOCAL-FIRST)
+O Cromak Bridge Vox não possui servidores centrais, bancos de dados em nuvem ou 
+painéis de monitoramento telemétrico da Cromak Technology. 
+Toda a configuração de sistema, histórico de conversas, agenda pessoal (SQLite) 
+e chaves de API que você insere no programa são salvas estritamente no seu 
+armazenamento local (AppData\Roaming\Cromak Technology\Bridge Vox).
+
+2. COMUNICAÇÃO DIRETA COM PROVEDORES (BYOK)
+As mensagens e arquivos que você envia para a Inteligência Artificial saem do 
+seu computador e vão DIRETAMENTE para os servidores oficiais do provedor que 
+você escolheu (Groq LPU, Google Gemini, OpenAI, Anthropic Claude ou Alibaba Qwen). 
+A Cromak Technology nunca atua como interceptadora e não possui acesso a 
+nenhum dos seus prompts, documentos ou arquivos.
+
+3. COLETA DE TELEMETRIA INEXISTENTE
+- Não rastreamos suas sessões de chat.
+- Não gravamos sua voz. O processamento de áudio é feito diretamente via microfone
+  local e enviado apenas para transcrição segura nas APIs configuradas.
+- Não indexamos nem transferimos os arquivos manipulados pelo recurso Auto-Coder.
+
+4. SEGURANÇA DAS CHAVES (API KEYS)
+Suas chaves são armazenadas localmente de forma isolada. Recomenda-se que você 
+configure limites de gastos (quotas) diretamente nos painéis dos provedores 
+(ex: console.groq.com ou aistudio.google.com) para manter total controle 
+financeiro sobre as suas contas.
+
+5. ACESSO AOS ARQUIVOS (MODO AGENTE)
+O Bridge Vox necessita de permissão para ler e gravar em pastas do usuário quando 
+você solicita ações de "Gerenciamento de Arquivos", "Criação de Planilhas/PDFs" 
+ou "Auto-Coder". Essas ações operam exclusivamente sob demanda do usuário e sob 
+os níveis de privilégio da sua conta do Windows.
+
+Ao utilizar o Cromak Bridge Vox, você aceita estas diretrizes de privacidade.
+================================================================================
