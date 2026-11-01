@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="https://cromaktechnology.github.io/images/cromak_technology_logo_small.png" alt="Cromak Technology Logo" width="90" style="margin-bottom: 10px;" />
+  <img src="https://cromaktechnology.github.io/images/cromaklogoa.png" alt="Cromak Technology Logo" width="256" style="margin-bottom: 10px;" />
 
   # 🎙️ Cromak Bridge Vox
 
