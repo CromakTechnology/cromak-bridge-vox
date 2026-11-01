@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     container.innerHTML = `
                         <div class="empty-state" id="emptyState" role="region" aria-label="Início de nova conversa. Escolha um comando rápido abaixo ou digite sua mensagem no campo de texto">
                             <div class="empty-icon-glow">
-                                <img src="${document.body.classList.contains('high-contrast-theme') ? 'lib/bridge-vox.png' : 'cromak-bridge.ico'}" alt="Logo do Cromak Bridge" class="empty-icon" onerror="this.style.display='none'">
+                                <img src="${document.body.classList.contains('high-contrast-theme') ? 'lib/bridge-vox.png' : 'lib/cromak-bridge.ico'}" alt="Logo do Cromak Bridge" class="empty-icon" onerror="this.style.display='none'">
                             </div>
                             <h2>Como posso ajudar você hoje no seu computador?</h2>
                             <p>Escolha um comando rápido abaixo ou digite sua pergunta para começar.</p>
@@ -1040,25 +1040,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         
+        let gravandoAudio = false;
+
+        function cancelarAudio() {
+            if (!gravandoAudio) return;
+            gravandoAudio = false;
+            esconderOverlayVoz();
+            if (window.pywebview && pywebview.api) {
+                if (typeof pywebview.api.cancelar_audio === 'function') {
+                    pywebview.api.cancelar_audio();
+                } else if (typeof pywebview.api.parar_audio === 'function') {
+                    pywebview.api.parar_audio();
+                }
+            }
+            anunciarParaLeitorDeTela("Gravação cancelada.");
+            focarCampoMensagem();
+        }
+
         function toggleAudio(autoEnviar = true) { 
+            if (gravandoAudio) {
+                // Se já estiver ouvindo, pressionar F2 cancela imediatamente
+                cancelarAudio();
+                return;
+            }
+
+            gravandoAudio = true;
             mostrarOverlayVoz();
-            anunciarParaLeitorDeTela("Microfone ativado. Fale após o bipe.");
+            anunciarParaLeitorDeTela("Microfone ativado. Fale após o bipe. Pressione F2 para cancelar.");
             
             pywebview.api.gravar_audio().then(texto => { 
+                if (!gravandoAudio) return; // Foi cancelado durante a captura
+                gravandoAudio = false;
                 esconderOverlayVoz();
+
                 if (!texto || texto.startsWith("[Erro]")) {
                     mostrarToastErro(texto || "[Erro] Não consegui ouvir.");
                     anunciarParaLeitorDeTela(texto || "Não consegui ouvir. Tente novamente com F2.");
                     focarCampoMensagem();
+                } else if (texto.startsWith("[Cancelado]")) {
+                    anunciarParaLeitorDeTela("Gravação cancelada.");
+                    focarCampoMensagem();
                 } else {
                     const inp = document.getElementById('userInput');
-                    inp.value = texto;
+                    if (inp) inp.value = texto;
                     focarCampoMensagem();
                     if (autoEnviar && typeof sendMessage === 'function') {
                         sendMessage();
                     }
                 }
             }).catch(e => {
+                if (!gravandoAudio) return;
+                gravandoAudio = false;
                 esconderOverlayVoz();
                 mostrarToastErro("[Erro] Falha no microfone.");
                 focarCampoMensagem();
@@ -1066,15 +1098,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function toggleAudioDuel() { 
+            if (gravandoAudio) {
+                cancelarAudio();
+                return;
+            }
+
+            gravandoAudio = true;
             mostrarOverlayVoz();
             pywebview.api.gravar_audio().then(texto => { 
+                if (!gravandoAudio) return;
+                gravandoAudio = false;
                 esconderOverlayVoz();
-                if (texto.startsWith("[Erro]")) {
+
+                if (texto && !texto.startsWith("[Erro]") && !texto.startsWith("[Cancelado]")) {
+                    const dInp = document.getElementById('duelInput');
+                    if (dInp) dInp.value = texto;
+                } else if (texto && texto.startsWith("[Erro]")) {
                     mostrarToastErro(texto);
-                } else {
-                    document.getElementById('duelInput').value = texto; 
                 }
             }).catch(e => {
+                if (!gravandoAudio) return;
+                gravandoAudio = false;
                 esconderOverlayVoz();
                 mostrarToastErro("[Erro] Falha no microfone.");
             }); 
@@ -1098,21 +1142,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 overlay.style.alignItems = 'center';
                 overlay.style.justifyContent = 'center';
                 overlay.style.flexDirection = 'column';
+                overlay.style.userSelect = 'none';
                 
                 overlay.innerHTML = `
-                    <div style="background: rgba(15, 15, 20, 0.9); border: 1px solid var(--accent-1); border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px var(--accent-1); animation: pulsar 1.5s infinite;">
+                    <div id="vozOverlayCircle" style="background: rgba(15, 15, 20, 0.9); border: 1px solid var(--accent-1); border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px var(--accent-1); animation: pulsar 1.5s infinite; cursor: pointer;" title="Clique para cancelar (F2 / Esc)">
                         <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                     </div>
                     <h2 style="color: white; margin-top: 30px; font-family: 'Inter', sans-serif; font-weight: 500;">Ouvindo...</h2>
                     <p style="color: #a1a1aa; font-family: 'Inter', sans-serif; font-size: 0.9rem;">Fale claramente no microfone (5 segundos)</p>
+                    <button type="button" id="vozBtnCancelar" style="margin-top: 18px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #e4e4e7; padding: 8px 22px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 8px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        Cancelar (F2 ou Esc)
+                    </button>
                     <style>
                         @keyframes pulsar {
                             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7); }
                             70% { transform: scale(1); box-shadow: 0 0 0 30px rgba(124, 58, 237, 0); }
                             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
                         }
+                        #vozBtnCancelar:hover {
+                            background: rgba(239, 68, 68, 0.2) !important;
+                            border-color: #ef4444 !important;
+                            color: #fca5a5 !important;
+                        }
                     </style>
                 `;
+                
+                overlay.addEventListener('click', () => {
+                    cancelarAudio();
+                });
+                
                 document.body.appendChild(overlay);
             }
             overlay.style.display = 'flex';
@@ -2139,7 +2198,13 @@ window.addEventListener('keydown', (e) => {
 
     // 4. Tecla ESCAPE: Interromper áudio / síntese de voz e fechar modais
     if (e.key === 'Escape') {
+        if (typeof gravandoAudio !== 'undefined' && gravandoAudio) {
+            e.preventDefault();
+            cancelarAudio();
+            return;
+        }
         if (typeof stopBtn !== 'undefined' && stopBtn) stopBtn.click();
+        if (typeof fecharSobre === 'function') fecharSobre();
         if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis) {
             window.speechSynthesis.cancel();
         }

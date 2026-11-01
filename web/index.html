@@ -26,7 +26,7 @@
             <button onclick="document.getElementById('apiSetupOverlay').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
             <div style="display: flex; justify-content: center; margin-bottom: 20px;">
                 <div class="empty-icon-glow" style="width: 100px; height: 100px; margin-bottom: 0;">
-                    <img src="cromak-bridge.png" alt="Cromak Bridge" style="width: 98px; height: 98px; object-fit: contain;" onerror="this.style.display='none'">
+                    <img src="lib/cromak-bridge.png" alt="Cromak Bridge" style="width: 98px; height: 98px; object-fit: contain;" onerror="this.style.display='none'">
                 </div>
             </div>
             <h2 style="text-align: center; margin-bottom: 8px;">Bem-vindo ao Cromak Bridge</h2>
@@ -110,7 +110,7 @@
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
             <div class="logo">
-                <img src="cromak-bridge.png" alt="Cromak Bridge" class="logo-icon-img">
+                <img src="lib/cromak-bridge.png" alt="Cromak Bridge" class="logo-icon-img">
                 Cromak Bridge
             </div>
 
@@ -739,59 +739,59 @@
 
 
         <!-- ABOUT MODAL -->
-    <div id="aboutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; align-items: flex-start; justify-content: center; padding-top: 10vh;">
-        <div style="background: rgba(15, 15, 20, 0.95); border: 1px solid var(--border-glass); border-radius: 12px; width: 680px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; position: relative;">
-            <div style="padding: 30px; display: flex; flex-direction: column; gap: 24px;">
-                <button onclick="document.getElementById('aboutModal').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+    <div id="aboutModal" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.75); backdrop-filter: blur(10px); z-index: 10000; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box;">
+        <div style="background: rgba(15, 15, 20, 0.97); border: 1px solid var(--border-glass); border-radius: 16px; width: 880px; max-width: 94vw; max-height: 90vh; box-shadow: 0 30px 60px rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow-y: auto; position: relative;">
+            <div style="padding: 36px 40px; display: flex; flex-direction: column; gap: 24px;">
+                <button onclick="document.getElementById('aboutModal').style.display='none'" aria-label="Fechar janela Sobre" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-secondary)'"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                 
-                <div style="display: flex; gap: 24px;">
+                <div style="display: flex; gap: 32px; align-items: flex-start;">
                     <!-- Info -->
                     <div style="flex: 1;">
-                        <h2 style="margin: 0 0 5px 0; font-size: 1.8rem; color: var(--text-primary); font-weight: 600; letter-spacing: -0.5px;">CROMAK Bridge</h2>
-                        <p id="aboutAppVersion" style="margin: 0 0 20px 0; color: var(--text-secondary); font-size: 0.9rem;">Version 1.3.5 (build 2026.10) | Matrix Core</p>
+                        <h2 style="margin: 0 0 6px 0; font-size: 1.9rem; color: var(--text-primary); font-weight: 600; letter-spacing: -0.5px;">CROMAK Bridge</h2>
+                        <p id="aboutAppVersion" style="margin: 0 0 22px 0; color: var(--text-secondary); font-size: 0.92rem;">Version 1.3.5 (build 2026.10) | Matrix Core</p>
                         
-                        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; align-items: center;">
+                        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 10px; margin-bottom: 22px; font-size: 0.92rem; align-items: center;">
                             <div style="color: var(--text-secondary);">License:</div>
-                            <div><span id="aboutStatusLicenca" style="background: rgba(34, 197, 94, 0.2); color: #22c55e; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; border: 1px solid rgba(34, 197, 94, 0.3);">Grátis para Usar</span></div>
+                            <div><span id="aboutStatusLicenca" style="background: rgba(34, 197, 94, 0.2); color: #22c55e; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 0.82rem; border: 1px solid rgba(34, 197, 94, 0.3);">Grátis para Usar</span></div>
                             
                             <div style="color: var(--text-secondary);">Registered to:</div>
                             <div style="color: #a1a1aa; font-weight: bold;">Unregistered</div>
                             
                             <div style="color: var(--text-secondary);">Serial Number:</div>
-                            <div><input type="text" id="aboutSerialKey" class="settings-input" style="padding: 6px; font-size: 0.85rem; width: 220px; text-align: center; font-family: monospace; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); color: #a1a1aa;" value="NO-KEY-REGISTERED" readonly></div>
+                            <div><input type="text" id="aboutSerialKey" class="settings-input" style="padding: 7px 12px; font-size: 0.88rem; width: 240px; text-align: center; font-family: monospace; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); color: #a1a1aa; margin-bottom: 0;" value="NO-KEY-REGISTERED" readonly></div>
                         </div>
                         
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 15px;">O Cromak Bridge é o motor de IA onipresente da suíte Matrix Core. Projetado para integração avançada de fluxo de trabalho, o sistema atua na camada estrutural do Windows, oferecendo execução autônoma de scripts (Auto-Coder) e iteração multimodal através das APIs mais avançadas do mundo.</p>
-                        <p style="font-size: 0.8rem; color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); text-align: center; margin-bottom: 25px;">Aviso: A execução de comandos do Modo Agente atua diretamente no sistema hospedeiro. Verifique as configurações de segurança recomendadas.</p>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">O Cromak Bridge é o motor de IA onipresente da suíte Matrix Core. Projetado para integração avançada de fluxo de trabalho, o sistema atua na camada estrutural do Windows, oferecendo execução autônoma de scripts (Auto-Coder) e iteração multimodal através das APIs mais avançadas do mundo.</p>
+                        <p style="font-size: 0.84rem; color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); text-align: center; margin-bottom: 22px; line-height: 1.5;">Aviso: A execução de comandos do Modo Agente atua diretamente no sistema hospedeiro. Verifique as configurações de segurança recomendadas.</p>
 
-                        <div style="margin-top: 14px; margin-bottom: 20px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-                            <strong style="color: var(--accent-1); display: block; margin-bottom: 4px;">Validação Técnica e Acessibilidade</strong>
+                        <div style="margin-top: 14px; margin-bottom: 24px; padding: 14px 18px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
+                            <strong style="color: var(--accent-1); display: block; margin-bottom: 6px;">Validação Técnica e Acessibilidade</strong>
                             Agradecimento especial a <strong style="color: var(--text-primary);"><a href="https://torniero.com.br" target="_blank" style="color: inherit; text-decoration: underline;">Gustavo Torniero</a></strong> (Jornalista e Consultor em Acessibilidade Digital) pelo suporte técnico voluntário na validação prática da navegação por leitor de telas (NVDA) no Bridge Vox 1.3.5.
                         </div>
                         
-                                                <!-- Buttons -->
-                        <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-                            <button class="dialog-btn" style="flex: 1; padding: 10px; font-size: 0.85rem; border-color: var(--accent-1); color: var(--accent-1); background: rgba(255, 255, 0, 0.1);" onclick="pywebview.api.abrir_link('https://cromaktechnology.github.io/pt/donate.html')">Apoiar Projeto / Doações</button>
-                            <button id="btnVerificarUpdate" class="dialog-btn" style="flex: 1; padding: 10px; font-size: 0.85rem; background: #27272a; color: #e4e4e7; border-color: #3f3f46;" onclick="verificarAtualizacaoOnline()" aria-label="Verificar se há atualizações do Cromak Bridge online">Verificar Atualizações</button>
-                            <button class="dialog-btn" style="flex: 1; padding: 10px; font-size: 0.85rem; background: #27272a; color: #e4e4e7; border-color: #3f3f46;" onclick="pywebview.api.abrir_link('https://cromaktechnology.github.io/pt/suporte.html')">Suporte Técnico</button>
+                        <!-- Buttons -->
+                        <div style="display: flex; gap: 14px; margin-bottom: 25px; flex-wrap: wrap;">
+                            <button class="dialog-btn" style="flex: 1; min-width: 190px; padding: 11px 16px; font-size: 0.88rem; border-color: var(--accent-1); color: var(--accent-1); background: rgba(255, 255, 0, 0.08); white-space: nowrap; cursor: pointer;" onclick="pywebview.api.abrir_link('https://cromaktechnology.github.io/pt/donate.html')">Apoiar Projeto / Doações</button>
+                            <button id="btnVerificarUpdate" class="dialog-btn" style="flex: 1; min-width: 190px; padding: 11px 16px; font-size: 0.88rem; background: #27272a; color: #e4e4e7; border-color: #3f3f46; white-space: nowrap; cursor: pointer;" onclick="verificarAtualizacaoOnline()" aria-label="Verificar se há atualizações do Cromak Bridge online">Verificar Atualizações</button>
+                            <button class="dialog-btn" style="flex: 1; min-width: 190px; padding: 11px 16px; font-size: 0.88rem; background: #27272a; color: #e4e4e7; border-color: #3f3f46; white-space: nowrap; cursor: pointer;" onclick="pywebview.api.abrir_link('https://cromaktechnology.github.io/pt/suporte.html')">Suporte Técnico</button>
                         </div>
                         
                         <!-- Links -->
-                        <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 25px;">
+                        <div style="display: flex; gap: 24px; justify-content: center; margin-bottom: 25px;">
                             <a href="#" onclick="pywebview.api.abrir_arquivo('docs/eula.txt')" style="color: var(--accent-2); text-decoration: underline; font-size: 0.9rem;">EULA</a>
                             <a href="#" onclick="pywebview.api.abrir_arquivo('docs/privacy.txt')" style="color: var(--accent-2); text-decoration: underline; font-size: 0.9rem;">Privacy Policy</a>
                             <a href="#" onclick="pywebview.api.abrir_arquivo('docs/readme.txt')" style="color: var(--accent-2); text-decoration: underline; font-size: 0.9rem;">Readme File</a>
                         </div>
                         
                         <!-- Footer -->
-                        <div style="font-size: 0.8rem; color: #52525b; border-top: 1px solid var(--border-glass); padding-top: 15px;">
+                        <div style="font-size: 0.82rem; color: #71717a; border-top: 1px solid var(--border-glass); padding-top: 16px; text-align: center;">
                             © 2026 Cromak Technology. All rights reserved.
                         </div>
                     </div>
 
                     <!-- Logo -->
-                    <div style="width: 110px; height: 110px; flex-shrink: 0;">
-                        <img src="cromak-bridge.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.3));">
+                    <div style="width: 120px; height: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: 16px; padding: 12px; box-sizing: border-box;">
+                        <img src="lib/cromak-bridge.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.3));">
                     </div>
                 </div>
             </div>

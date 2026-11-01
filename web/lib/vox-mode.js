@@ -74,8 +74,12 @@ window.addEventListener('keydown', (e) => {
         return;
     }
     
-    if (match(sc.stop)) {
+    if (match(sc.stop) || e.key === 'Escape') {
         e.preventDefault();
+        if (gravando) {
+            cancelarGravacao();
+            return;
+        }
         pywebview.api.parar_audio();
         return;
     }
@@ -113,8 +117,25 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
+function cancelarGravacao() {
+    if (!gravando) return;
+    gravando = false;
+    const micCircle = document.getElementById('micCircle');
+    const statusTxt = document.getElementById('voxStatus');
+    const outTxt = document.getElementById('voxTextOutput');
+    if (micCircle) micCircle.className = 'vox-mic-circle';
+    if (statusTxt) statusTxt.innerText = "Gravação cancelada. Pressione ESPAÇO para falar.";
+    if (window.pywebview && pywebview.api) {
+        if (typeof pywebview.api.cancelar_audio === 'function') pywebview.api.cancelar_audio();
+        else if (typeof pywebview.api.parar_audio === 'function') pywebview.api.parar_audio();
+    }
+}
+
 function toggleMicrofone() {
-    if (gravando) return; // Ja esta processando
+    if (gravando) {
+        cancelarGravacao();
+        return;
+    }
 
     // Se a IA estiver falando algo, a barra de espaco corta a fala dela
     if (cromakAudioAtual && !cromakAudioAtual.paused) {
@@ -267,8 +288,25 @@ window.addEventListener('keydown', (e) => {
                 if(typeof adicionarMensagem !== 'undefined') adicionarMensagem(resp, 'ai');
             }
         });
+function cancelarGravacao() {
+    if (!gravando) return;
+    gravando = false;
+    const micCircle = document.getElementById('micCircle');
+    const statusTxt = document.getElementById('voxStatus');
+    const outTxt = document.getElementById('voxTextOutput');
+    if (micCircle) micCircle.className = 'vox-mic-circle';
+    if (statusTxt) statusTxt.innerText = "Gravação cancelada. Pressione ESPAÇO para falar.";
+    if (window.pywebview && pywebview.api) {
+        if (typeof pywebview.api.cancelar_audio === 'function') pywebview.api.cancelar_audio();
+        else if (typeof pywebview.api.parar_audio === 'function') pywebview.api.parar_audio();
+    }
+}
+
 function toggleMicrofone() {
-    if (gravando) return; // Ja esta processando
+    if (gravando) {
+        cancelarGravacao();
+        return;
+    }
 
     // Se a IA estiver falando algo, a barra de espaco corta a fala dela
     if (cromakAudioAtual && !cromakAudioAtual.paused) {

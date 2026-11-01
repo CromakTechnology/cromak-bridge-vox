@@ -690,6 +690,20 @@ class ApiBackend:
     def gravar_audio(self):
         return self.audio.ouvir()
 
+    def cancelar_audio(self):
+        """Interrompe imediatamente a gravação e cancela a escuta de voz."""
+        try:
+            if hasattr(self, "audio") and self.audio:
+                self.audio.cancelar()
+        except Exception:
+            pass
+        try:
+            import sounddevice as sd
+            sd.stop()
+        except Exception:
+            pass
+        return True
+
 
     def selecionar_projeto(self):
         try:
@@ -1032,7 +1046,11 @@ class ApiBackend:
         os._exit(0)
 
     def parar_audio(self):
-        """Interrompe qualquer reprodução de áudio ativa."""
+        """Interrompe qualquer reprodução de áudio ativa ou gravação de microfone."""
+        try:
+            self.cancelar_audio()
+        except Exception:
+            pass
         try:
             import pyttsx3
             eng = pyttsx3.init()
