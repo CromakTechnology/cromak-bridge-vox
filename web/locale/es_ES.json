@@ -159,5 +159,14 @@
   "dialog_exit_confirming": "Cerrando Cromak Bridge Vox. ¡Hasta pronto!",
   "toast_lang_changed": "Configuración guardada e idioma actualizado.",
   "btn_save": "Guardar",
-  "btn_delete": "Eliminar"
+  "btn_delete": "Eliminar",
+  "connection_diag_title": "Diagnóstico de Conexión",
+  "connection_diag_desc": "Conectado a Internet y al motor de IA activo con éxito.",
+  "connection_diag_hint": "Haga clic o pulse Enter para verificar",
+  "connection_offline": "Sin Conexión",
+  "connection_offline_desc": "El ordenador no tiene acceso a Internet. Verifique su red.",
+  "connection_api_required": "Clave de API Necesaria",
+  "connection_api_required_desc": "Ninguna clave de API configurada para este motor.",
+  "tab_nav_title": "Navegación Secuencial por Teclado",
+  "tab_nav_cycle": "Use Tab para avanzar cíclicamente y Shift + Tab para retroceder."
 }

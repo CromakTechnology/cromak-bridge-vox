@@ -275,6 +275,15 @@
     border-left: 3px solid var(--accent-1);
 }
 
+.settings-sidebar .tab-btn:focus,
+.settings-sidebar .tab-btn:focus-visible {
+    outline: 2px solid var(--accent-1) !important;
+    outline-offset: -2px !important;
+    background: rgba(99, 102, 241, 0.25) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.6) !important;
+}
+
 .settings-content-area {
     flex: 1;
     padding: 30px 40px;
@@ -340,4 +349,161 @@
 .btn-api-link:focus {
     outline: 2px solid var(--accent-1);
     outline-offset: 2px;
+}
+
+/* ========================================================
+   BALÃO DE AJUDA / HELP FLUTUANTE CUSTOMIZADO
+   ======================================================== */
+.help-tooltip-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.help-balloon {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 290px;
+    background: rgba(14, 14, 22, 0.96);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 20px rgba(99, 102, 241, 0.2);
+    color: var(--text-primary);
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(0.97);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    text-align: left;
+}
+
+/* Seta estilizada do balão */
+.help-balloon::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 24px;
+    width: 10px;
+    height: 10px;
+    background: rgba(14, 14, 22, 0.96);
+    border-left: 1px solid rgba(99, 102, 241, 0.35);
+    border-top: 1px solid rgba(99, 102, 241, 0.35);
+    transform: rotate(45deg);
+}
+
+.help-tooltip-container:hover .help-balloon,
+.help-tooltip-container:focus-within .help-balloon,
+#connectionStatusBadge:focus .help-balloon,
+#connectionStatusBadge:focus-visible .help-balloon {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* ========================================================
+   NAVEGAÇÃO POR TECLADO & FOCO VISÍVEL DE ALTO CONTRASTE (WCAG)
+   ======================================================== */
+:focus-visible {
+    outline: 2px solid var(--accent-1) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.6) !important;
+}
+
+/* 1. Caixas de digitação SEM borda ao receber foco (Conversa e Duelo) */
+#userInput,
+#userInput:focus,
+#userInput:focus-visible,
+#duelInput,
+#duelInput:focus,
+#duelInput:focus-visible {
+    outline: none !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.input-container:focus-within {
+    border-color: rgba(99, 102, 241, 0.5) !important;
+}
+
+/* 2. Botões de Modo com foco visível nítido */
+.mode-btn:focus,
+.mode-btn:focus-visible {
+    outline: 2px solid var(--accent-1) !important;
+    outline-offset: 2px !important;
+    background: rgba(99, 102, 241, 0.3) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(99, 102, 241, 0.7) !important;
+}
+
+/* 3. Botão Nova Conversa com destaque luminoso */
+.btn-new-chat:focus,
+.btn-new-chat:focus-visible {
+    outline: 2px solid #ffffff !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.9) !important;
+    transform: translateY(-1px);
+}
+
+/* 4. Campo de pesquisa de conversas */
+.search-bar:focus,
+.search-bar:focus-visible {
+    outline: 2px solid var(--accent-1) !important;
+    outline-offset: 1px !important;
+    border-color: var(--accent-1) !important;
+    box-shadow: 0 0 14px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* 5. Itens da lista de conversas recentes */
+.session-item:focus,
+.session-item:focus-visible {
+    outline: 2px solid var(--accent-1) !important;
+    outline-offset: -1px !important;
+    background: rgba(99, 102, 241, 0.25) !important;
+    color: #ffffff !important;
+}
+
+.session-item:focus-within .session-actions,
+.session-item:focus .session-actions {
+    display: flex !important;
+}
+
+/* 6. Ações, configurações, seletores e status de conexão */
+.settings-btn:focus,
+.settings-btn:focus-visible,
+.s-action-btn:focus,
+.s-action-btn:focus-visible,
+.icon-btn:focus,
+.icon-btn:focus-visible,
+.btn-send:focus,
+.btn-send:focus-visible,
+.model-dropdown:focus,
+.model-dropdown:focus-visible,
+.custom-select-trigger:focus,
+.custom-select-trigger:focus-visible,
+#connectionStatusBadge:focus,
+#connectionStatusBadge:focus-visible,
+#connectionStatusBadgeDuel:focus,
+#connectionStatusBadgeDuel:focus-visible,
+#btnAttachmentDuel:focus,
+#btnAttachmentDuel:focus-visible,
+#micBtnDuel:focus,
+#micBtnDuel:focus-visible,
+#duelSendBtn:focus,
+#duelSendBtn:focus-visible {
+    outline: 2px solid var(--accent-1) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.6) !important;
+}
+
+#connectionStatusBadgeDuel:focus .help-balloon,
+#connectionStatusBadgeDuel:focus-visible .help-balloon {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
 }

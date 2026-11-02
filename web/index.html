@@ -121,7 +121,7 @@
             </div>
 
             
-            <button class="btn-new-chat" onclick="criarSessao()" aria-label="Iniciar nova conversa">
+            <button class="btn-new-chat" id="btnNewChat" onclick="criarSessao()" aria-label="Iniciar nova conversa (Nova Conversa)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span data-i18n="btn_new_chat">Nova Conversa</span>
             </button>
@@ -193,9 +193,25 @@
                         <option value="gemini-1.5-pro">GEMINI 1.5 PRO</option>
                     </select>
                 </div>
-                <div id="connectionStatusBadge" style="color: var(--success); font-size: 0.85rem; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; padding: 4px 8px; border-radius: 6px; transition: background 0.2s;" onclick="verificarOuAbrirConfigRede()" role="status" aria-live="polite" title="Verificando conexão de rede e motor de IA...">
-                    <span id="connectionDot" style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); transition: all 0.3s ease;"></span>
-                    <span id="connectionText" data-i18n="status_connected">Conectado</span>
+                <div class="help-tooltip-container">
+                    <div id="connectionStatusBadge" tabindex="0" style="color: var(--success); font-size: 0.85rem; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; padding: 6px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); transition: all 0.2s ease;" onclick="verificarOuAbrirConfigRede()" onkeydown="if(event.key==='Enter'||event.key===' ')verificarOuAbrirConfigRede()" role="button" aria-haspopup="true" aria-expanded="false" aria-live="polite" aria-label="Status da Conexão. Pressione Enter para diagnosticar">
+                        <span id="connectionDot" style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); transition: all 0.3s ease;"></span>
+                        <span id="connectionText" data-i18n="status_connected">Conectado</span>
+                    </div>
+
+                    <!-- CAIXA HELP FLUTUANTE CUSTOMIZADA -->
+                    <div class="help-balloon" id="connectionHelpBalloon" role="tooltip" aria-hidden="true">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--accent-1); margin-bottom: 6px; font-size: 0.86rem;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                            <span id="balloonTitle" data-i18n="connection_diag_title">Diagnóstico de Conexão</span>
+                        </div>
+                        <div id="balloonDesc" data-i18n="connection_diag_desc" style="color: var(--text-secondary); font-size: 0.80rem; line-height: 1.45;">
+                            Conectado à Internet e ao motor atual com sucesso.
+                        </div>
+                        <div id="balloonHint" style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.74rem; color: #a1a1aa; display: flex; align-items: center; gap: 5px;">
+                            <span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Clique</span> ou <span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Enter</span> para verificar
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -270,16 +286,34 @@
         <main class="chat-area" id="mainDuelo" style="display: none;">
             <header class="chat-header">
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <button class="s-action-btn" onclick="toggleSidebarDesktop()" style="padding: 6px; margin-right: 2px;" title="Alternar Painel Lateral">
+                    <button class="s-action-btn" id="toggleDesktopSidebarBtnDuel" onclick="toggleSidebarDesktop()" style="padding: 6px; margin-right: 2px;" title="Alternar Painel Lateral" aria-label="Alternar Painel Lateral">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="9" y1="3" x2="9" y2="21"></line>
                         </svg>
                     </button>
                 </div>
-                <div style="display: flex; justify-content: center; align-items: center; gap: 8px; flex: 1; padding-right: 32px;">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 8px; flex: 1;">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin: 0;">Pergunte a Outros Modelos</h3>
+                    <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin: 0;" data-i18n="duel_title">Pergunte a Outros Modelos</h3>
+                </div>
+                <div class="help-tooltip-container">
+                    <div id="connectionStatusBadgeDuel" tabindex="0" style="color: var(--success); font-size: 0.85rem; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; padding: 6px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); transition: all 0.2s ease;" onclick="verificarOuAbrirConfigRede()" onkeydown="if(event.key==='Enter'||event.key===' ')verificarOuAbrirConfigRede()" role="button" aria-haspopup="true" aria-expanded="false" aria-live="polite" aria-label="Status da Conexão. Pressione Enter para diagnosticar">
+                        <span id="connectionDotDuel" style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); transition: all 0.3s ease;"></span>
+                        <span id="connectionTextDuel" data-i18n="status_connected">Conectado</span>
+                    </div>
+                    <div class="help-balloon" id="connectionHelpBalloonDuel" role="tooltip" aria-hidden="true">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--accent-1); margin-bottom: 6px; font-size: 0.86rem;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                            <span id="balloonTitleDuel" data-i18n="connection_diag_title">Diagnóstico de Conexão</span>
+                        </div>
+                        <div id="balloonDescDuel" data-i18n="connection_diag_desc" style="color: var(--text-secondary); font-size: 0.80rem; line-height: 1.45;">
+                            Conectado à Internet e aos motores do duelo com sucesso.
+                        </div>
+                        <div id="balloonHintDuel" style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.74rem; color: #a1a1aa; display: flex; align-items: center; gap: 5px;">
+                            <span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Clique</span> ou <span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Enter</span> para verificar
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -289,6 +323,7 @@
                     <div style="padding: 12px; border-bottom: 1px solid var(--border-glass); text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center;">
                         <select id="duelProv1" class="model-dropdown" style="border-color: var(--accent-1); color: var(--text-primary); font-size: 0.9rem; padding: 4px 10px; width: 80%;" onchange="carregarModelosDuelo(1)">
                             <option value="gemini" selected>Google Gemini</option>
+                            <option value="groq">Groq (Ultra-Rápido)</option>
                             <option value="qwen">Alibaba Qwen</option>
                             <option value="openai">OpenAI (ChatGPT)</option>
                             <option value="claude">Anthropic Claude</option>
@@ -305,6 +340,7 @@
                     <div style="padding: 12px; border-bottom: 1px solid var(--border-glass); text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center;">
                         <select id="duelProv2" class="model-dropdown" style="border-color: var(--accent-1); color: var(--text-primary); font-size: 0.9rem; padding: 4px 10px; width: 80%;" onchange="carregarModelosDuelo(2)">
                             <option value="gemini">Google Gemini</option>
+                            <option value="groq">Groq (Ultra-Rápido)</option>
                             <option value="qwen">Alibaba Qwen</option>
                             <option value="openai">OpenAI (ChatGPT)</option>
                             <option value="claude" selected>Anthropic Claude</option>
@@ -356,15 +392,18 @@
                         </button>
                     </div>
                     
-                    <button class="icon-btn" onclick="toggleAttachmentMenuDuel(event)" id="btnAttachmentDuel" title="Anexar Arquivo">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                    <button class="icon-btn" onclick="toggleAttachmentMenuDuel(event)" id="btnAttachmentDuel" title="Anexar Arquivo" data-i18n-title="btn_attach" aria-label="Anexar arquivo ou capturar tela">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                     </button>
-                    <input type="text" placeholder="Pergunte às IAs simultaneamente..." id="duelInput" autocomplete="off" onkeypress="if(event.key === 'Enter') enviarDuelo()">
-                    <button class="icon-btn" onclick="toggleAudioDuel()" title="Entrada por voz">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    <input type="text" placeholder="Pergunte às IAs simultaneamente..." data-i18n-placeholder="duel_placeholder" id="duelInput" autocomplete="off" onkeypress="if(event.key === 'Enter') enviarDuelo()" aria-label="Digite sua mensagem para as IAs do modo duelo">
+                    <button class="icon-btn" id="micBtnDuel" onclick="toggleAudioDuel()" title="Entrada por voz" data-i18n-title="btn_voice_input" aria-label="Gravar áudio pelo microfone">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                     </button>
-                    <button class="btn-send" title="Disparar para todos" onclick="enviarDuelo()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <button class="btn-stop" id="stopBtnDuel" onclick="interromperDuelo()" title="Interromper geração" data-i18n-title="btn_stop_generation" aria-label="Interromper resposta das IAs" style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>
+                    </button>
+                    <button class="btn-send" id="duelSendBtn" title="Disparar para todos" data-i18n-title="duel_btn_send" onclick="enviarDuelo()" aria-label="Disparar mensagem para todas as IAs">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
                 </div>
             </footer>

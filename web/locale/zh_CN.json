@@ -159,5 +159,14 @@
   "dialog_exit_confirming": "正在关闭 Cromak Bridge Vox，再见！",
   "toast_lang_changed": "设置已保存，界面语言已更新。",
   "btn_save": "保存",
-  "btn_delete": "删除"
+  "btn_delete": "删除",
+  "connection_diag_title": "连接诊断",
+  "connection_diag_desc": "已成功连接到互联网和当前AI引擎。",
+  "connection_diag_hint": "点击或按Enter键进行验证",
+  "connection_offline": "无网络连接",
+  "connection_offline_desc": "计算机无法访问互联网，请检查网络设置。",
+  "connection_api_required": "需要API密钥",
+  "connection_api_required_desc": "当前引擎尚未配置API密钥。",
+  "tab_nav_title": "顺序键盘导航",
+  "tab_nav_cycle": "使用Tab向前切换，Shift + Tab向后切换。"
 }

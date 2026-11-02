@@ -159,5 +159,14 @@
   "dialog_exit_confirming": "جاري إغلاق Cromak Bridge Vox. إلى اللقاء!",
   "toast_lang_changed": "تم حفظ الإعدادات وتحديث لغة الواجهة.",
   "btn_save": "حفظ",
-  "btn_delete": "حذف"
+  "btn_delete": "حذف",
+  "connection_diag_title": "تشخيص الاتصال",
+  "connection_diag_desc": "تم الاتصال بالإنترنت ومحرك الذكاء الاصطناعي بنجاح.",
+  "connection_diag_hint": "انقر أو اضغط على Enter للتحقق",
+  "connection_offline": "لا يوجد اتصال",
+  "connection_offline_desc": "الكمبيوتر غير متصل بالإنترنت. يرجى التحقق من الشبكة.",
+  "connection_api_required": "مفتاح API مطلوب",
+  "connection_api_required_desc": "لم يتم تكوين مفتاح API لهذا المحرك.",
+  "tab_nav_title": "التنقل التسلسلي عبر لوحة المفاتيح",
+  "tab_nav_cycle": "استخدم Tab للتقدم و Shift + Tab للرجوع للخلف."
 }

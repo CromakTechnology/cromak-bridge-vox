@@ -159,5 +159,14 @@
   "dialog_exit_confirming": "Cromak Bridge Vox बंद हो रहा है। अलविदा!",
   "toast_lang_changed": "सेटिंग्स सहेजी गईं और भाषा अपडेट की गई।",
   "btn_save": "सहेजें",
-  "btn_delete": "हटाएं"
+  "btn_delete": "हटाएं",
+  "connection_diag_title": "कनेक्शन निदान",
+  "connection_diag_desc": "इंटरनेट और एआई इंजन से सफलतापूर्वक जुड़ा हुआ है।",
+  "connection_diag_hint": "जाँचने के लिए क्लिक करें या Enter दबाएं",
+  "connection_offline": "कोई कनेक्शन नहीं",
+  "connection_offline_desc": "कंप्यूटर में इंटरनेट का उपयोग नहीं है। अपना नेटवर्क जांचें।",
+  "connection_api_required": "एपीआई कुंजी आवश्यक है",
+  "connection_api_required_desc": "इस इंजन के लिए कोई एपीआई कुंजी कॉन्फ़िगर नहीं की गई है।",
+  "tab_nav_title": "क्रमिक कीबोर्ड नेविगेशन",
+  "tab_nav_cycle": "आगे बढ़ने के लिए Tab और पीछे जाने के लिए Shift + Tab का उपयोग करें।"
 }

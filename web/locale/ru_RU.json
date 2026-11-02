@@ -159,5 +159,14 @@
   "dialog_exit_confirming": "Закрытие Cromak Bridge Vox. До встречи!",
   "toast_lang_changed": "Настройки сохранены, язык обновлен.",
   "btn_save": "Сохранить",
-  "btn_delete": "Удалить"
+  "btn_delete": "Удалить",
+  "connection_diag_title": "Диагностика подключения",
+  "connection_diag_desc": "Успешно подключено к Интернету и движку ИИ.",
+  "connection_diag_hint": "Нажмите или Enter для проверки",
+  "connection_offline": "Нет соединения",
+  "connection_offline_desc": "Нет доступа к Интернету. Проверьте сетевое подключение.",
+  "connection_api_required": "Требуется ключ API",
+  "connection_api_required_desc": "Для этого движка не настроен ключ API.",
+  "tab_nav_title": "Последовательная навигация с клавиатуры",
+  "tab_nav_cycle": "Используйте Tab для перехода вперед и Shift + Tab для возврата назад."
 }

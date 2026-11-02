@@ -105,6 +105,32 @@
                 <li><span class="kbd">Seta para Cima</span> (no campo vazio): Pula o cursor para a última mensagem da conversa para navegação acessível.</li>
             </ul>
 
+            <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 15h10M12 9v6"></path></svg> 2.2 NAVEGAÇÃO SEQUENCIAL CIRCULAR (TAB E SHIFT + TAB)</h3>
+            <p>O Cromak Bridge Vox conta com mapeamento determinístico de foco por script. Pressionar as teclas de tabulação permite percorrer toda a interface em ciclo fechado e fluido:</p>
+            <ul>
+                <li><span class="kbd">Tab</span> &nbsp;<b>AVANÇAR CICLICAMENTE:</b> Move o foco no sentido horário pela ordem estrita:
+                    <ol style="margin-top: 8px; margin-bottom: 8px; padding-left: 20px; line-height: 1.8;">
+                        <li><b>Caixa de Digitação:</b> Envie uma mensagem...</li>
+                        <li><b>Microfone:</b> Ativação do Walkie-Talkie</li>
+                        <li><b>Botão Enviar:</b> Disparo da mensagem</li>
+                        <li><b>Botão Modo Conversa:</b> Seleção do modo padrão</li>
+                        <li><b>Botão Modo Duelo:</b> Comparativo simultâneo entre 2 IAs</li>
+                        <li><b>Botão Nova Conversa:</b> Inicia nova sessão limpa</li>
+                        <li><b>Pesquisar Sessão:</b> Busca rápida no histórico</li>
+                        <li><b>Itens Recentes:</b> Conversas anteriores salvas (Pressione <span class="kbd">Enter</span> ou <span class="kbd">Espaço</span> para abrir a conversa)</li>
+                        <li><b>Botão Configurações:</b> Menu e preferências gerais</li>
+                        <li><b>Alternar Painel Lateral:</b> Oculta/exibe barra lateral</li>
+                        <li><b>Provedor de IA:</b> Seletor rápido de motor ativo</li>
+                        <li><b>Modelo de IA:</b> Seletor rápido do modelo de inteligência</li>
+                        <li><b>Diagnóstico de Conexão:</b> Abre o balão Help moderno com status da rede</li>
+                        <li><b>Anexar Arquivo:</b> Menu de anexos, imagens e projetos</li>
+                        <li><i>(Retorna para a Caixa de Digitação)</i></li>
+                    </ol>
+                </li>
+                <li><span class="kbd">Shift + Tab</span> &nbsp;<b>RETROCEDER CICLICAMENTE:</b> Percorre essa mesma sequência rigorosa no sentido inverso.</li>
+                <li><span class="kbd">ESC</span> &nbsp;<b>FOCO DIRETO NA DIGITAÇÃO:</b> Fecha balões de ajuda, menus suspensos ou interrompe a fala, devolvendo o cursor imediatamente para o campo de envio de mensagens de qualquer lugar da tela.</li>
+            </ul>
+
             <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> 2.3 DIAGNÓSTICO E PRIVACIDADE TOTAL (LOGS SEGUROS)</h3>
             <p>O Cromak Bridge Vox gera logs de diagnóstico técnico em <code>%APPDATA%\Cromak Technology\Bridge Vox\logs\bridge_vox.log</code>. O sistema adota a política <b>Privacy-First</b>: chaves de API são automaticamente mascaradas e suas mensagens, perguntas e arquivos <b>NUNCA</b> são gravados nos logs. Para abrir a pasta de logs a qualquer momento, acesse <b>Configurações (F10) &gt; Geral &gt; Abrir Pasta de Logs</b> ou clique no ícone da bandeja do sistema.</p>
 

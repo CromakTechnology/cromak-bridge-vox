@@ -159,5 +159,14 @@
   "dialog_exit_confirming": "Cromak Bridge Vox wird beendet. Auf Wiedersehen!",
   "toast_lang_changed": "Einstellungen gespeichert und Sprache aktualisiert.",
   "btn_save": "Speichern",
-  "btn_delete": "Löschen"
+  "btn_delete": "Löschen",
+  "connection_diag_title": "Verbindungsdiagnose",
+  "connection_diag_desc": "Erfolgreich mit dem Internet und der KI-Engine verbunden.",
+  "connection_diag_hint": "Klicken oder Enter drücken zur Überprüfung",
+  "connection_offline": "Keine Verbindung",
+  "connection_offline_desc": "Kein Internetzugang. Überprüfen Sie Ihre Netzwerkverbindung.",
+  "connection_api_required": "API-Schlüssel erforderlich",
+  "connection_api_required_desc": "Kein API-Schlüssel für diesen Motor konfiguriert.",
+  "tab_nav_title": "Sequenzielle Tastaturnavigation",
+  "tab_nav_cycle": "Verwenden Sie Tab zum Vorwärtsspringen und Shift + Tab zum Zurückspringen."
 }

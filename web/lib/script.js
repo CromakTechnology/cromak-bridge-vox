@@ -1,3 +1,229 @@
+
+function interromperDuelo() {
+    const stopBtn = document.getElementById('stopBtnDuel');
+    const sendBtn = document.getElementById('duelSendBtn');
+    const input = document.getElementById('duelInput');
+
+    if (stopBtn) stopBtn.style.display = 'none';
+    if (sendBtn) sendBtn.style.display = 'flex';
+    if (input) {
+        input.disabled = false;
+        input.focus();
+    }
+
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (window.currentAudio) {
+        window.currentAudio.pause();
+        window.currentAudio.currentTime = 0;
+    }
+    if (window.pywebview && pywebview.api && pywebview.api.parar_audio) {
+        pywebview.api.parar_audio();
+    }
+    mostrarToast("Duelo interrompido.");
+}
+
+
+// ============================================================
+// SISTEMA DE MAPEAMENTO SEQUENCIAL DE TAB (WCAG & CROMAK UX)
+// ============================================================
+
+// ============================================================
+// MAPA DE NAVEGAÇÃO SEQUENCIAL DAS PREFERÊNCIAS (SETTINGS MODAL)
+// ============================================================
+function obterSequenciaSettingsModal() {
+    const modal = document.getElementById('settingsModal');
+    if (!modal || modal.style.display !== 'flex') return null;
+
+    const seq = [];
+
+    // 1. Aba ativa da barra lateral (somente ela participa do ciclo sequencial de Tab)
+    const activeTabBtn = modal.querySelector('.settings-sidebar .tab-btn.active') || modal.querySelector('.settings-sidebar .tab-btn');
+    if (activeTabBtn) seq.push(activeTabBtn);
+
+    // 2. Elementos focáveis visíveis do painel de conteúdo da aba atualmente aberta
+    const tabs = Array.from(modal.querySelectorAll('.settings-tab'));
+    const activeTabContent = tabs.find(el => el.style.display === 'block' || (el.style.display !== 'none' && el.offsetParent !== null));
+    
+    if (activeTabContent) {
+        const focaveis = Array.from(activeTabContent.querySelectorAll(
+            'input:not([type="hidden"]), select, textarea, button, .custom-select-trigger, [tabindex]:not([tabindex="-1"])'
+        )).filter(el => {
+            return el.offsetParent !== null && !el.disabled && el.style.display !== 'none' && el.style.visibility !== 'hidden';
+        });
+        seq.push(...focaveis);
+    }
+
+    // 3. Botão Cancelar
+    const btnCancel = modal.querySelector('.dialog-btn.cancel');
+    if (btnCancel && btnCancel.offsetParent !== null) seq.push(btnCancel);
+
+    // 4. Botão Salvar Alterações
+    const btnConfirm = modal.querySelector('.dialog-btn.confirm');
+    if (btnConfirm && btnConfirm.offsetParent !== null) seq.push(btnConfirm);
+
+    // 5. Botão Fechar (&times;)
+    const btnClose = modal.querySelector('.settings-header .close-btn');
+    if (btnClose && btnClose.offsetParent !== null) seq.push(btnClose);
+
+    return seq;
+}
+
+function obterSequenciaTab() {
+    const seq = [];
+    
+    // Se algum modal ou diálogo flutuante estiver aberto, o focus trap do modal assume o controle
+    const modalAberto = document.querySelector('.custom-dialog-overlay[style*="display: flex"], .settings-modal[style*="display: flex"], .modal-overlay[style*="display: flex"]');
+    if (modalAberto) return null;
+
+    const modoDuelo = (typeof modoAtual !== 'undefined' && modoAtual === 'duelo');
+
+    if (modoDuelo) {
+        // --- SEQUÊNCIA MODO DUELO ---
+        // 1. Campo de digitação
+        const duelInput = document.getElementById('duelInput');
+        if (duelInput && duelInput.offsetParent !== null) seq.push(duelInput);
+
+        // 2. Microfone
+        const micDuel = document.getElementById('micBtnDuel');
+        if (micDuel && micDuel.offsetParent !== null && micDuel.style.display !== 'none') seq.push(micDuel);
+
+        // 3. Botão Enviar
+        const btnSend = document.getElementById('duelSendBtn');
+        if (btnSend && btnSend.offsetParent !== null) seq.push(btnSend);
+
+        // 4. Modo Conversa
+        const btnConversa = document.getElementById('btnConversa');
+        if (btnConversa && btnConversa.offsetParent !== null) seq.push(btnConversa);
+
+        // 5. Modo Duelo
+        const btnDuelo = document.getElementById('btnDuelo');
+        if (btnDuelo && btnDuelo.offsetParent !== null) seq.push(btnDuelo);
+
+        // 6. Nova Conversa
+        const btnNewChat = document.getElementById('btnNewChat');
+        if (btnNewChat && btnNewChat.offsetParent !== null) seq.push(btnNewChat);
+
+        // 7. Pesquisar sessão
+        const search = document.getElementById('searchSession');
+        if (search && search.offsetParent !== null) seq.push(search);
+
+        // 8. Itens de conversas recentes
+        const sessItems = document.querySelectorAll('#sessionList .session-item');
+        sessItems.forEach(item => {
+            if (item.offsetParent !== null) seq.push(item);
+        });
+
+        // 9. Configurações
+        const btnConfig = document.getElementById('btnMainConfig');
+        if (btnConfig && btnConfig.offsetParent !== null) seq.push(btnConfig);
+
+        // 10. Alternar Painel
+        const togglePanelDuel = document.getElementById('toggleDesktopSidebarBtnDuel') || document.getElementById('toggleDesktopSidebarBtn');
+        if (togglePanelDuel && togglePanelDuel.offsetParent !== null) seq.push(togglePanelDuel);
+
+        // 11. Provedor 1 (custom trigger)
+        const p1 = document.getElementById('duelProv1');
+        const t1 = p1?.nextElementSibling?.querySelector ? (p1.nextElementSibling.querySelector('.custom-select-trigger') || p1.nextElementSibling) : p1;
+        if (t1 && t1.offsetParent !== null) seq.push(t1);
+
+        // 12. Modelo 1 (custom trigger)
+        const m1 = document.getElementById('duelMod1');
+        const tm1 = m1?.nextElementSibling?.querySelector ? (m1.nextElementSibling.querySelector('.custom-select-trigger') || m1.nextElementSibling) : m1;
+        if (tm1 && tm1.offsetParent !== null) seq.push(tm1);
+
+        // 13. Provedor 2 (custom trigger)
+        const p2 = document.getElementById('duelProv2');
+        const t2 = p2?.nextElementSibling?.querySelector ? (p2.nextElementSibling.querySelector('.custom-select-trigger') || p2.nextElementSibling) : p2;
+        if (t2 && t2.offsetParent !== null) seq.push(t2);
+
+        // 14. Modelo 2 (custom trigger)
+        const m2 = document.getElementById('duelMod2');
+        const tm2 = m2?.nextElementSibling?.querySelector ? (m2.nextElementSibling.querySelector('.custom-select-trigger') || m2.nextElementSibling) : m2;
+        if (tm2 && tm2.offsetParent !== null) seq.push(tm2);
+
+        // 15. Status da Conexão no Duelo
+        const badgeDuel = document.getElementById('connectionStatusBadgeDuel');
+        if (badgeDuel && badgeDuel.offsetParent !== null) seq.push(badgeDuel);
+
+        // 16. Botão Anexar Arquivo no Duelo
+        const attachDuel = document.getElementById('btnAttachmentDuel');
+        if (attachDuel && attachDuel.offsetParent !== null) seq.push(attachDuel);
+
+        return seq;
+    }
+
+    // --- SEQUÊNCIA MODO CONVERSA ---
+    // 1. Campo de digitação
+    const inputPrincipal = document.getElementById('userInput');
+    if (inputPrincipal && inputPrincipal.offsetParent !== null) seq.push(inputPrincipal);
+
+    // 2. Microfone
+    const mic = document.getElementById('micBtn');
+    if (mic && mic.offsetParent !== null && mic.style.display !== 'none') seq.push(mic);
+
+    // 3. Botão Enviar
+    const btnSend = document.getElementById('sendBtn');
+    if (btnSend && btnSend.offsetParent !== null) seq.push(btnSend);
+
+    // 4. Botão Modo Conversa
+    const btnConversa = document.getElementById('btnConversa');
+    if (btnConversa && btnConversa.offsetParent !== null) seq.push(btnConversa);
+
+    // 5. Botão Modo Duelo
+    const btnDuelo = document.getElementById('btnDuelo');
+    if (btnDuelo && btnDuelo.offsetParent !== null) seq.push(btnDuelo);
+
+    // 6. Botão Nova Conversa
+    const btnNewChat = document.getElementById('btnNewChat');
+    if (btnNewChat && btnNewChat.offsetParent !== null) seq.push(btnNewChat);
+
+    // 7. Campo de pesquisa de conversas
+    const search = document.getElementById('searchSession');
+    if (search && search.offsetParent !== null) seq.push(search);
+
+    // 8. Itens de conversas recentes (Recentes)
+    const sessItems = document.querySelectorAll('#sessionList .session-item');
+    sessItems.forEach(item => {
+        if (item.offsetParent !== null) seq.push(item);
+    });
+
+    // 9. Botão de Configurações
+    const btnConfig = document.getElementById('btnMainConfig');
+    if (btnConfig && btnConfig.offsetParent !== null) seq.push(btnConfig);
+
+    // 10. Botão Alternar Painel Lateral
+    const togglePanel = document.getElementById('toggleDesktopSidebarBtn');
+    if (togglePanel && togglePanel.offsetParent !== null) seq.push(togglePanel);
+
+    // 11. Provedor de IA (Dropdown customizado trigger)
+    const provSelect = document.getElementById('quickProviderSelector');
+    if (provSelect) {
+        const provTrigger = provSelect.nextElementSibling && provSelect.nextElementSibling.querySelector 
+            ? (provSelect.nextElementSibling.querySelector('.custom-select-trigger') || provSelect.nextElementSibling)
+            : provSelect;
+        if (provTrigger && provTrigger.offsetParent !== null) seq.push(provTrigger);
+    }
+
+    // 12. Modelo de IA (Dropdown customizado trigger)
+    const modelSelect = document.getElementById('modelSelector');
+    if (modelSelect) {
+        const modelTrigger = modelSelect.nextElementSibling && modelSelect.nextElementSibling.querySelector
+            ? (modelSelect.nextElementSibling.querySelector('.custom-select-trigger') || modelSelect.nextElementSibling)
+            : modelSelect;
+        if (modelTrigger && modelTrigger.offsetParent !== null) seq.push(modelTrigger);
+    }
+
+    // 13. Badge de Status da Conexão (Conectado / Balão de Ajuda)
+    const badge = document.getElementById('connectionStatusBadge');
+    if (badge && badge.offsetParent !== null) seq.push(badge);
+
+    // 14. Botão de Anexo (retorna para antes de userInput)
+    const attach = document.getElementById('btnAttachment');
+    if (attach && attach.offsetParent !== null) seq.push(attach);
+
+    return seq;
+}
+
 // --- GESTÃO DE ATALHOS ---
 
 window.appShortcuts = {
@@ -87,6 +313,8 @@ function resetShortcuts() {
 document.addEventListener('DOMContentLoaded', () => {
 
     initShortcuts();
+
+    if (typeof initCustomSelects === 'function') initCustomSelects();
 
     // Foco inicial programático imediato (WAI-ARIA role="application" & WCAG 2.1.4)
 
@@ -296,6 +524,10 @@ window.addEventListener('focus', () => {
 
                         });
 
+                        select.value = atual;
+
+                        if (typeof forceUpdateCustomUI === 'function') forceUpdateCustomUI('configLanguage');
+
                     }
 
                 }).catch(() => {});
@@ -412,7 +644,35 @@ window.addEventListener('focus', () => {
 
                 }
 
-                
+                const configProv = document.getElementById('configProvider');
+
+                if (configProv && config.provider) {
+
+                    configProv.value = config.provider;
+
+                    forceUpdateCustomUI('configProvider');
+
+                }
+
+                const cfgMode = document.getElementById('configInterfaceMode');
+
+                if (cfgMode) {
+
+                    cfgMode.value = config.interface_mode || 'normal';
+
+                    forceUpdateCustomUI('configInterfaceMode');
+
+                }
+
+                const cfgLang = document.getElementById('configLanguage');
+
+                if (cfgLang && config.language) {
+
+                    cfgLang.value = config.language;
+
+                    forceUpdateCustomUI('configLanguage');
+
+                }
 
                 // Restaura o model atual no top bar
 
@@ -442,9 +702,13 @@ window.addEventListener('focus', () => {
 
                     const {prov1, mod1, prov2, mod2} = config.duel;
 
-                    document.getElementById('duelProv1').value = prov1 || 'gemini';
+                    const dp1 = document.getElementById('duelProv1');
 
-                    document.getElementById('duelProv2').value = prov2 || 'claude';
+                    if (dp1) { dp1.value = prov1 || 'gemini'; forceUpdateCustomUI('duelProv1'); }
+
+                    const dp2 = document.getElementById('duelProv2');
+
+                    if (dp2) { dp2.value = prov2 || 'claude'; forceUpdateCustomUI('duelProv2'); }
 
                     
 
@@ -464,6 +728,8 @@ window.addEventListener('focus', () => {
 
                         if(mod1) sel1.value = mod1;
 
+                        forceUpdateCustomUI('duelMod1');
+
 
 
                         const sel2 = document.getElementById('duelMod2');
@@ -473,6 +739,8 @@ window.addEventListener('focus', () => {
                         modelos2.forEach(m => { sel2.appendChild(new Option(m.replace('models/', ''), m)); });
 
                         if(mod2) sel2.value = mod2;
+
+                        forceUpdateCustomUI('duelMod2');
 
                     });
 
@@ -628,13 +896,47 @@ window.addEventListener('focus', () => {
 
                 const updateTriggerText = () => {
 
-                    const selectedOpt = select.options[select.selectedIndex];
+                    let selectedOpt = (select.selectedIndex >= 0 && select.options[select.selectedIndex]) ? select.options[select.selectedIndex] : null;
 
-                    const textoOpcao = selectedOpt ? selectedOpt.innerText : 'Selecione...';
+                    if (!selectedOpt || selectedOpt.value !== select.value) {
 
-                    trigger.querySelector('.custom-select-text').innerText = textoOpcao;
+                        for (let i = 0; i < select.options.length; i++) {
+
+                            if (select.options[i].value === select.value) {
+
+                                selectedOpt = select.options[i];
+
+                                select.selectedIndex = i;
+
+                                break;
+
+                            }
+
+                        }
+
+                    }
+
+                    const textoOpcao = selectedOpt ? selectedOpt.innerText : (select.options.length > 0 ? select.options[0].innerText : 'Selecione...');
+
+                    const spanText = trigger.querySelector('.custom-select-text');
+
+                    if (spanText) spanText.innerText = textoOpcao;
 
                     trigger.setAttribute('aria-label', `${rotuloAcessivel}: ${textoOpcao}`);
+
+                    const botoes = dropdown.querySelectorAll('button[role="option"]');
+
+                    Array.from(select.options).forEach((opt, idx) => {
+
+                        if (botoes[idx]) {
+
+                            const isSel = (opt.value === select.value);
+
+                            botoes[idx].setAttribute('aria-selected', isSel ? 'true' : 'false');
+
+                        }
+
+                    });
 
                 };
 
@@ -795,6 +1097,8 @@ window.addEventListener('focus', () => {
                 select.addEventListener('change', updateTriggerText);
 
                 select.refreshCustomUI = updateTriggerText;
+                select.renderCustomOptions = renderOptions;
+                select.updateCustomTriggerText = updateTriggerText;
 
 
 
@@ -810,7 +1114,41 @@ window.addEventListener('focus', () => {
 
             const el = document.getElementById(selectId);
 
-            if(el && el.refreshCustomUI) el.refreshCustomUI();
+            if (!el) return;
+
+            if (!el.dataset.customized && typeof initCustomSelects === 'function') {
+
+                initCustomSelects();
+
+            }
+
+            if (typeof el.renderCustomOptions === 'function') {
+
+                el.renderCustomOptions();
+
+            } else if (typeof el.refreshCustomUI === 'function') {
+
+                el.refreshCustomUI();
+
+            } else {
+
+                const container = el.nextElementSibling;
+
+                if (container && container.classList.contains('custom-select-container')) {
+
+                    const spanText = container.querySelector('.custom-select-text');
+
+                    const opt = el.options[el.selectedIndex];
+
+                    if (spanText && opt) {
+
+                        spanText.innerText = opt.innerText;
+
+                    }
+
+                }
+
+            }
 
         }
 
@@ -1152,6 +1490,19 @@ window.addEventListener('focus', () => {
 
                 
 
+                // Torna cada conversa focavel por teclado (Tab) e acessivel
+                item.tabIndex = 0;
+                item.setAttribute('role', 'button');
+                item.setAttribute('aria-label', (isPinned ? 'Conversa fixada: ' : 'Conversa: ') + title);
+                item.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        abrirSessao(id);
+                    }
+                };
+                pinBtn.tabIndex = -1;
+                renameBtn.tabIndex = -1;
+                delBtn.tabIndex = -1;
                 actionsDiv.append(pinBtn, renameBtn, delBtn); item.append(titleSpan, actionsDiv); list.appendChild(item);
 
             });
@@ -1282,7 +1633,15 @@ window.addEventListener('focus', () => {
 
                         const configProv = document.getElementById('configProvider');
 
-                        if (configProv) configProv.value = provider;
+                        if (configProv) {
+
+                            configProv.value = provider;
+
+                            forceUpdateCustomUI('configProvider');
+
+                        }
+
+                        if (typeof atualizarStatusConexao === 'function') atualizarStatusConexao();
 
                     });
 
@@ -2600,7 +2959,13 @@ window.addEventListener('focus', () => {
 
                     if (config) {
 
-                        document.getElementById('configProvider').value = config.provider || 'gemini';
+                        const activeProv = (document.getElementById('quickProviderSelector') && document.getElementById('quickProviderSelector').value)
+
+                            ? document.getElementById('quickProviderSelector').value
+
+                            : (config.provider || 'gemini');
+
+                        document.getElementById('configProvider').value = activeProv;
 
                         document.getElementById('configLanguage').value = config.language || 'pt_BR';
 
@@ -2626,7 +2991,25 @@ window.addEventListener('focus', () => {
 
                         if (document.getElementById('configInterfaceMode')) {
 
-                            document.getElementById('configInterfaceMode').value = config.interface_mode || 'normal';
+                            const activeMode = document.body.classList.contains('high-contrast-theme')
+
+                                ? 'high_contrast'
+
+                                : (config.interface_mode || 'normal');
+
+                            document.getElementById('configInterfaceMode').value = activeMode;
+
+                        }
+
+                        forceUpdateCustomUI('configProvider');
+
+                        forceUpdateCustomUI('configInterfaceMode');
+
+                        forceUpdateCustomUI('configLanguage');
+
+                        if (document.getElementById('presetComportamento')) {
+
+                            forceUpdateCustomUI('presetComportamento');
 
                         }
 
@@ -3096,6 +3479,18 @@ window.addEventListener('focus', () => {
                     }
 
                 });
+
+                forceUpdateCustomUI('configProvider');
+
+                forceUpdateCustomUI('configInterfaceMode');
+
+                forceUpdateCustomUI('configLanguage');
+
+                if (document.getElementById('presetComportamento')) {
+
+                    forceUpdateCustomUI('presetComportamento');
+
+                }
 
                 
 
@@ -3625,6 +4020,20 @@ window.addEventListener('focus', () => {
 
                     setTimeout(() => { if (typeof initShortcuts === 'function') initShortcuts(); }, 50);
 
+                } else if (tabName === 'apis') {
+
+                    forceUpdateCustomUI('configProvider');
+
+                } else if (tabName === 'geral') {
+
+                    forceUpdateCustomUI('configInterfaceMode');
+
+                    forceUpdateCustomUI('configLanguage');
+
+                } else if (tabName === 'comportamento') {
+
+                    forceUpdateCustomUI('presetComportamento');
+
                 }
 
             }
@@ -3947,6 +4356,9 @@ window.addEventListener('focus', () => {
 
                 }
 
+                if (typeof selector.renderCustomOptions === 'function') {
+                    selector.renderCustomOptions();
+                }
                 salvarDueloLocal();
 
             });
@@ -3983,6 +4395,7 @@ window.addEventListener('focus', () => {
 
             
 
+            window.modoAtual = modo;
             if (modo === 'conversa') {
 
                 btnConversa.classList.add('active');
@@ -3992,6 +4405,8 @@ window.addEventListener('focus', () => {
                 mainConversa.style.display = 'flex';
 
                 mainDuelo.style.display = 'none';
+                atualizarStatusConexao();
+                setTimeout(() => { const ui = document.getElementById('userInput'); if (ui) ui.focus(); }, 50);
 
             } else {
 
@@ -4002,6 +4417,8 @@ window.addEventListener('focus', () => {
                 mainDuelo.style.display = 'flex';
 
                 mainConversa.style.display = 'none';
+                atualizarStatusConexao();
+                setTimeout(() => { const di = document.getElementById('duelInput'); if (di) di.focus(); }, 50);
 
                 
 
@@ -4068,6 +4485,10 @@ window.addEventListener('focus', () => {
             input.value = '';
 
             input.disabled = true;
+            const sendBtnDuel = document.getElementById('duelSendBtn');
+            const stopBtnDuel = document.getElementById('stopBtnDuel');
+            if (sendBtnDuel) sendBtnDuel.style.display = 'none';
+            if (stopBtnDuel) stopBtnDuel.style.display = 'flex';
 
             
 
@@ -4088,6 +4509,8 @@ window.addEventListener('focus', () => {
             pywebview.api.processar_duelo(text, prov1, mod1, prov2, mod2).then(resultado => {
 
                 input.disabled = false;
+                if (sendBtnDuel) sendBtnDuel.style.display = 'flex';
+                if (stopBtnDuel) stopBtnDuel.style.display = 'none';
 
                 removerImagemDuelo();
 
@@ -4700,6 +5123,14 @@ window.addEventListener('keydown', (e) => {
         }
 
         // Deixa propagar para fechar modais caso haja algum aberto
+        const activeModal = document.querySelector('.modal-overlay[style*="display: flex"], .modal-overlay[style*="display: block"]');
+        if (!activeModal) {
+            const isDuelo = (typeof modoAtual !== 'undefined' && modoAtual === 'duelo');
+            const targetInput = isDuelo ? document.getElementById('duelInput') : document.getElementById('userInput');
+            if (targetInput && document.activeElement !== targetInput) {
+                targetInput.focus();
+            }
+        }
 
     }
 
@@ -5019,66 +5450,151 @@ window.addEventListener('keydown', (e) => {
 
 
 
-    // 2. Confinamento de foco (Focus Trap) dentro de modais abertos
+    // 2. Navegação por Setas e Enter dentro da Sidebar de Preferências
+    const settingsModalAtivo = document.getElementById('settingsModal');
+    if (settingsModalAtivo && settingsModalAtivo.style.display === 'flex') {
+        const activeEl = document.activeElement;
+        if (activeEl && activeEl.classList.contains('tab-btn')) {
+            const tabBtns = Array.from(settingsModalAtivo.querySelectorAll('.settings-sidebar .tab-btn'));
+            const currIdx = tabBtns.indexOf(activeEl);
 
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const nextIdx = (currIdx + 1) % tabBtns.length;
+                const nextBtn = tabBtns[nextIdx];
+                nextBtn.click();
+                nextBtn.focus();
+                return;
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const prevIdx = (currIdx - 1 + tabBtns.length) % tabBtns.length;
+                const prevBtn = tabBtns[prevIdx];
+                prevBtn.click();
+                prevBtn.focus();
+                return;
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                activeEl.click();
+                // Foca imediatamente o primeiro campo interativo do painel de conteúdo aberto!
+                const activeTab = Array.from(settingsModalAtivo.querySelectorAll('.settings-tab')).find(el => el.style.display === 'block' || (el.style.display !== 'none' && el.offsetParent !== null));
+                if (activeTab) {
+                    setTimeout(() => {
+                        const primeiro = activeTab.querySelector('input:not([type="hidden"]), select, textarea, button, .custom-select-trigger');
+                        if (primeiro) primeiro.focus();
+                    }, 40);
+                }
+                return;
+            }
+        }
+    }
+
+    // 3. Confinamento de foco e Navegação Sequencial de Tab
     if (e.key === 'Tab') {
-
-        const modalAberto = document.querySelector('.custom-dialog-overlay[style*="display: flex"], .settings-modal[style*="display: flex"], .modal-overlay[style*="display: flex"]');
-
-        if (!modalAberto) return;
-
-
-
-        // Pega todos os elementos focáveis visíveis dentro do modal
-
-        const elementosFocaveis = Array.from(modalAberto.querySelectorAll(
-
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-
-        )).filter(el => {
-
-            return el.offsetParent !== null && !el.disabled && el.style.display !== 'none' && el.style.visibility !== 'hidden';
-
-        });
-
-
-
-        if (elementosFocaveis.length === 0) return;
-
-
-
-        const primeiroElemento = elementosFocaveis[0];
-
-        const ultimoElemento = elementosFocaveis[elementosFocaveis.length - 1];
-
-
-
-        if (e.shiftKey) {
-
-            // Shift + Tab voltando: se estiver no primeiro, pula pro último
-
-            if (document.activeElement === primeiroElemento || !modalAberto.contains(document.activeElement)) {
-
+        // Se as Preferências (settingsModal) estiverem abertas, executa o ciclo especializado das abas
+        if (settingsModalAtivo && settingsModalAtivo.style.display === 'flex') {
+            const seq = obterSequenciaSettingsModal();
+            if (seq && seq.length > 0) {
                 e.preventDefault();
+                const active = document.activeElement;
+                let index = seq.indexOf(active);
 
-                ultimoElemento.focus();
+                if (index === -1 && active) {
+                    index = seq.findIndex(el => el.contains(active));
+                }
 
+                // Se estiver em QUALQUER botão de aba da sidebar (ativo ou inativo):
+                if (active && active.classList.contains('tab-btn')) {
+                    if (e.shiftKey) {
+                        // Shift+Tab recua para o último elemento (Fechar x)
+                        const ultimo = seq[seq.length - 1];
+                        if (ultimo) ultimo.focus();
+                    } else {
+                        // Tab avança direto para o 1º campo interativo do painel da aba ativa!
+                        const primeiroCampo = seq[1];
+                        if (primeiroCampo) primeiroCampo.focus();
+                        else if (seq[0]) seq[0].focus();
+                    }
+                    return;
+                }
+
+                let proximo;
+                if (e.shiftKey) {
+                    proximo = (index <= 0) ? seq[seq.length - 1] : seq[index - 1];
+                } else {
+                    proximo = (index === -1 || index >= seq.length - 1) ? seq[0] : seq[index + 1];
+                }
+
+                if (proximo) {
+                    proximo.focus();
+                    if (typeof proximo.scrollIntoViewIfNeeded === 'function') {
+                        proximo.scrollIntoViewIfNeeded();
+                    } else if (typeof proximo.scrollIntoView === 'function') {
+                        proximo.scrollIntoView({ block: 'nearest' });
+                    }
+                }
+                return;
             }
-
-        } else {
-
-            // Tab avançando: se estiver no último, pula pro primeiro
-
-            if (document.activeElement === ultimoElemento || !modalAberto.contains(document.activeElement)) {
-
-                e.preventDefault();
-
-                primeiroElemento.focus();
-
-            }
-
         }
 
+        const modalAberto = document.querySelector('.custom-dialog-overlay[style*="display: flex"], .modal-overlay[style*="display: flex"]');
+
+        if (modalAberto) {
+            // Outros diálogos/modais abertos: confina o foco no diálogo
+            const elementosFocaveis = Array.from(modalAberto.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            )).filter(el => {
+                return el.offsetParent !== null && !el.disabled && el.style.display !== 'none' && el.style.visibility !== 'hidden';
+            });
+
+            if (elementosFocaveis.length === 0) return;
+
+            const primeiroElemento = elementosFocaveis[0];
+            const ultimoElemento = elementosFocaveis[elementosFocaveis.length - 1];
+
+            if (e.shiftKey) {
+                if (document.activeElement === primeiroElemento || !modalAberto.contains(document.activeElement)) {
+                    e.preventDefault();
+                    ultimoElemento.focus();
+                }
+            } else {
+                if (document.activeElement === ultimoElemento || !modalAberto.contains(document.activeElement)) {
+                    e.preventDefault();
+                    primeiroElemento.focus();
+                }
+            }
+            return;
+        }
+
+        // Navegação sequencial perfeita mapeada por script (Sem modal aberto)
+        const seq = obterSequenciaTab();
+        if (seq && seq.length > 0) {
+            e.preventDefault();
+            const active = document.activeElement;
+            let index = seq.indexOf(active);
+
+            // Se o foco estiver dentro de um container ou trigger
+            if (index === -1 && active) {
+                index = seq.findIndex(el => el.contains(active));
+            }
+
+            let proximo;
+            if (e.shiftKey) {
+                // Shift + Tab (voltando)
+                proximo = (index <= 0) ? seq[seq.length - 1] : seq[index - 1];
+            } else {
+                // Tab (avançando)
+                proximo = (index === -1 || index >= seq.length - 1) ? seq[0] : seq[index + 1];
+            }
+
+            if (proximo) {
+                proximo.focus();
+                if (typeof proximo.scrollIntoViewIfNeeded === 'function') {
+                    proximo.scrollIntoViewIfNeeded();
+                } else if (typeof proximo.scrollIntoView === 'function') {
+                    proximo.scrollIntoView({ block: 'nearest' });
+                }
+            }
+        }
     }
 
 });
@@ -5228,42 +5744,96 @@ function atualizarStatusConexao() {
     const badge = document.getElementById('connectionStatusBadge');
     const dot = document.getElementById('connectionDot');
     const text = document.getElementById('connectionText');
+    const bTitle = document.getElementById('balloonTitle');
+    const bDesc = document.getElementById('balloonDesc');
+    const bHint = document.getElementById('balloonHint');
+
+    // Elementos correspondentes no Modo Duelo
+    const badgeDuel = document.getElementById('connectionStatusBadgeDuel');
+    const dotDuel = document.getElementById('connectionDotDuel');
+    const textDuel = document.getElementById('connectionTextDuel');
+    const bTitleDuel = document.getElementById('balloonTitleDuel');
+    const bDescDuel = document.getElementById('balloonDescDuel');
+    const bHintDuel = document.getElementById('balloonHintDuel');
+
+    const sincronizarDuelo = (cor, txt, label, titleText, descText, hintHTML) => {
+        if (badgeDuel) {
+            badgeDuel.removeAttribute('title');
+            badgeDuel.style.color = cor;
+            if (label) badgeDuel.setAttribute('aria-label', label);
+        }
+        if (dotDuel) {
+            dotDuel.style.background = cor;
+            dotDuel.style.boxShadow = `0 0 10px ${cor}`;
+        }
+        if (textDuel && txt) textDuel.innerText = txt;
+        if (bTitleDuel && titleText) bTitleDuel.innerText = titleText;
+        if (bDescDuel && descText) bDescDuel.innerText = descText;
+        if (bHintDuel && hintHTML) bHintDuel.innerHTML = hintHTML;
+    };
+
     if (!badge || !dot || !text) return;
+
+    // Remove o tooltip nativo preto do Windows para usar o balao help moderno
+    badge.removeAttribute('title');
 
     if (!navigator.onLine) {
         badge.style.color = '#ef4444';
-        badge.title = 'Sem conexão com a Internet. Verifique seu Wi-Fi ou cabo de rede.';
+        badge.setAttribute('aria-label', 'Status: Sem conexão com a Internet. Verifique seu Wi-Fi ou cabo de rede.');
         dot.style.background = '#ef4444';
-        dot.style.boxShadow = '0 0 8px #ef4444';
+        dot.style.boxShadow = '0 0 10px #ef4444';
         text.innerText = 'Sem Conexão';
+        if (bTitle) bTitle.innerText = 'Sem Conexão';
+        if (bDesc) bDesc.innerText = 'O computador está sem acesso à Internet. Verifique seu Wi-Fi ou cabo de rede.';
+        if (bHint) bHint.innerHTML = '<span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Aviso</span> Rede offline';
+        sincronizarDuelo('#ef4444', 'Sem Conexão', 'Status: Sem conexão com a Internet.', 'Sem Conexão', 'O computador está sem acesso à Internet.', '<span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Aviso</span> Rede offline');
         return;
     }
 
     if (window.pywebview && pywebview.api && pywebview.api.obter_status_conexao) {
         pywebview.api.obter_status_conexao().then(res => {
+            badge.removeAttribute('title');
             if (!res.online) {
                 badge.style.color = '#ef4444';
-                badge.title = 'Computador sem acesso à Internet.';
+                badge.setAttribute('aria-label', 'Status: Computador sem acesso à Internet ou aos serviços de IA.');
                 dot.style.background = '#ef4444';
-                dot.style.boxShadow = '0 0 8px #ef4444';
+                dot.style.boxShadow = '0 0 10px #ef4444';
                 text.innerText = 'Sem Conexão';
+                if (bTitle) bTitle.innerText = 'Sem Conexão';
+                if (bDesc) bDesc.innerText = 'Computador sem acesso à Internet ou aos serviços de inteligência artificial.';
+                if (bHint) bHint.innerHTML = '<span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Aviso</span> Verifique sua rede';
+                sincronizarDuelo('#ef4444', 'Sem Conexão', 'Status: Sem acesso à Internet.', 'Sem Conexão', 'Computador sem acesso à Internet.', '<span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Aviso</span> Verifique sua rede');
             } else if (!res.chave_configurada) {
+                const prov = (res.provedor || 'o provedor ativo').toUpperCase();
                 badge.style.color = '#eab308';
-                badge.title = 'Chave de API não configurada para ' + (res.provedor || 'o provedor ativo').toUpperCase() + '. Clique para configurar.';
+                badge.setAttribute('aria-label', 'Status: Chave de API não configurada para ' + prov + '. Clique para configurar.');
                 dot.style.background = '#eab308';
-                dot.style.boxShadow = '0 0 8px #eab308';
+                dot.style.boxShadow = '0 0 10px #eab308';
                 text.innerText = 'Configurar API';
+                if (bTitle) bTitle.innerText = 'Chave de API Necessária';
+                if (bDesc) bDesc.innerText = 'Nenhuma chave de API configurada para o motor ' + prov + '. Clique para adicionar sua chave nas configurações.';
+                if (bHint) bHint.innerHTML = '<span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Clique</span> ou <span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Enter</span> para configurar';
+                sincronizarDuelo('#eab308', 'Configurar API', 'Status: Chave de API não configurada.', 'Chave de API Necessária', 'Configure chaves para as IAs do duelo.', '<span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Clique</span> ou <span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Enter</span>');
             } else {
+                const prov = (res.provedor || 'IA').toUpperCase();
                 badge.style.color = 'var(--success)';
-                badge.title = 'Conectado à Internet e ao motor ' + (res.provedor || '').toUpperCase() + ' com sucesso!';
+                badge.setAttribute('aria-label', 'Status: Conectado à Internet e ao motor ' + prov + ' com sucesso!');
                 dot.style.background = 'var(--success)';
-                dot.style.boxShadow = '0 0 8px var(--success)';
+                dot.style.boxShadow = '0 0 10px var(--success)';
                 text.innerText = 'Conectado';
+                if (bTitle) bTitle.innerText = 'Conexão Estabelecida';
+                if (bDesc) bDesc.innerText = 'Conectado com sucesso à Internet e ao motor ' + prov + '. Sistema pronto para interações rápidas.';
+                if (bHint) bHint.innerHTML = '<span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Status</span> Motor operacional';
+                sincronizarDuelo('var(--success)', 'Conectado', 'Status: Conectado com sucesso.', 'Conexão Estabelecida', 'Motores do duelo operacionais.', '<span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Status</span> Operacional');
             }
         }).catch(() => {
+            badge.removeAttribute('title');
             badge.style.color = 'var(--success)';
             dot.style.background = 'var(--success)';
             text.innerText = 'Conectado';
+            if (bTitle) bTitle.innerText = 'Conexão Ativa';
+            if (bDesc) bDesc.innerText = 'Conectado à Internet e aos serviços de inteligência artificial.';
+            if (bHint) bHint.innerHTML = '<span style="background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; font-family: monospace;">Status</span> Operacional';
         });
     }
 }
