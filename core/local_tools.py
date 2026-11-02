@@ -31,16 +31,13 @@ def get_real_windows_folder(folder_name):
     }
     # 1. Verifica se o usuário definiu um caminho customizado no config.json
     try:
-        from .seguranca import ler_config_seguro
-        base_dir = os.getenv("APPDATA") or os.path.expanduser("~")
-        for sub in ("Bridge Vox", "Bridge"):
-            cfg_p = os.path.join(base_dir, "Cromak Technology", sub, "config.json")
-            if os.path.exists(cfg_p):
-                cfg = ler_config_seguro(cfg_p) or {}
-                chave_cfg = mapa_cfg.get(folder_name)
-                if chave_cfg and cfg.get(chave_cfg) and os.path.exists(cfg.get(chave_cfg)):
-                    return cfg.get(chave_cfg)
-                break
+        from .seguranca import ler_config_seguro, get_appdata_dir
+        cfg_p = os.path.join(get_appdata_dir(), "config.json")
+        if os.path.exists(cfg_p):
+            cfg = ler_config_seguro(cfg_p) or {}
+            chave_cfg = mapa_cfg.get(folder_name)
+            if chave_cfg and cfg.get(chave_cfg) and os.path.exists(cfg.get(chave_cfg)):
+                return cfg.get(chave_cfg)
     except Exception:
         pass
 
@@ -294,7 +291,7 @@ def executar_comando(comando: str) -> str:
     
     # Checa a trava de segurança
     try:
-        config_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'config.json')
+        config_path = os.path.join(get_appdata_dir(), 'config.json')
         cfg = ler_config_seguro(config_path)
         if cfg.get("agent_mode", True) == False:
                     return "ERRO DE PERMISSÃO: O Modo Agente Jarvis está DESLIGADO nas configurações. Você não tem permissão para executar comandos neste momento."
@@ -546,7 +543,7 @@ def analisar_tela(instrucao: str = "Descreva detalhadamente o que você está ve
         tela = ImageGrab.grab()
         
         # 2. Busca chave da Groq (Visão Qwen 3.8) ou Gemini nas configurações do app
-        config_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'config.json')
+        config_path = os.path.join(get_appdata_dir(), 'config.json')
         cfg = ler_config_seguro(config_path) or {}
         chaves = cfg.get("api_keys", {})
         groq_key = chaves.get("groq", "") or (cfg.get("api_key", "") if cfg.get("provider") == "groq" else "")
@@ -665,7 +662,7 @@ def memorizar_conhecimento(assunto: str, detalhes: str) -> str:
     from datetime import datetime
     
     try:
-        caminho_memoria = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'memoria_longo_prazo.json')
+        caminho_memoria = os.path.join(get_appdata_dir(), 'memoria_longo_prazo.json')
         
         memorias = []
         if os.path.exists(caminho_memoria):
@@ -699,7 +696,7 @@ def pesquisar_memoria_permanente(termo_busca: str) -> str:
     from .seguranca import ler_config_seguro
     
     try:
-        caminho_memoria = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'memoria_longo_prazo.json')
+        caminho_memoria = os.path.join(get_appdata_dir(), 'memoria_longo_prazo.json')
         
         if not os.path.exists(caminho_memoria):
             return "Nenhuma memória de longo prazo foi gravada ainda."
@@ -847,7 +844,7 @@ def analisar_midia(caminho_arquivo: str, instrucao: str = "Descreva os detalhes 
         if not os.path.exists(caminho_arquivo):
             return f"Erro: Arquivo '{caminho_arquivo}' não encontrado."
             
-        config_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'config.json')
+        config_path = os.path.join(get_appdata_dir(), 'config.json')
         api_key = None
         cfg = ler_config_seguro(config_path)
         api_key = cfg.get("api_keys", {}).get("gemini", "")
@@ -956,7 +953,7 @@ def enviar_email(destinatario: str, assunto: str, corpo: str) -> str:
     import os
     from .seguranca import ler_config_seguro
 
-    config_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'config.json')
+    config_path = os.path.join(get_appdata_dir(), 'config.json')
     try:
         cfg = ler_config_seguro(config_path)
         cred = cfg.get("email_credentials", {})
@@ -1010,7 +1007,7 @@ def ler_emails(quantidade: int = 5, apenas_nao_lidos: bool = True) -> str:
     import os
     from .seguranca import ler_config_seguro
 
-    config_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'config.json')
+    config_path = os.path.join(get_appdata_dir(), 'config.json')
     try:
         cfg = ler_config_seguro(config_path)
         cred = cfg.get("email_credentials", {})
@@ -1195,7 +1192,7 @@ def capturar_webcam(camera_index: int = 0) -> str:
         
         from .seguranca import ler_config_seguro
         
-        config_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'config.json')
+        config_path = os.path.join(get_appdata_dir(), 'config.json')
         cfg = ler_config_seguro(config_path) or {}
         chaves = cfg.get("api_keys", {})
         groq_key = chaves.get("groq", "") or (cfg.get("api_key", "") if cfg.get("provider") == "groq" else "")
@@ -1617,13 +1614,11 @@ def procurar_arquivo_usuario(termo_busca: str, pasta_especifica: str = "todas") 
 
 
 def _caminho_db_agenda() -> str:
-    import os
-    base_dir = os.getenv("APPDATA") or os.path.expanduser("~")
-    pasta_vox = os.path.join(base_dir, "Cromak Technology", "Bridge Vox")
-    pasta_bridge = os.path.join(base_dir, "Cromak Technology", "Bridge")
-    pasta_alvo = pasta_vox if os.path.exists(pasta_vox) else pasta_bridge
-    os.makedirs(pasta_alvo, exist_ok=True)
-    return os.path.join(pasta_alvo, "agenda_pessoal.db")
+    from .seguranca import get_appdata_dir
+    pasta_vox = get_appdata_dir()
+    pasta_db = os.path.join(pasta_vox, "banco_de_dados")
+    os.makedirs(pasta_db, exist_ok=True)
+    return os.path.join(pasta_db, "agenda_pessoal.db")
 
 def _inicializar_db_agenda():
     import sqlite3
@@ -1908,18 +1903,17 @@ def alternar_preferencia_sistema(opcao: str, ativar: bool = True) -> str:
     if chave not in nomes_amigaveis:
         return f"Opção '{opcao}' não reconhecida. Opções disponíveis: Modo Agente, Resposta por Voz, Tela Cheia, Iniciar com o Windows, Bandeja."
 
-    base_dir = os.getenv("APPDATA") or os.path.expanduser("~")
-    for sub in ("Bridge Vox", "Bridge"):
-        cfg_p = os.path.join(base_dir, "Cromak Technology", sub, "config.json")
-        if os.path.exists(cfg_p):
-            cfg = ler_config_seguro(cfg_p) or {}
-            cfg[chave] = bool(ativar)
-            salvar_config_seguro(cfg_p, cfg)
-            estado_txt = "ativada" if ativar else "desativada"
-            msg = f"Sucesso: A opção '{nomes_amigaveis[chave]}' foi {estado_txt} nas Preferências do sistema."
-            if chave in ("auto_tts", "always_voice", "agent_mode", "start_fullscreen"):
-                msg += " (Importante: Para que a nova configuração de fala/voz/modo tenha efeito completo em todas as janelas e áudios, feche e abra o aplicativo novamente pelo atalho F4)."
-            return msg
+    from .seguranca import get_appdata_dir, salvar_config_seguro, ler_config_seguro
+    cfg_p = os.path.join(get_appdata_dir(), "config.json")
+    if os.path.exists(cfg_p):
+        cfg = ler_config_seguro(cfg_p) or {}
+        cfg[chave] = bool(ativar)
+        salvar_config_seguro(cfg_p, cfg)
+        estado_txt = "ativada" if ativar else "desativada"
+        msg = f"Sucesso: A opção '{nomes_amigaveis[chave]}' foi {estado_txt} nas Preferências do sistema."
+        if chave in ("auto_tts", "always_voice", "agent_mode", "start_fullscreen"):
+            msg += " (Importante: Para que a nova configuração de fala/voz/modo tenha efeito completo em todas as janelas e áudios, feche e abra o aplicativo novamente pelo atalho F4)."
+        return msg
 
     return "Erro: Arquivo de configuração não encontrado."
 

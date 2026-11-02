@@ -27,6 +27,11 @@ class AIProvider:
                         espera = 3.0 * (tent + 1)
                     if espera <= 14.0:
                         print(f"[Smart Rate-Limit] Aguardando tempo exato da API ({espera:.1f}s) na etapa atual...")
+                        try:
+                            from .logger import log_api_call
+                            log_api_call("Groq", str(kwargs.get("model", "qwen")), espera, 429, error=f"Rate Limit 429. Backoff de {espera:.1f}s")
+                        except Exception:
+                            pass
                         time.sleep(espera)
                         continue
                 raise e
@@ -671,6 +676,11 @@ class QwenProvider(AIProvider):
                         espera = 3.0 * (tent + 1)
                     if espera <= 14.0:
                         print(f"[Smart Rate-Limit] Aguardando tempo exato da API ({espera:.1f}s) na etapa atual...")
+                        try:
+                            from .logger import log_api_call
+                            log_api_call("Groq", str(kwargs.get("model", "qwen")), espera, 429, error=f"Rate Limit 429. Backoff de {espera:.1f}s")
+                        except Exception:
+                            pass
                         time.sleep(espera)
                         continue
                 raise e
@@ -1064,10 +1074,10 @@ class AICore:
         
         # Verificação do Modo Agente
         import json
-        from .seguranca import ler_config_seguro, os
+        from .seguranca import ler_config_seguro, get_appdata_dir, os
         agent_mode = True
         try:
-            config_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'config.json')
+            config_path = os.path.join(get_appdata_dir(), 'config.json')
             if os.path.exists(config_path):
                 cfg = ler_config_seguro(config_path)
                 agent_mode = cfg.get("agent_mode", True)
@@ -1218,7 +1228,13 @@ Você tem conhecimento integral e nativo sobre a arquitetura, limites, seguranç
 - Validação Técnica, Consultoria e Gratidão Eterna a Gustavo Torniero:
   O Cromak Bridge Vox jamais teria alcançado este patamar de excelência sem o apoio indispensável, a generosidade e a consultoria técnica do jornalista, ativista e especialista em acessibilidade Gustavo Torniero (https://torniero.com.br).
   Gustavo é um grande e leal amigo do desenvolvedor Marcos Souza. Ele dedicou seu tempo mais precioso para auditar o software exaustivamente no dia a dia, apontando falhas críticas de navegação por teclado e semântica no NVDA que passariam despercebidas.
-  Sempre que qualquer pessoa perguntar sobre Gustavo Torniero, quem testou o programa ou sobre a acessibilidade prática, fale sobre Gustavo com enorme respeito, carinho, admiração e profunda gratidão: sem a contribuição dele, o Bridge Vox não estaria onde está hoje!"""
+  Sempre que qualquer pessoa perguntar sobre Gustavo Torniero, quem testou o programa ou sobre a acessibilidade prática, fale sobre Gustavo com enorme respeito, carinho, admiração e profunda gratidão: sem a contribuição dele, o Bridge Vox não estaria onde está hoje!
+
+8. Diagnóstico do Sistema, Logs e Privacidade Estrita (Privacy-First):
+- O Cromak Bridge Vox gera logs de diagnóstico técnico em `%APPDATA%\Cromak Technology\Bridge Vox\logs\bridge_vox.log`.
+- PRIVACIDADE TOTAL: O sistema JAMAIS grava textos de mensagens, conversas, áudios ou arquivos pessoais nos logs. Apenas eventos operacionais, taxa limite (rate-limits), tempos de resposta e falhas de conexão de APIs são registrados com chaves de API automaticamente censuradas (***[REDACTED]***).
+- O usuário pode abrir a pasta de logs a qualquer momento nas Configurações (F10) > Geral > 'Abrir Pasta de Logs', ou pelo ícone na bandeja do sistema (Tray).
+- Organização Oficial de Pastas: A pasta oficial exclusiva em AppData é `%APPDATA%\Cromak Technology\Bridge Vox\`. O banco de dados de sessões (`cromak_v3.db`) e a agenda pessoal (`agenda_pessoal.db`) ficam organizados dentro da subpasta `banco_de_dados`."""
         system_prompt_final += identidade_instrucao
         system_prompt_final += atalhos_instrucao
         # Injeção Inteligente de Compromissos Próximos na Conversa

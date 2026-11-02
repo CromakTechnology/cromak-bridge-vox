@@ -76,26 +76,23 @@ class AudioEngine:
 
             # 1ª Tentativa: Groq Whisper (whisper-large-v3-turbo) se houver chave Groq configurada
             try:
-                from .seguranca import ler_config_seguro
-                base_dir = os.getenv("APPDATA") or os.path.expanduser("~")
-                for sub in ("Bridge Vox", "Bridge"):
-                    cfg_p = os.path.join(base_dir, "Cromak Technology", sub, "config.json")
-                    if os.path.exists(cfg_p):
-                        cfg = ler_config_seguro(cfg_p) or {}
-                        groq_key = cfg.get("api_keys", {}).get("groq", "") or (cfg.get("api_key", "") if cfg.get("provider") == "groq" else "")
-                        if groq_key:
-                            from openai import OpenAI
-                            client = OpenAI(api_key=groq_key, base_url="https://api.groq.com/openai/v1", timeout=8.0)
-                            with open(caminho_temp, "rb") as af:
-                                trans = client.audio.transcriptions.create(
-                                    file=("comando_temp.wav", af.read()),
-                                    model="whisper-large-v3-turbo",
-                                    language="pt"
-                                )
-                            texto_w = (trans.text or "").strip()
-                            if texto_w:
-                                return texto_w
-                            break
+                from .seguranca import ler_config_seguro, get_appdata_dir
+                cfg_p = os.path.join(get_appdata_dir(), "config.json")
+                if os.path.exists(cfg_p):
+                    cfg = ler_config_seguro(cfg_p) or {}
+                    groq_key = cfg.get("api_keys", {}).get("groq", "") or (cfg.get("api_key", "") if cfg.get("provider") == "groq" else "")
+                    if groq_key:
+                        from openai import OpenAI
+                        client = OpenAI(api_key=groq_key, base_url="https://api.groq.com/openai/v1", timeout=8.0)
+                        with open(caminho_temp, "rb") as af:
+                            trans = client.audio.transcriptions.create(
+                                file=("comando_temp.wav", af.read()),
+                                model="whisper-large-v3-turbo",
+                                language="pt"
+                            )
+                        texto_w = (trans.text or "").strip()
+                        if texto_w:
+                            return texto_w
             except Exception as e_w:
                 print("Fallback de Whisper para SpeechRecognition:", e_w)
 

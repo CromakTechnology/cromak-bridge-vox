@@ -37,28 +37,15 @@ def resource_path(relative_path):
         base_path = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(base_path, relative_path)
 
+from core.seguranca import get_appdata_dir
+
 def get_data_dir():
     """
-    Retorna o diretório correto para salvar dados persistentes (AppData/Roaming no Windows).
-    Garante que o EXE não perca dados após ser fechado.
-    Suporta tanto 'Bridge' quanto 'Bridge Vox' de forma transparente.
+    Retorna o diretório persistente oficial do Cromak Bridge Vox:
+    %APPDATA%\\Cromak Technology\\Bridge Vox
+    Mantém 100% de integridade e migra dados legados automaticamente.
     """
-    if os.name == 'nt':  # Se for Windows
-        base_dir = os.getenv('APPDATA')
-    else:  # Fallback para Linux/Mac
-        base_dir = os.path.expanduser('~')
-    
-    pasta_vox = os.path.join(base_dir, "Cromak Technology", "Bridge Vox")
-    pasta_bridge = os.path.join(base_dir, "Cromak Technology", "Bridge")
-    
-    # Se já existir config na pasta Bridge Vox (instalador novo), usa ela
-    if os.path.exists(os.path.join(pasta_vox, "config.json")):
-        return pasta_vox
-        
-    if not os.path.exists(pasta_bridge):
-        os.makedirs(pasta_bridge, exist_ok=True)
-        
-    return pasta_bridge
+    return get_appdata_dir()
 
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -66,7 +53,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 APP_VERSION = "1.3.5"
 APP_BUILD = "2026.10"
-APP_NOME = "Cromak Bridge"
+APP_NOME = "Cromak Bridge Vox"
 
 from core.gemini_api import AICore
 from core.memory_manager import MemoryManager
@@ -272,9 +259,8 @@ class ApiBackend:
             import json
             
             # Puxa a chave da API
-            config_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'Cromak Technology', 'Bridge', 'config.json')
-            with open(config_path, 'r', encoding='utf-8') as f:
-                cfg = json.load(f)
+            config_path = os.path.join(self.data_dir, 'config.json')
+            cfg = ler_config_seguro(config_path)
             
             chaves = cfg.get("api_keys", {})
             chave = chaves.get("gemini", cfg.get("api_key", ""))
@@ -477,7 +463,7 @@ class ApiBackend:
     def configurar_startup(self, enable):
         """Adiciona ou remove o aplicativo da inicialização do Registro do Windows."""
         key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
-        app_name = os.path.join("Cromak Technology", "Bridge")
+        app_name = "Cromak Bridge Vox"
         exe_path = sys.executable if getattr(sys, 'frozen', False) else os.path.abspath(sys.argv[0])
             
         try:
@@ -515,6 +501,10 @@ class ApiBackend:
                     import webbrowser
                     webbrowser.open("https://cromaktechnology.github.io/pt/suporte.html")
 
+                def abrir_logs_tray(icon, item):
+                    from core.logger import abrir_pasta_logs
+                    abrir_pasta_logs()
+
                 def sair_app(icon, item):
                     icon.stop()
                     import os
@@ -523,6 +513,7 @@ class ApiBackend:
                 menu = pystray.Menu(
                     pystray.MenuItem("Abrir Cromak Bridge Vox", mostrar_janela, default=True),
                     pystray.Menu.SEPARATOR,
+                    pystray.MenuItem("Abrir Pasta de Logs", abrir_logs_tray),
                     pystray.MenuItem("Verificar Atualizações...", verificar_updates),
                     pystray.MenuItem("Suporte", abrir_suporte),
                     pystray.Menu.SEPARATOR,
@@ -629,7 +620,7 @@ class ApiBackend:
         try:
             import winreg as reg
             key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
-            app_name = os.path.join("Cromak Technology", "Bridge")
+            app_name = "Cromak Bridge Vox"
             exe_path = sys.executable if getattr(sys, 'frozen', False) else os.path.abspath(sys.argv[0])
             
             # Conecta ao registro do usuário atual
@@ -779,6 +770,11 @@ class ApiBackend:
                 os.startfile(caminho_abs)
             except Exception as e:
                 print(f"Erro ao abrir arquivo: {e}")
+
+    def abrir_pasta_logs(self):
+        """Abre a pasta de logs técnicos de diagnóstico no Windows Explorer mantendo a privacidade do usuário."""
+        from core.logger import abrir_pasta_logs
+        return abrir_pasta_logs()
 
     # --- FERRAMENTAS E ARQUIVOS ---
     def gravar_audio(self):
@@ -1278,9 +1274,12 @@ def global_hotkey_listener():
         if user32.RegisterHotKey(None, HOTKEY_ALT_C, 0x0001, 0x43):
             registrados.append("Alt+C")
 
+    from core.logger import log_info, log_warning
     if registrados:
+        log_info(f"Atalhos globais de invocação ativados: [{', '.join(registrados)}]")
         print(f"Atalhos globais de invocação ativados: [{', '.join(registrados)}] (Restauram o app da bandeja de qualquer lugar)")
     else:
+        log_warning("Aviso: Windows não permitiu registrar atalhos globais de invocação (conflito de hotkey).")
         print("Aviso: Windows não permitiu registrar atalhos globais de invocação.")
         return
 
@@ -1452,8 +1451,12 @@ if __name__ == '__main__':
     except Exception:
         pass
 
+    from core.logger import log_info
+    log_info(f"Iniciando Cromak Bridge Vox v{APP_VERSION} (Build {APP_BUILD})")
+    log_info(f"Provedor ativo: {api.config.get('provider')} | Modelo: {api.config.get('model')}")
+
     janela = webview.create_window(
-        'Cromak Bridge', 
+        'Cromak Bridge Vox', 
         url=html_path, 
         width=1100, 
         height=750, 

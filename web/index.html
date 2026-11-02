@@ -473,6 +473,18 @@
                         Minimizar para a bandeja do sistema ao fechar (Tray)
                     </label>
                 </div>
+
+                <!-- GRUPO: DIAGNÓSTICO E PRIVACIDADE -->
+                <div style="border: 1px solid var(--border-glass); border-radius: 8px; padding: 16px; margin-bottom: 10px;">
+                    <div style="font-size: 0.80rem; color: var(--accent-1); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Diagnóstico e Privacidade</div>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 12px;">
+                        Os logs registram métricas técnicas, tempo de resposta e eventuais rate-limits com chaves anonimizadas. Suas mensagens, áudios e conversas pessoais <strong>NUNCA</strong> são gravados em arquivo.
+                    </p>
+                    <button type="button" class="dialog-btn" style="padding: 9px 18px; font-size: 0.85rem; background: rgba(255,255,255,0.06); border: 1px solid var(--border-glass); color: var(--text-primary); cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px;" onclick="pywebview.api.abrir_pasta_logs()" aria-label="Abrir pasta de logs de diagnóstico técnico">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        Abrir Pasta de Logs
+                    </button>
+                </div>
             </div>
             
             <!-- ABA 2: CHAVES DE API -->
@@ -781,6 +793,7 @@ Agradecimento especial e eterno ao jornalista e consultor em acessibilidade digi
                             <a href="#" onclick="pywebview.api.abrir_arquivo('docs/eula.txt')" style="color: var(--accent-2); text-decoration: underline; font-size: 0.9rem;">EULA</a>
                             <a href="#" onclick="pywebview.api.abrir_arquivo('docs/privacy.txt')" style="color: var(--accent-2); text-decoration: underline; font-size: 0.9rem;">Privacy Policy</a>
                             <a href="#" onclick="pywebview.api.abrir_arquivo('docs/readme.txt')" style="color: var(--accent-2); text-decoration: underline; font-size: 0.9rem;">Readme File</a>
+                            <a href="#" onclick="pywebview.api.abrir_pasta_logs()" style="color: var(--accent-1); text-decoration: underline; font-size: 0.9rem;" aria-label="Abrir pasta de logs de diagnóstico técnico">Logs do Sistema</a>
                         </div>
                         
                         <!-- Footer -->
