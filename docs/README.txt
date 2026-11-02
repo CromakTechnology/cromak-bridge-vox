@@ -91,12 +91,12 @@ O agente de máquina seleciona e executa ferramentas locais automaticamente:
   arquivos manipulados.
 
 ================================================================================
-5. SUPORTE TÉCNICO E COMUNIDADE
+5. SUPORTE TÉCNICO, CÓDIGO-FONTE E COMUNIDADE
 ================================================================================
-Central de Suporte: https://cromaktechnology.github.io/pt/suporte.html
-Repositório GitHub: https://github.com/CromakTechnology/cromak-bridge-vox
-Doações e Apoio: https://link.mercadopago.com.br/cromaktechnology
+Repositório Oficial (Open Source):
+-> https://github.com/CromakTechnology/cromak-bridge-vox
+   Participe do desenvolvimento, reporte sugestões/bugs ou envie Pull Requests!
 
-Cromak Technology - Da lógica dos códigos até a precisão da máquina, onde a 
-criatividade humana encontra a tecnologia acessível.
-================================================================================
+Central de Suporte: https://cromaktechnology.github.io/pt/suporte.html
+Site Oficial: https://cromaktechnology.github.io/pt/bridge-vox.html
+Doações e Apoio ao Projeto: https://link.mercadopago.com.br/cromaktechnology
