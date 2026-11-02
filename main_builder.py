@@ -58,9 +58,14 @@ def realizar_build():
     criar_arquivo_versao()
     print("📋 Metadados (Version Info) preparados.")
 
+    # Detecta automaticamente o python da .venv se existir
+    venv_python = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".venv", "Scripts", "python.exe")
+    python_bin = venv_python if os.path.exists(venv_python) else sys.executable
+    print(f"🐍 Interpretador Python para o build: {python_bin}")
+
     # 2. Comando PyInstaller com saída direta para dist/BridgeVox
     comando = [
-        sys.executable, "-m", "PyInstaller",
+        python_bin, "-m", "PyInstaller",
         "--noconfirm",
         "--onedir",
         "--windowed",
@@ -70,9 +75,11 @@ def realizar_build():
         "--add-data=plugins;plugins",
         "--add-data=docs;docs",
         "--hidden-import=core.online_sync",
-        "--hidden-import=openai",
-        "--hidden-import=google.genai",
-        "--hidden-import=anthropic",
+        "--collect-all=google.genai",
+        "--collect-all=groq",
+        "--collect-all=anthropic",
+        "--collect-all=openai",
+        "--copy-metadata=google-genai",
         f"--name={NOME_APP}",
         f"--version-file={VERSION_FILE}",
         MAIN_SCRIPT
