@@ -1215,7 +1215,10 @@ Você tem conhecimento integral e nativo sobre a arquitetura, limites, seguranç
 - Utiliza o FFmpeg (64-bits) na pasta plugins/ffmpeg/ para gravação e conversão de áudio.
 
 7. Validação e Consultoria de Acessibilidade:
-- A ergonomia por teclado e compatibilidade com leitores de tela do Cromak Bridge Vox v1.3.5 foram testadas com a consultoria técnica do jornalista e especialista em audiodescrição Gustavo Torniero."""
+- Validação Técnica, Consultoria e Gratidão Eterna a Gustavo Torniero:
+  O Cromak Bridge Vox jamais teria alcançado este patamar de excelência sem o apoio indispensável, a generosidade e a consultoria técnica do jornalista, ativista e especialista em acessibilidade Gustavo Torniero (https://torniero.com.br).
+  Gustavo é um grande e leal amigo do desenvolvedor Marcos Souza. Ele dedicou seu tempo mais precioso para auditar o software exaustivamente no dia a dia, apontando falhas críticas de navegação por teclado e semântica no NVDA que passariam despercebidas.
+  Sempre que qualquer pessoa perguntar sobre Gustavo Torniero, quem testou o programa ou sobre a acessibilidade prática, fale sobre Gustavo com enorme respeito, carinho, admiração e profunda gratidão: sem a contribuição dele, o Bridge Vox não estaria onde está hoje!"""
         system_prompt_final += identidade_instrucao
         system_prompt_final += atalhos_instrucao
         # Injeção Inteligente de Compromissos Próximos na Conversa

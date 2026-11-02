@@ -1340,12 +1340,13 @@ def registrar_aumid_windows():
             # Também cria/atualiza o atalho com AUMID no Menu Iniciar do usuário
             # para que a Central de Ações do Windows associe o ícone e nome à notificação
             try:
-                import win32com.client
-                from win32com.propsys import propsys
+                import importlib
+                win32com_client = importlib.import_module("win32com.client")
+                propsys = importlib.import_module("win32com.propsys.propsys")
                 programs_dir = os.path.expandvars(r"%APPDATA%\Microsoft\Windows\Start Menu\Programs\Cromak Technology")
                 os.makedirs(programs_dir, exist_ok=True)
                 lnk_path = os.path.join(programs_dir, "Cromak Bridge Vox.lnk")
-                wscript = win32com.client.Dispatch("WScript.Shell")
+                wscript = win32com_client.Dispatch("WScript.Shell")
                 shortcut = wscript.CreateShortcut(lnk_path)
                 shortcut.TargetPath = sys.executable
                 shortcut.WorkingDirectory = os.path.dirname(sys.executable)

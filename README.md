@@ -48,8 +48,12 @@ Diferente de um simples chat restrito a uma aba de navegador, o Bridge Vox atua 
 
 ## ♿ Acessibilidade Sem Concessões (Validado na Prática)
 
-> ### 🤝 Validação Técnica & Consultoria
-> O **Cromak Bridge Vox v1.3.5** teve sua ergonomia de navegação por teclado, estrutura semântica e compatibilidade com leitores de tela rigorosamente testadas com a consultoria e validação técnica de **[Gustavo Torniero](https://torniero.com.br)** — jornalista, ativista e o primeiro consultor em audiodescrição contratado em regime CLT por uma emissora de TV no Brasil.
+> ### 🤝 Validação Técnica, Amizade & Gratidão a Gustavo Torniero
+> O **Cromak Bridge Vox v1.3.5** não teria alcançado o seu nível atual de excelência, fluidez e inclusão real sem a generosidade, a parceria e a consultoria técnica de **[Gustavo Torniero](https://torniero.com.br)** — jornalista, ativista dos direitos das pessoas com deficiência e o primeiro consultor em audiodescrição contratado em regime CLT por uma emissora de TV no Brasil.
+> 
+> Mais do que um consultor renomado, Gustavo é um grande amigo que dedicou seu tempo precioso para auditar exaustivamente o software no dia a dia. Foi o seu olhar crítico, experiente e generoso que apontou falhas cruciais de navegação, semântica e ergonomia com o NVDA — barreiras que passariam despercebidas sem a sua vivência prática.
+> 
+> *A ele, o nosso mais profundo respeito e eterna gratidão: sem a sua contribuição indispensável, este projeto jamais teria chegado até aqui.*
 
 ### Recursos de Inclusão Nativa:
 - 🎯 **WAI-ARIA `role="application"` & Modo de Foco Automático:** A interface opera com `role="application"` para instruir leitores de tela como NVDA e JAWS a alternarem automaticamente para o **Modo de Foco**, permitindo que as teclas de atalho cheguem diretamente à aplicação sem interceptação pelo Modo de Navegação virtual (*Browse Mode*).
