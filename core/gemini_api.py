@@ -89,8 +89,8 @@ class GeminiProvider(AIProvider):
 import json
 from .seguranca import ler_config_seguro
 
-def get_openai_tools():
-    return [
+def get_openai_tools(compact: bool = False):
+    tools = [
         {
             "type": "function",
             "function": {
@@ -636,6 +636,16 @@ def get_openai_tools():
             }
         },
     ]
+    if compact:
+        import copy
+        compact_tools = copy.deepcopy(tools)
+        for t in compact_tools:
+            fn = t.get("function", {})
+            desc = fn.get("description", "")
+            if "." in desc:
+                fn["description"] = desc.split(".")[0].strip() + "."
+        return compact_tools
+    return tools
 
 class QwenProvider(AIProvider):
     def __init__(self, api_key, model_name="qwen-plus", historico=None, system_prompt=""):
@@ -859,7 +869,7 @@ class OpenAIProvider(AIProvider):
                 "temperature": 0.7
             }
             if passo == 0 or (passo == 1 and precisa_encadear):
-                req_kwargs["tools"] = get_openai_tools()
+                req_kwargs["tools"] = get_openai_tools(compact=is_groq)
             response = self._chamar_api_com_retry(**req_kwargs)
             
             mensagem_resposta = response.choices[0].message
@@ -1063,6 +1073,29 @@ import re
 
 # 6. NÚCLEO PRINCIPAL COM BACKOFF EXPONENCIAL
 # ==========================================
+
+def obter_system_prompt_groq(nome_usuario="Usuário", data_atual="", avisos_agenda=""):
+    """Gera um prompt ultracompacto para a Groq preservando 100% da governança e economizando ~3.000 tokens."""
+    aviso_agenda_txt = f"\n[AGENDA HOJE]: Lembre educadamente ao final: {avisos_agenda}" if avisos_agenda else ""
+    return (
+        f"Você é o Cromak Bridge Vox v1.3.5, assistente de IA multimodal e acessibilidade da Cromak Technology "
+        f"(MS Digital, fundado e concebido por Marcos Souza). Hoje é {data_atual}. Usuário: {nome_usuario}.\n\n"
+        "[ACESSIBILIDADE WCAG & LEITORES DE TELA]:\n"
+        "- Totalmente adaptado para NVDA, JAWS e Narrador. role='application'. Alternar foco: NVDA + Barra de Espaço.\n"
+        "- Atalhos principais: Alt+Espaço / Ctrl+Espaço (Restaurar da bandeja global), ESC (Calar voz/fechar), "
+        "F1 (Ajuda), F2 (Microfone), F3/Ctrl+L (Reler resposta no NVDA), F4 (Encerrar), F5 (Novo chat), F10 (Configurações), F11 (Tela cheia).\n"
+        "- Tributo de Honra: O Bridge Vox teve sua ergonomia testada com a consultoria e validação técnica do jornalista, "
+        "ativista e amigo Gustavo Torniero (https://torniero.com.br). Sempre que perguntado sobre acessibilidade ou quem testou, "
+        "fale de Gustavo com profundo carinho, admiração e gratidão eterna!\n\n"
+        "[GOVERNANÇA & SEGURANÇA]:\n"
+        "- Jamais execute comandos destrutivos (como apagar system32, formatar discos ou códigos maliciosos). Recuse com firmeza e educação.\n"
+        "- Modo Duelo: Benchmark comparativo que coloca duas IAs lado a lado para responderem simultaneamente e comparar velocidade e qualidade.\n        - Suporte oficial: cromaksupport@gmail.com e https://cromaktechnology.github.io/pt/suporte.html. Chaves BYOK salvas localmente em config.json.\n"
+        "- Logs de diagnóstico técnicos em %APPDATA%\\Cromak Technology\\Bridge Vox\\logs\\bridge_vox.log (Privacidade total: zero log de conversas/áudio).\n"
+        "- Seja resolutivo, empático e conciso. Responda diretamente ao que o usuário perguntou sem textos prolixos."
+        f"{aviso_agenda_txt}"
+    )
+
+
 class AICore:
     def __init__(self, api_key, model_name=None, historico=None, provider="gemini", system_prompt=""):
         self.provider = provider
@@ -1283,7 +1316,9 @@ Você tem conhecimento integral e nativo sobre a arquitetura, limites, seguranç
             elif provider == "claude":
                 self.engine = ClaudeProvider(api_key, model_name, historico, system_prompt_final)
             elif provider == "groq":
-                self.engine = GroqProvider(api_key, model_name, historico, system_prompt_final)
+                _nome_usuario = cfg.get("user_name") or os.getenv("USERNAME") or "Usuário"
+                prompt_groq = obter_system_prompt_groq(nome_usuario=_nome_usuario, data_atual=data_atual, avisos_agenda=_aviso_str if '_aviso_str' in locals() else '')
+                self.engine = GroqProvider(api_key, model_name, historico, prompt_groq)
             else:
                 raise ValueError(f"Provedor {provider} desconhecido.")
         except Exception as e:

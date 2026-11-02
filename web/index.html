@@ -193,8 +193,9 @@
                         <option value="gemini-1.5-pro">GEMINI 1.5 PRO</option>
                     </select>
                 </div>
-                <div style="color: var(--success); font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
-                    <span style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success);"></span> <span data-i18n="status_connected">Conectado</span>
+                <div id="connectionStatusBadge" style="color: var(--success); font-size: 0.85rem; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; padding: 4px 8px; border-radius: 6px; transition: background 0.2s;" onclick="verificarOuAbrirConfigRede()" role="status" aria-live="polite" title="Verificando conexão de rede e motor de IA...">
+                    <span id="connectionDot" style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); transition: all 0.3s ease;"></span>
+                    <span id="connectionText" data-i18n="status_connected">Conectado</span>
                 </div>
             </header>
 

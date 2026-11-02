@@ -776,6 +776,31 @@ class ApiBackend:
         from core.logger import abrir_pasta_logs
         return abrir_pasta_logs()
 
+    def obter_status_conexao(self):
+        """Retorna em tempo real se o computador tem acesso à internet e se o provedor ativo possui chave de API configurada."""
+        import socket
+        provedor = self.config.get("provider", "gemini")
+        chaves = self.config.get("api_keys", {})
+        chave = chaves.get(provedor, "") or (self.config.get("api_key", "") if self.config.get("provider") == provedor else "")
+        chave_ok = bool(chave.strip()) if provedor != "ollama" else True
+
+        online = True
+        try:
+            s = socket.create_connection(("1.1.1.1", 53), timeout=1.2)
+            s.close()
+        except OSError:
+            try:
+                s = socket.create_connection(("8.8.8.8", 53), timeout=1.2)
+                s.close()
+            except OSError:
+                online = False
+
+        return {
+            "online": online,
+            "chave_configurada": chave_ok,
+            "provedor": provedor
+        }
+
     # --- FERRAMENTAS E ARQUIVOS ---
     def gravar_audio(self):
         return self.audio.ouvir()
