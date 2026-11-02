@@ -1,0 +1,47 @@
+name: Feature Request
+description: Propose an idea, new capability, or accessibility enhancement for Cromak Bridge Vox.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature! Please articulate how this enhancement aligns with our core mission of local autonomy and radical accessibility.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement or Use Case
+      description: Is your feature request related to a specific limitation, workflow friction, or accessibility barrier?
+      placeholder: "e.g., I'm always frustrated when I need to manually switch between..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution & Experience
+      description: Describe what you want to happen, including commands or hotkeys if applicable:
+    validations:
+      required: true
+
+  - type: textarea
+    id: a11y_impact
+    attributes:
+      label: Accessibility Impact (A11y)
+      description: How will this feature benefit keyboard users, screen reader users, or low-vision users? What accessible cues should be included?
+      placeholder: "e.g., It will announce completion via NVDA with 'Sound cue + text summary', avoiding the need to open a window."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any relevant mockups, reference links, API documentation, or notes here.

@@ -1,0 +1,106 @@
+name: Bug Report
+description: Report a bug, crash, or unexpected behavior in Cromak Bridge Vox.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please provide as much context as possible so we can reproduce and fix it.
+        If this issue directly impacts keyboard navigation or screen readers, please use the dedicated **Accessibility Barrier** template instead.
+
+  - type: input
+    id: version
+    attributes:
+      label: Cromak Bridge Vox Version
+      description: What version of Cromak Bridge Vox are you running? (Check help or installer name)
+      placeholder: "e.g., v1.3.5 Matrix Core"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os_version
+    attributes:
+      label: Windows Version & Architecture
+      description: Select your operating system environment.
+      options:
+        - Windows 11 (64-bit)
+        - Windows 10 (64-bit standard edition)
+        - Windows 10 LTSC / IoT Enterprise
+        - Windows Server 2022 / 2025
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: screen_reader
+    attributes:
+      label: Screen Reader In Use
+      description: Are you using assistive speech technologies while encountering this issue?
+      options:
+        - None (Visual / Mouse operation only)
+        - NVDA (NonVisual Desktop Access)
+        - Windows Narrator
+        - JAWS (Job Access With Speech)
+        - Other (SuperNova, ZoomText, etc.)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: AI Provider & Model (If applicable)
+      description: Which provider was selected when the issue occurred?
+      options:
+        - Groq Cloud
+        - Google Gemini
+        - OpenAI ChatGPT
+        - Anthropic Claude
+        - Alibaba Qwen
+        - None / Offline feature (Audio, DB, Hotkeys)
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to recreate the problem.
+      placeholder: |
+        1. Open Cromak Bridge Vox.
+        2. Press Alt+Space to bring window to front.
+        3. Type '...' or trigger action '...'
+        4. See error.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened (e.g., error alert, crash, freeze, silent failure).
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, Console Output, or Error Messages
+      description: Copy and paste any error logs or stack traces here.
+      render: shell
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate.
+          required: true
+        - label: I am not pasting private API keys, secrets, or sensitive user data in this report.
+          required: true

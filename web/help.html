@@ -42,7 +42,7 @@
         .no-results { display: none; text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.2rem; }
     </style>
 </head>
-<body>
+<body role="application" aria-label="Ajuda e Manual de Atalhos - Cromak Bridge Vox">
     <div class="help-container">
         <div class="help-header">
             <div class="help-header-top">
@@ -83,6 +83,13 @@
             </h2>
             <p>Esta modalidade pode ser ativada no menu <i>Configurações > Comportamento</i>. Quando ativada, a interface gráfica se torna secundária e o usuário passa a operar o sistema por meio de atalhos e áudio imersivo (Text-to-Speech e Microfone Nativo).</p>
             
+                        <!-- AVISO DE ACESSIBILIDADE NVDA (MODO DE FOCO) -->
+            <div style="background: rgba(99, 102, 241, 0.12); border-left: 4px solid var(--accent-1); padding: 14px 18px; border-radius: 8px; margin: 20px 0; font-size: 0.95rem; line-height: 1.6;">
+                <b style="color: var(--accent-1);">♿ Dica Fundamental para Usuários do Leitor de Tela NVDA:</b><br>
+                O Cromak Bridge Vox foi desenvolvido com o padrão WAI-ARIA <code>role="application"</code> para que o leitor de telas alterne automaticamente para o <b>Modo de Foco</b>. 
+                Caso o seu leitor de tela (NVDA/JAWS) permaneça no Modo de Navegação virtual (Browse Mode) e capture as teclas para si, pressione <span class="kbd">NVDA + Barra de Espaço</span> para alternar para o <b>Modo de Foco</b> e liberar todos os comandos diretos do sistema.
+            </div>
+
             <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path></svg> 2.1 ATALHOS GLOBAIS E DE NAVEGAÇÃO ACESSÍVEL</h3>
             <p>Projetados estrategicamente para total autonomia sem tocar no mouse e com compatibilidade total ao NVDA e leitores de tela:</p>
             <ul>

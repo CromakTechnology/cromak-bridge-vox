@@ -1,0 +1,95 @@
+name: Accessibility Barrier (a11y)
+description: Report a barrier impacting keyboard navigation, screen reader speech, ARIA live regions, or contrast.
+title: "[A11y]: "
+labels: ["accessibility", "a11y-priority"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### ♿ Accessibility Barrier Report
+        **Cromak Bridge Vox is built to be 100% accessible.** We treat accessibility bugs as critical defects.
+        Thank you for helping us identify barriers so every user has equal autonomy.
+
+  - type: input
+    id: version
+    attributes:
+      label: Cromak Bridge Vox Version
+      placeholder: "e.g., v1.3.5 Matrix Core"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: assistive_tech
+    attributes:
+      label: Assistive Technology In Use
+      description: Check all assistive technologies and modalities you use:
+      options:
+        - label: NVDA (NonVisual Desktop Access)
+        - label: Windows Narrator
+        - label: JAWS (Job Access With Speech)
+        - label: Refreshable Braille Display
+        - label: Keyboard-Only (No mouse)
+        - label: High Contrast / Screen Magnifier (ZoomText, Windows Magnifier)
+
+  - type: dropdown
+    id: barrier_category
+    attributes:
+      label: Barrier Category
+      description: What type of accessibility obstacle occurred?
+      options:
+        - Focus Lost / Unclear Focus Position
+        - Focus Trap (Cannot escape modal or section via Tab / Esc)
+        - Missing or Inaccurate ARIA Label / Button Name
+        - Screen Reader Does Not Announce Dynamic Response (Live Region Failure)
+        - Excessive Speech Chatter / Repeated Stutter
+        - Hotkey Conflict / Unresponsive Shortcut
+        - Visual Contrast / Legibility Barrier in High Contrast Mode
+        - Other Accessibility Barrier
+    validations:
+      required: true
+
+  - type: input
+    id: interface_area
+    attributes:
+      label: Affected Interface Component
+      description: Where in the application did this occur?
+      placeholder: "e.g., Main prompt input, Settings modal, Exit confirmation dialog (F4), System tray"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Encounter the Barrier
+      description: Describe the exact keyboard actions or navigation sequence:
+      placeholder: |
+        1. Launch Bridge Vox.
+        2. Press Tab 3 times to reach '...'
+        3. Press Enter.
+        4. Focus vanishes or screen reader remains silent.
+    validations:
+      required: true
+
+  - type: textarea
+    id: speech_transcript
+    attributes:
+      label: Screen Reader Speech Transcript (NVDA Speech Viewer / Logs)
+      description: If using NVDA or JAWS, open the Speech Viewer and copy what was announced:
+      placeholder: "e.g., NVDA said: 'unknown', or was completely silent when response arrived."
+
+  - type: textarea
+    id: expected_a11y
+    attributes:
+      label: Expected Accessible Experience
+      description: How should this component behave to be fully intuitive and accessible?
+      placeholder: "e.g., The dialog should trap focus properly and announce: 'Exit Bridge Vox? Press Enter to confirm or Escape to cancel.'"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Acknowledgement
+      options:
+        - label: I confirm this issue hinders or degrades an accessible computing workflow.
+          required: true

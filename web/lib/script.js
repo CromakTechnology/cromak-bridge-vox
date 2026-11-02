@@ -44,6 +44,21 @@ function resetShortcuts() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initShortcuts();
+    // Foco inicial programático imediato (WAI-ARIA role="application" & WCAG 2.1.4)
+    setTimeout(() => {
+        const input = document.getElementById('userInput');
+        if (input && !input.disabled) {
+            input.focus();
+        }
+    }, 100);
+});
+
+// Ao retornar o foco para a janela do Bridge Vox, garante foco no campo de digitação
+window.addEventListener('focus', () => {
+    const activeModal = document.querySelector('.api-setup-overlay[style*="display: flex"], .settings-modal[style*="display: flex"], #customDialog[style*="display: flex"]');
+    if (!activeModal && typeof focarCampoMensagem === 'function') {
+        focarCampoMensagem();
+    }
 });
 
 
@@ -2277,16 +2292,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ==========================================
-// MODO BRIDGE VOX (ATALHOS DE ACESSIBILIDADE FRONTEND)
+// MODO BRIDGE VOX (ATALHOS DE ACESSIBILIDADE FRONTEND - CONFORME WCAG 2.1.4)
 // ==========================================
 window.addEventListener('keydown', (e) => {
-    // 1. F4 ou Alt+F4: Encerramento com Confirmação e Acessibilidade (NVDA)
-    const isExitKey = e.key === 'F4' || (e.altKey && e.key === 'F4') || 
+    // Se estiver interagindo com campo de gravação de atalho no modal de preferências, não intercepta
+    if (document.activeElement && document.activeElement.classList.contains('shortcut-input')) return;
+
+    // 1. F4 ou Alt+F4 ou Ctrl+Q / Alt+Q: Encerramento com Confirmação e Acessibilidade (NVDA)
+    const isExitKey = e.key === 'F4' || 
+                      (e.altKey && (e.key === 'F4' || e.key.toLowerCase() === 'q')) || 
+                      (e.ctrlKey && e.key.toLowerCase() === 'q') ||
                       (window.appShortcuts && window.appShortcuts.exit && e.key.toUpperCase() === window.appShortcuts.exit.toUpperCase());
     if (isExitKey) {
-        // Se estiver configurando nova tecla de atalho no modal, permite digitar
-        if (document.activeElement && document.activeElement.classList.contains('shortcut-input')) return;
-        
         e.preventDefault();
         e.stopPropagation();
         if (typeof window.confirmarEncerramento === 'function') {
@@ -2297,24 +2314,21 @@ window.addEventListener('keydown', (e) => {
         return;
     }
 
-    // 2. F3 ou Ctrl+L: Ler / Focar na última resposta da IA (Acessibilidade NVDA)
-    if (e.key === 'F3' || (e.ctrlKey && (e.key === 'l' || e.key === 'L'))) {
+    // 2. F3 ou Ctrl+L ou Alt+L: Ler / Focar na última resposta da IA (Acessibilidade NVDA)
+    if (e.key === 'F3' || ((e.ctrlKey || e.altKey) && (e.key.toLowerCase() === 'l'))) {
         e.preventDefault();
         focarUltimaRespostaIA();
         return;
     }
 
-    // 3. F11: Alternar Tela Cheia (Fullscreen)
-    if (e.key === 'F11') {
+    // 3. F11 ou Alt+Enter: Alternar Tela Cheia (Fullscreen)
+    if (e.key === 'F11' || (e.altKey && e.key === 'Enter')) {
         e.preventDefault();
         if (window.pywebview && pywebview.api && pywebview.api.alternar_tela_cheia) {
             pywebview.api.alternar_tela_cheia();
         }
         return;
     }
-
-    // Se estiver interagindo com campo de gravação de atalho no modal, não intercepta
-    if (document.activeElement && document.activeElement.classList.contains('shortcut-input')) return;
 
     // 4. Tecla ESCAPE: Interromper áudio / síntese de voz e fechar modais
     if (e.key === 'Escape') {
@@ -2338,18 +2352,30 @@ window.addEventListener('keydown', (e) => {
         // Deixa propagar para fechar modais caso haja algum aberto
     }
 
-    const input = document.getElementById('userInput');
-    const isTyping = document.activeElement === input || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT';
-    
-    // 5. Atalhos Funcionais: F1 (Ajuda), F2 (Microfone), F5 (Nova Conversa), F10 (Configurações)
+    const activeEl = document.activeElement;
+    const isTyping = activeEl && (
+        activeEl.id === 'userInput' || 
+        activeEl.tagName === 'TEXTAREA' || 
+        activeEl.tagName === 'INPUT' || 
+        activeEl.isContentEditable || 
+        activeEl.classList.contains('shortcut-input')
+    );
+
+    // 5. Atalhos Funcionais com suporte a modificadores (WCAG 2.1.4):
+    //    F1 ou Alt+H / Ctrl+H (Ajuda)
+    //    F2 ou Alt+M / Ctrl+M (Microfone / Walkie-talkie)
+    //    F5 ou Ctrl+N / Alt+N (Nova Conversa)
+    //    F10 ou Ctrl+, / Alt+S (Configurações)
     const sc = window.appShortcuts || {};
     let keyName = e.key;
     if (keyName === ' ') keyName = 'Space';
     if (keyName.length === 1) keyName = keyName.toUpperCase();
     const match = (val) => val && (keyName === val.toUpperCase() || keyName === val);
 
-    if (e.key === 'F1' || match(sc.help)) {
-        if (isTyping && keyName.length === 1) return;
+    // F1 / Alt+H / Ctrl+H -> Ajuda
+    const isHelp = e.key === 'F1' || match(sc.help) || ((e.altKey || e.ctrlKey) && e.key.toLowerCase() === 'h');
+    if (isHelp) {
+        if (isTyping && !e.altKey && !e.ctrlKey) return;
         e.preventDefault();
         if (window.pywebview && pywebview.api && pywebview.api.abrir_janela_ajuda) {
             pywebview.api.abrir_janela_ajuda();
@@ -2357,15 +2383,19 @@ window.addEventListener('keydown', (e) => {
         return;
     }
 
-    if (e.key === 'F2' || match(sc.mic)) {
-        if (isTyping && keyName === 'Space') return;
+    // F2 / Alt+M / Ctrl+M -> Microfone (Walkie-Talkie)
+    const isMic = e.key === 'F2' || match(sc.mic) || ((e.altKey || e.ctrlKey) && e.key.toLowerCase() === 'm');
+    if (isMic) {
+        if (isTyping && !e.altKey && !e.ctrlKey) return;
         e.preventDefault();
         toggleAudio(true);
         return;
     }
 
-    if (e.key === 'F5' || match(sc.clear)) {
-        if (isTyping && keyName.length === 1) return;
+    // F5 / Ctrl+N / Alt+N -> Nova Conversa
+    const isNewChat = e.key === 'F5' || match(sc.clear) || ((e.altKey || e.ctrlKey) && e.key.toLowerCase() === 'n');
+    if (isNewChat) {
+        if (isTyping && !e.altKey && !e.ctrlKey) return;
         e.preventDefault();
         criarSessao();
         anunciarAoLeitor("Nova conversa iniciada.");
@@ -2373,29 +2403,36 @@ window.addEventListener('keydown', (e) => {
         return;
     }
 
-    if (e.key === 'F10' || match(sc.config)) {
-        if (isTyping && keyName.length === 1) return;
+    // F10 / Ctrl+, / Alt+S -> Configurações
+    const isConfig = e.key === 'F10' || match(sc.config) || (e.ctrlKey && e.key === ',') || (e.altKey && e.key.toLowerCase() === 's');
+    if (isConfig) {
+        if (isTyping && !e.altKey && !e.ctrlKey) return;
         e.preventDefault();
         if (typeof abrirConfiguracoes !== 'undefined') abrirConfiguracoes();
         return;
     }
 
-    if (e.ctrlKey || e.altKey) return;
-
-    let comando = "";
-    if (!isTyping) {
-        if (match(sc.txt)) comando = "Abra o editor de texto (Editor de Texto).";
-        else if (match(sc.mail)) comando = "Leia meus e-mails (Leitor de E-mails).";
-        else if (match(sc.web)) comando = "Pesquise na internet (Navegador Web).";
-        else if (match(sc.files)) comando = "Liste os arquivos do diretório atual (Gerenciador de Arquivos).";
-        else if (match(sc.calc)) comando = "Vamos fazer uma conta matemática.";
-        else if (match(sc.whats)) comando = "Mande uma mensagem no WhatsApp.";
+    // WCAG 2.1.4: Se o usuário estiver digitando em campo de texto, atalhos de tecla única NUNCA disparam!
+    if (isTyping && !e.altKey && !e.ctrlKey) {
+        return; // Usuário digitando normalmente
     }
-    
+
+    // Ferramentas Rápidas com suporte a Tecla Única (quando NÃO estiver digitando) OU Alt+Letra (a qualquer momento)
+    let comando = "";
+    const isTool = (letter) => (!isTyping && match(letter) && !e.ctrlKey && !e.altKey) || (e.altKey && e.key.toUpperCase() === letter);
+
+    if (isTool(sc.txt || 'T')) comando = "Abra o editor de texto (Editor de Texto).";
+    else if (isTool(sc.mail || 'R')) comando = "Leia meus e-mails (Leitor de E-mails).";
+    else if (isTool(sc.web || 'I')) comando = "Pesquise na internet (Navegador Web).";
+    else if (isTool(sc.files || 'A')) comando = "Liste os arquivos do diretório atual (Gerenciador de Arquivos).";
+    else if (isTool(sc.calc || 'C')) comando = "Vamos fazer uma conta matemática.";
+    else if (isTool(sc.whats || 'Z')) comando = "Mande uma mensagem no WhatsApp.";
+
     if (comando !== "") {
         e.preventDefault();
-        if (input) { input.value = comando; document.getElementById('sendBtn').click(); }
-        else { 
+        const inputEl = document.getElementById('userInput');
+        if (inputEl) { inputEl.value = comando; document.getElementById('sendBtn').click(); }
+        else if (window.pywebview && pywebview.api && pywebview.api.enviar_comando_texto) {
             pywebview.api.enviar_comando_texto(comando);
         }
         return;

@@ -10,6 +10,7 @@ AppPublisher=Cromak Technology
 AppPublisherURL=https://cromaktechnology.github.io
 AppSupportURL=https://cromaktechnology.github.io/pt/suporte.html
 AppUpdatesURL=https://cromaktechnology.github.io/pt/bridge-vox.html
+AppUserModelID=Cromak Bridge Vox
 
 ; Pasta padrão de instalação oficial (Arquivos de Programas do Windows)
 DefaultDirName={autopf}\Cromak Technology\Bridge Vox
@@ -68,9 +69,14 @@ Source: "cromak-bridge.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 ; Atalhos na Área de Trabalho e no Menu Iniciar
-Name: "{autodesktop}\Cromak Bridge Vox"; Filename: "{app}\BridgeVox.exe"; WorkingDir: "{app}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Assistente de IA Acessível Cromak Bridge Vox"
-Name: "{autoprograms}\Cromak Technology\Cromak Bridge Vox"; Filename: "{app}\BridgeVox.exe"; WorkingDir: "{app}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Assistente de IA Acessível Cromak Bridge Vox"
+Name: "{autodesktop}\Cromak Bridge Vox"; Filename: "{app}\BridgeVox.exe"; WorkingDir: "{app}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Assistente de IA Acessível Cromak Bridge Vox"; AppUserModelID: "Cromak Bridge Vox"
+Name: "{autoprograms}\Cromak Technology\Cromak Bridge Vox"; Filename: "{app}\BridgeVox.exe"; WorkingDir: "{app}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Assistente de IA Acessível Cromak Bridge Vox"; AppUserModelID: "Cromak Bridge Vox"
 Name: "{autoprograms}\Cromak Technology\Desinstalar Cromak Bridge Vox"; Filename: "{uninstallexe}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Desinstalar Cromak Bridge Vox"
+
+[Registry]
+Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Cromak Bridge Vox"; ValueType: string; ValueName: "DisplayName"; ValueData: "Cromak Bridge Vox"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Cromak Bridge Vox"; ValueType: string; ValueName: "IconUri"; ValueData: "{app}\cromak-bridge.ico"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Cromak Bridge Vox"; ValueType: dword; ValueName: "ShowInSettings"; ValueData: 1; Flags: uninsdeletekey
 
 [Run]
 ; Inicia o aplicativo automaticamente ao término da instalação

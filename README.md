@@ -52,10 +52,12 @@ Diferente de um simples chat restrito a uma aba de navegador, o Bridge Vox atua 
 > O **Cromak Bridge Vox v1.3.5** teve sua ergonomia de navegação por teclado, estrutura semântica e compatibilidade com leitores de tela rigorosamente testadas com a consultoria e validação técnica de **[Gustavo Torniero](https://torniero.com.br)** — jornalista, ativista e o primeiro consultor em audiodescrição contratado em regime CLT por uma emissora de TV no Brasil.
 
 ### Recursos de Inclusão Nativa:
+- 🎯 **WAI-ARIA `role="application"` & Modo de Foco Automático:** A interface opera com `role="application"` para instruir leitores de tela como NVDA e JAWS a alternarem automaticamente para o **Modo de Foco**, permitindo que as teclas de atalho cheguem diretamente à aplicação sem interceptação pelo Modo de Navegação virtual (*Browse Mode*).
+- 💡 **Dica de Operação para NVDA:** Caso o leitor de tela NVDA não responda aos atalhos de navegação direta, certifique-se de alternar para o Modo de Foco pressionando **`NVDA + Barra de Espaço`**.
 - 🔊 **NVDA & Narrador do Windows:** Live Regions ARIA dedicadas para que cada token gerado e finalização de resposta seja anunciado ao usuário de forma imediata e fluida, sem eco.
 - 🌐 **Internacionalização em 11 Idiomas & Auto-detecção:** Detecta automaticamente o idioma do sistema operacional no primeiro uso. Toda a interface, atalhos e falas de leitor de tela se adaptam instantaneamente.
-- 🛑 **Encerramento Acessível e Seguro (F4 / Alt+F4):** Diálogo de confirmação acessível com anúncio prioritário no NVDA (Enter para fechar, Esc para cancelar), prevenindo fechamentos acidentais.
-- ⌨️ **Operação 100% por Teclado:** Foco automático contínuo na caixa de entrada e navegação em fluxo contínuo sem nunca exigir o ponteiro do mouse.
+- 🛑 **Encerramento Acessível e Seguro (F4 / Alt+F4 / Ctrl+Q):** Diálogo de confirmação acessível com anúncio prioritário no NVDA (Enter para fechar, Esc para cancelar), prevenindo fechamentos acidentais.
+- ⌨️ **Operação 100% por Teclado (WCAG 2.1.4):** Foco automático contínuo na caixa de entrada, teclas modificadoras alternativas para todos os atalhos e proteção estrita contra disparo de letras soltas durante a digitação.
 - 🌓 **Modo Alto Contraste para Baixa Visão:** Fundo 100% preto com tipografia e bordas em amarelo vibrante, proporcionando máximo conforto ocular e zero poluição visual.
 - 🗣️ **Síntese & Reconhecimento de Voz:** Ditado por atalho global e síntese de voz nativa opcional com volume e velocidade calibrados.
 
@@ -163,17 +165,20 @@ O **Cromak Bridge Vox** foi projetado para alcançar usuários e desenvolvedores
 
 O Bridge Vox pode ser invocado e operado de qualquer lugar do sistema operacional:
 
-| Tecla de Atalho | Ação Executada |
-| :--- | :--- |
-| <kbd>Alt</kbd> + <kbd>Espaço</kbd> ou <kbd>Ctrl</kbd> + <kbd>Espaço</kbd> | **Invocar / Ocultar** a janela do assistente globalmente |
-| <kbd>F2</kbd> | **Gravar Voz:** Inicia a gravação de áudio do microfone (ou cancela se já ativo) |
-| <kbd>F3</kbd> ou <kbd>Ctrl</kbd> + <kbd>L</kbd> | **Reler Resposta:** Envia a última resposta da IA diretamente ao NVDA/Narrador |
-| <kbd>F4</kbd> ou <kbd>Alt</kbd> + <kbd>F4</kbd> | **Encerrar com Confirmação:** Abre diálogo acessível (Enter fecha, Esc cancela) com voz no NVDA |
-| <kbd>F5</kbd> | **Nova Conversa:** Limpa o contexto atual e inicia um novo diálogo |
-| <kbd>F10</kbd> | **Configurações:** Abre o painel de preferências, seleção de idiomas e chaves de API |
-| <kbd>F11</kbd> | **Tela Cheia:** Alterna entre modo janela e tela cheia imersiva |
-| <kbd>F1</kbd> | **Central de Ajuda:** Abre o manual rápido de comandos e atalhos |
-| <kbd>Esc</kbd> | **Cancelar / Fechar:** Fecha diálogos modais ou cancela captura de voz |
+| Tecla de Atalho | Tecla Alternativa (WCAG 2.1.4) | Ação Executada |
+| :--- | :--- | :--- |
+| <kbd>Alt</kbd> + <kbd>Espaço</kbd> | <kbd>Ctrl</kbd> + <kbd>Espaço</kbd> | **Invocar / Ocultar** a janela do assistente globalmente no Windows |
+| <kbd>F1</kbd> | <kbd>Alt</kbd> + <kbd>H</kbd> ou <kbd>Ctrl</kbd> + <kbd>H</kbd> | **Central de Ajuda:** Abre o manual detalhado de comandos e atalhos |
+| <kbd>F2</kbd> | <kbd>Alt</kbd> + <kbd>M</kbd> ou <kbd>Ctrl</kbd> + <kbd>M</kbd> | **Gravar Voz (Walkie-Talkie):** Inicia ou conclui ditado pelo microfone |
+| <kbd>F3</kbd> | <kbd>Ctrl</kbd> + <kbd>L</kbd> ou <kbd>Alt</kbd> + <kbd>L</kbd> | **Reler Resposta:** Foca a última resposta da IA para leitura prioritária no NVDA |
+| <kbd>F4</kbd> ou <kbd>Alt</kbd> + <kbd>F4</kbd> | <kbd>Ctrl</kbd> + <kbd>Q</kbd> ou <kbd>Alt</kbd> + <kbd>Q</kbd> | **Encerrar com Confirmação:** Diálogo acessível (Enter confirma, Esc cancela) |
+| <kbd>F5</kbd> | <kbd>Ctrl</kbd> + <kbd>N</kbd> ou <kbd>Alt</kbd> + <kbd>N</kbd> | **Nova Conversa:** Reinicia o contexto de diálogo com anúncio auditivo |
+| <kbd>F10</kbd> | <kbd>Ctrl</kbd> + <kbd>,</kbd> ou <kbd>Alt</kbd> + <kbd>S</kbd> | **Configurações:** Painel de provedores BYOK, chaves de API e temas |
+| <kbd>F11</kbd> | <kbd>Alt</kbd> + <kbd>Enter</kbd> | **Tela Cheia:** Alterna entre modo imersivo e modo janela |
+| <kbd>Esc</kbd> | — | **Cancelar / Silenciar:** Interrompe leitura de áudio e fecha modais abertos |
+| <kbd>Alt</kbd> + <kbd>T, R, I, A, C, Z</kbd> | Letras soltas fora de inputs | **Ferramentas Rápidas:** Texto, E-mail, Web, Arquivos, Calculadora, WhatsApp |
+
+> 📌 **Atenção (Modo de Foco do NVDA):** Caso o leitor de tela NVDA não responda aos atalhos de navegação direta, certifique-se de alternar para o Modo de Foco pressionando **`NVDA + Barra de Espaço`**.
 
 ---
 
@@ -218,6 +223,7 @@ Para a maioria dos usuários, não é necessário instalar Python ou configurar 
 
 #### Pré-requisitos
 - **Windows 10 ou 11 (64-bits)**
+- **Microsoft Edge WebView2 Runtime:** Nativo no Windows 10 e 11 padrão. Em edições especializadas como **Windows 10 LTSC**, **Windows Server** ou **Windows IoT Enterprise**, é necessária a instalação avulsa do [Microsoft Edge WebView2 Evergreen Bootstrapper](https://go.microsoft.com/fwlink/p/?LinkId=2124703).
 - **Python 3.10 ou superior** instalado e adicionado ao `PATH`
 - **FFmpeg (64-bits):** Essencial para captura e conversão de áudio, transcrição de voz pelo microfone, síntese e download de mídia. Coloque `ffmpeg.exe` e `ffprobe.exe` dentro da pasta `plugins/ffmpeg/` (ou adicione-os ao `PATH` do Windows).
 - Conexão com a internet para requisições às APIs dos provedores
@@ -263,21 +269,34 @@ As chaves são armazenadas localmente de forma criptografada em `%APPDATA%\Croma
 
 ## 🔒 Segurança e Privacidade
 
-- **Arquitetura Zero Telemetria:** Nenhum dado de áudio, texto, arquivos ou histórico é enviado para servidores da Cromak Technology.
-- **Isolamento de Credenciais:** As chaves de API nunca são expostas na interface pública ou sincronizadas em nuvem.
+- **Arquitetura Zero Telemetria:** Nenhum dado de áudio, texto, arquivos ou histórico é enviado para servidores intermediários da Cromak Technology.
+- **Isolamento de Credenciais:** As chaves de API nunca são expostas na interface pública ou sincronizadas em nuvem. Criptografia em repouso atrelada à máquina local via `%APPDATA%\Cromak Technology\Bridge Vox\config.json`.
 - **Aviso sobre o Auto-Coder:** O Modo Agente possui permissões de execução de scripts locais e manipulação de arquivos a pedido expresso do usuário. Recomenda-se cautela ao autorizar comandos destrutivos.
+- 🛡️ **Política Completa:** Consulte nosso [SECURITY.md](SECURITY.md) para detalhes exaustivos sobre a distinção entre processamento estritamente local e chamadas de nuvem, além das diretrizes para reporte responsável de vulnerabilidades.
 
 ---
 
 ## 🤝 Como Contribuir
 
-Contribuições são muito bem-vindas! Se você deseja colaborar com melhorias de acessibilidade, correções de bugs ou suporte a novos modelos:
+Contribuições são muito bem-vindas! Convidamos desenvolvedores, tradutores e auditores de tecnologia assistiva de todo o mundo a colaborar:
 
-1. Faça um **Fork** do projeto.
-2. Crie uma branch para sua funcionalidade (`git checkout -b feature/nova-ferramenta`).
-3. Faça commit das alterações (`git commit -m 'feat: Adiciona novo atalho de leitura NVDA'`).
-4. Faça push para a branch (`git push origin feature/nova-ferramenta`).
-5. Abra um **Pull Request**.
+1. Consulte o nosso **[Guia de Contribuição Completo (CONTRIBUTING.md)](CONTRIBUTING.md)** e nosso **[Código de Conduta (CODE_OF_CONDUCT.md)](CODE_OF_CONDUCT.md)**.
+2. Faça um **Fork** do projeto no GitHub.
+3. Crie uma branch para sua funcionalidade (`git checkout -b feat/nova-ferramenta` ou `a11y/ajuste-nvda`).
+4. Realize testes rigorosos de navegação por teclado e leitor de tela (NVDA / Narrador).
+5. Abra um **Pull Request** utilizando nosso [template obrigatório de checagem de acessibilidade](.github/PULL_REQUEST_TEMPLATE.md).
+
+---
+
+## 📜 Governança e Comunidade Open Source
+
+Para viabilizar nossa colaboração internacional e manter a máxima transparência e conformidade, consulte os documentos oficiais de governança do projeto:
+
+- 🛡️ **[Política de Segurança & Transparência (SECURITY.md)](SECURITY.md)**: Detalhamento técnico da arquitetura local-first vs nuvem, credenciais e canal de reporte responsável.
+- 🤝 **[Guia de Contribuição (CONTRIBUTING.md)](CONTRIBUTING.md)**: Diretrizes passo a passo para código, internacionalização (11 idiomas) e auditorias de acessibilidade (a11y).
+- 💬 **[Central de Suporte & Resolução de Problemas (SUPPORT.md)](SUPPORT.md)**: Canais oficiais de dúvidas, orientações técnicas e links para a pasta `docs/`.
+- 🌐 **[Código de Conduta (CODE_OF_CONDUCT.md)](CODE_OF_CONDUCT.md)**: Padrão Contributor Covenant v2.1 adaptado para radical inclusão e acessibilidade.
+- 📋 **[Modelos de Issues & Pull Requests (.github/)](.github/)**: Modelos estruturados para [bugs](.github/ISSUE_TEMPLATE/bug_report.yml), [barreiras de acessibilidade](.github/ISSUE_TEMPLATE/accessibility_issue.yml) e [solicitações de novos recursos](.github/ISSUE_TEMPLATE/feature_request.yml).
 
 ---
 

@@ -56,42 +56,32 @@ window.addEventListener('pywebviewready', () => {
     tocarFala("Sistema de acessibilidade iniciado. Pressione espaço e faça sua pergunta.");
 });
 
-// Listener Global para a barra de espaco
+// Listener Global de Atalhos - Modo Vox (WCAG 2.1.4: Character Key Shortcuts)
 window.addEventListener('keydown', (e) => {
     if (document.activeElement && document.activeElement.classList.contains('shortcut-input')) return;
-    if (e.ctrlKey || e.altKey) return;
-    
+
+    const activeEl = document.activeElement;
+    const isTyping = activeEl && (
+        activeEl.tagName === 'INPUT' || 
+        activeEl.tagName === 'TEXTAREA' || 
+        activeEl.isContentEditable ||
+        activeEl.classList.contains('shortcut-input')
+    );
+
     let keyName = e.key;
     if (keyName === ' ') keyName = 'Space';
     if (keyName.length === 1) keyName = keyName.toUpperCase();
     
-    const sc = window.appShortcuts;
+    const sc = window.appShortcuts || {};
     const match = (val) => val && (keyName === val.toUpperCase() || keyName === val);
 
-    if (match(sc.mic)) {
+    // 1. Sair / Encerramento: F4, Alt+F4, Ctrl+Q, Alt+Q
+    const isExit = match(sc.exit) || e.key === 'F4' || 
+                   (e.altKey && (e.key === 'F4' || e.key.toLowerCase() === 'q')) || 
+                   (e.ctrlKey && e.key.toLowerCase() === 'q');
+    if (isExit) {
         e.preventDefault();
-        if (typeof toggleMicrofone === 'function') toggleMicrofone();
-        return;
-    }
-    
-    if (match(sc.stop) || e.key === 'Escape') {
-        e.preventDefault();
-        if (gravando) {
-            cancelarGravacao();
-            return;
-        }
-        pywebview.api.parar_audio();
-        return;
-    }
-    
-    if (match(sc.config)) {
-        e.preventDefault();
-        if(typeof abrirConfiguracoes !== 'undefined') abrirConfiguracoes();
-        return;
-    }
-
-    if (match(sc.exit)) {
-        e.preventDefault();
+        e.stopPropagation();
         if (typeof window.confirmarEncerramento === 'function') {
             window.confirmarEncerramento();
         } else if (typeof confirmarEncerramento === 'function') {
@@ -101,24 +91,72 @@ window.addEventListener('keydown', (e) => {
         }
         return;
     }
-    
-    if (match(sc.help)) {
+
+    // 2. Parar áudio / fechar: Escape
+    if (match(sc.stop) || e.key === 'Escape') {
         e.preventDefault();
-        pywebview.api.abrir_janela_ajuda();
+        if (gravando) {
+            cancelarGravacao();
+            return;
+        }
+        if (window.pywebview && pywebview.api && pywebview.api.parar_audio) {
+            pywebview.api.parar_audio();
+        }
         return;
     }
 
+    // 3. Microfone: F2, Espaço (quando não digitando), Alt+M, Ctrl+M
+    const isMic = (match(sc.mic) && !isTyping) || 
+                  ((e.altKey || e.ctrlKey) && e.key.toLowerCase() === 'm') ||
+                  (e.key === 'F2');
+    if (isMic) {
+        if (isTyping && !e.altKey && !e.ctrlKey) return;
+        e.preventDefault();
+        if (typeof toggleMicrofone === 'function') toggleMicrofone();
+        return;
+    }
+
+    // 4. Configurações: F10, Ctrl+,, Alt+S
+    const isConfig = match(sc.config) || e.key === 'F10' || (e.ctrlKey && e.key === ',') || (e.altKey && e.key.toLowerCase() === 's');
+    if (isConfig) {
+        if (isTyping && !e.altKey && !e.ctrlKey) return;
+        e.preventDefault();
+        if (typeof abrirConfiguracoes !== 'undefined') abrirConfiguracoes();
+        return;
+    }
+
+    // 5. Ajuda: F1, Alt+H, Ctrl+H
+    const isHelp = match(sc.help) || e.key === 'F1' || ((e.altKey || e.ctrlKey) && e.key.toLowerCase() === 'h');
+    if (isHelp) {
+        if (isTyping && !e.altKey && !e.ctrlKey) return;
+        e.preventDefault();
+        if (window.pywebview && pywebview.api && pywebview.api.abrir_janela_ajuda) {
+            pywebview.api.abrir_janela_ajuda();
+        }
+        return;
+    }
+
+    // WCAG 2.1.4: Se estiver digitando em campo de texto, atalhos de tecla única NUNCA disparam!
+    if (isTyping && !e.altKey && !e.ctrlKey) {
+        return;
+    }
+
+    // Ferramentas com suporte a tecla única (sem foco em texto) OU com modificador Alt+Letra
     let comando = "";
-    if (match(sc.txt)) comando = "Abra o editor de texto (Editor de Texto).";
-    else if (match(sc.mail)) comando = "Leia meus e-mails (Leitor de E-mails).";
-    else if (match(sc.web)) comando = "Pesquise na internet (Navegador Web).";
-    else if (match(sc.files)) comando = "Liste os arquivos do diretório atual (Gerenciador de Arquivos).";
-    else if (match(sc.calc)) comando = "Vamos fazer uma conta matemática.";
-    else if (match(sc.whats)) comando = "Mande uma mensagem no WhatsApp.";
-    
+    const isTool = (letter) => (!isTyping && match(letter) && !e.ctrlKey && !e.altKey) || (e.altKey && e.key.toUpperCase() === letter);
+
+    if (isTool(sc.txt || 'T')) comando = "Abra o editor de texto (Editor de Texto).";
+    else if (isTool(sc.mail || 'R')) comando = "Leia meus e-mails (Leitor de E-mails).";
+    else if (isTool(sc.web || 'I')) comando = "Pesquise na internet (Navegador Web).";
+    else if (isTool(sc.files || 'A')) comando = "Liste os arquivos do diretório atual (Gerenciador de Arquivos).";
+    else if (isTool(sc.calc || 'C')) comando = "Vamos fazer uma conta matemática.";
+    else if (isTool(sc.whats || 'Z')) comando = "Mande uma mensagem no WhatsApp.";
+
     if (comando !== "") {
         e.preventDefault();
-        pywebview.api.enviar_comando_texto(comando);
+        if (window.pywebview && pywebview.api && pywebview.api.enviar_comando_texto) {
+            pywebview.api.enviar_comando_texto(comando);
+        }
         return;
     }
 });

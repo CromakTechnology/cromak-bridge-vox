@@ -1306,12 +1306,130 @@ def global_hotkey_listener():
 # VARIÁVEL GLOBAL PARA OS ATALHOS DO BRIDGE VOX (Linguagem Universal)
 cromak_window_global = None
 
+def registrar_aumid_windows():
+    aumid = "Cromak Bridge Vox"
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(aumid)
+    except Exception:
+        pass
+    
+    # Registra no registro do Windows (HKCU\Software\Classes\AppUserModelId\...)
+    # para garantir que as notificações Toast do Windows exibam o ícone e nome oficiais
+    try:
+        caminhos_ico = [
+            resource_path(os.path.join("web", "lib", "cromak-bridge.ico")),
+            resource_path("cromak-bridge.ico"),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "web", "lib", "cromak-bridge.ico")),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "cromak-bridge.ico")),
+            os.path.abspath(os.path.join(os.getcwd(), "web", "lib", "cromak-bridge.ico")),
+            os.path.abspath(os.path.join(os.getcwd(), "cromak-bridge.ico")),
+        ]
+        ico_final = None
+        for p in caminhos_ico:
+            if os.path.exists(p):
+                ico_final = os.path.abspath(p)
+                break
+        
+        if ico_final:
+            key_path = fr"Software\Classes\AppUserModelId\{aumid}"
+            with reg.CreateKey(reg.HKEY_CURRENT_USER, key_path) as key:
+                reg.SetValueEx(key, "DisplayName", 0, reg.REG_SZ, "Cromak Bridge Vox")
+                reg.SetValueEx(key, "IconUri", 0, reg.REG_SZ, ico_final)
+                reg.SetValueEx(key, "ShowInSettings", 0, reg.REG_DWORD, 1)
+
+            # Também cria/atualiza o atalho com AUMID no Menu Iniciar do usuário
+            # para que a Central de Ações do Windows associe o ícone e nome à notificação
+            try:
+                import win32com.client
+                from win32com.propsys import propsys
+                programs_dir = os.path.expandvars(r"%APPDATA%\Microsoft\Windows\Start Menu\Programs\Cromak Technology")
+                os.makedirs(programs_dir, exist_ok=True)
+                lnk_path = os.path.join(programs_dir, "Cromak Bridge Vox.lnk")
+                wscript = win32com.client.Dispatch("WScript.Shell")
+                shortcut = wscript.CreateShortcut(lnk_path)
+                shortcut.TargetPath = sys.executable
+                shortcut.WorkingDirectory = os.path.dirname(sys.executable)
+                shortcut.IconLocation = f"{ico_final},0"
+                shortcut.Description = "Assistente de IA Acessível Cromak Bridge Vox"
+                shortcut.Save()
+                
+                store = propsys.SHGetPropertyStoreFromParsingName(lnk_path, None, 2)
+                pk = propsys.PSGetPropertyKeyFromName("System.AppUserModel.ID")
+                prop = propsys.PROPVARIANTType(aumid)
+                store.SetValue(pk, prop)
+                store.Commit()
+            except Exception:
+                pass
+    except Exception as e:
+        print("Aviso ao registrar AUMID no Windows:", e)
+
+def verificar_webview2_instalado():
+    """
+    Verifica se o Microsoft Edge WebView2 Runtime está presente no sistema operacional.
+    Retorna True se instalado, False caso contrário.
+    """
+    import winreg
+    locais = [
+        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-942A-42c4-9B14-5F33630F7078}"),
+        (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\EdgeUpdate\Clients\{F3017226-942A-42c4-9B14-5F33630F7078}"),
+        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-942A-42c4-9B14-5F33630F7078}"),
+    ]
+    for hkey, subkey in locais:
+        for flag in [0, winreg.KEY_WOW64_32KEY, winreg.KEY_WOW64_64KEY]:
+            try:
+                with winreg.OpenKey(hkey, subkey, 0, winreg.KEY_READ | flag) as k:
+                    val, _ = winreg.QueryValueEx(k, "pv")
+                    if val and val.strip() != "" and val.strip() != "0.0.0.0":
+                        return True
+            except Exception:
+                pass
+
+    pastas_padrao = [
+        os.path.expandvars(r"%ProgramFiles(x86)%\Microsoft\EdgeWebView\Application"),
+        os.path.expandvars(r"%ProgramFiles%\Microsoft\EdgeWebView\Application"),
+        os.path.expandvars(r"%LOCALAPPDATA%\Microsoft\EdgeWebView\Application"),
+    ]
+    for pasta in pastas_padrao:
+        if os.path.exists(pasta):
+            try:
+                subitens = os.listdir(pasta)
+                for item in subitens:
+                    if item and item[0].isdigit() and os.path.isdir(os.path.join(pasta, item)):
+                        return True
+            except Exception:
+                pass
+    return False
+
+def alertar_falta_webview2():
+    """
+    Exibe um diálogo nativo e 100% acessível (compatível com NVDA, JAWS e Narrador)
+    notificando que o Microsoft Edge WebView2 Runtime está ausente no Windows e
+    oferecendo redirecionamento imediato para download gratuito.
+    """
+    mensagem = (
+        "O Microsoft Edge WebView2 Runtime não foi detectado neste computador.\n\n"
+        "O Cromak Bridge Vox necessita deste componente oficial para renderizar a interface gráfica acessível.\n"
+        "(Em edições padrão do Windows 10 e 11 ele já vem pré-instalado, mas edições como Windows 10 LTSC, "
+        "Windows Server ou Windows IoT requerem instalação avulsa).\n\n"
+        "Deseja abrir agora a página oficial da Microsoft para baixar o instalador gratuito do WebView2 Runtime?"
+    )
+    titulo = "Cromak Bridge Vox - Requisito do Sistema Ausente"
+    # 0x04 = MB_YESNO, 0x10 = MB_ICONERROR, 0x1000 = MB_SYSTEMMODAL
+    resposta = ctypes.windll.user32.MessageBoxW(0, mensagem, titulo, 0x04 | 0x10 | 0x1000)
+    if resposta == 6:  # IDYES
+        webbrowser.open("https://go.microsoft.com/fwlink/p/?LinkId=2124703")
+    import os
+    os._exit(1)
+
 def aplicar_atalhos_bridgevox():
     # Os atalhos de janela (F1, F2, F3, F4, F5, F10, F11, Esc) são gerenciados localmente no script.js
     # apenas quando a janela do Bridge está ativa, evitando conflito com outros programas do Windows.
     pass
 
 if __name__ == '__main__':
+    registrar_aumid_windows()
+    if not verificar_webview2_instalado():
+        alertar_falta_webview2()
     api = ApiBackend()
     
     modo_interface = api.config.get("interface_mode", "normal")
@@ -1355,19 +1473,23 @@ if __name__ == '__main__':
             janela.hide()
             if hasattr(api, 'tray_icon') and api.tray_icon:
                 try:
-                    api.tray_icon.notify(
-                        "O Bridge Vox está em segundo plano. Pressione Ctrl+Espaço para reabrir a janela principal a qualquer momento.",
-                        "Cromak Bridge Vox"
+                    # Envia a notificação Toast nativa sem repetir o título no corpo
+                    # O cabeçalho da notificação no Windows já exibe: [Ícone] Cromak Bridge Vox
+                    api.tray_icon._message(
+                        pystray._win32.win32.NIM_MODIFY,
+                        pystray._win32.win32.NIF_INFO,
+                        szInfo="O Bridge Vox está em segundo plano. Pressione Ctrl+Espaço para reabrir a janela principal a qualquer momento.",
+                        szInfoTitle=""
                     )
-                except:
-                    pass
+                except Exception:
+                    try:
+                        api.tray_icon.notify(
+                            "O Bridge Vox está em segundo plano. Pressione Ctrl+Espaço para reabrir a janela principal a qualquer momento."
+                        )
+                    except Exception:
+                        pass
             return False # Impede o encerramento do processo
         return True # Permite que o app feche normalmente
-        
-    try:
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("CromakTechnology.BridgeVox.1.3.5")
-    except Exception:
-        pass
 
     def on_main_shown():
         aplicar_icone_janela('Cromak Bridge')
@@ -1376,6 +1498,11 @@ if __name__ == '__main__':
                 janela.toggle_fullscreen()
             except Exception:
                 pass
+        # Foco intencional e imediato para o NVDA entrar no Modo de Foco com role="application"
+        try:
+            janela.evaluate_js("if (typeof focarCampoMensagem === 'function') focarCampoMensagem();")
+        except Exception:
+            pass
 
     janela.events.closing += on_closing
     janela.events.shown += on_main_shown
@@ -1384,7 +1511,11 @@ if __name__ == '__main__':
     if api.config.get("minimize_to_tray", False):
         api.gerenciar_tray(True)
         
-    webview.start(icon=resource_path(os.path.join('web', 'lib', 'cromak-bridge.ico')))
+    try:
+        webview.start(icon=resource_path(os.path.join('web', 'lib', 'cromak-bridge.ico')))
+    except Exception as e:
+        print("Erro crítico ao inicializar interface WebView2:", e)
+        alertar_falta_webview2()
     
     # Ao fechar a janela, garante o encerramento total de todos os processos e threads (kill limpo)
     try:
