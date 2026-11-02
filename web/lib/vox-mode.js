@@ -92,7 +92,13 @@ window.addEventListener('keydown', (e) => {
 
     if (match(sc.exit)) {
         e.preventDefault();
-        pywebview.api.encerrar_sistema();
+        if (typeof window.confirmarEncerramento === 'function') {
+            window.confirmarEncerramento();
+        } else if (typeof confirmarEncerramento === 'function') {
+            confirmarEncerramento();
+        } else if (window.pywebview && pywebview.api && pywebview.api.encerrar_sistema) {
+            pywebview.api.encerrar_sistema();
+        }
         return;
     }
     
@@ -258,178 +264,6 @@ function salvarConfiguracoes() {
         }
     });
 }
-
-window.addEventListener('keydown', (e) => {
-    if (document.activeElement && document.activeElement.classList.contains('shortcut-input')) return;
-
-    const input = document.getElementById('userInput');
-    const isTyping = document.activeElement === input || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT';
-    if (e.ctrlKey || e.altKey) return;
-    
-    let keyName = e.key;
-    if (keyName === ' ') keyName = 'Space';
-    if (keyName.length === 1) keyName = keyName.toUpperCase();
-    
-    const sc = window.appShortcuts;
-    const match = (val) => val && (keyName === val.toUpperCase() || keyName === val);
-
-    if (match(sc.mic)) {
-        if (isTyping && keyName === 'Space') return;
-        e.preventDefault();
-        const btnVoz = document.getElementById('voiceBtn') || document.getElementById('mainMicBtn') || document.getElementById('micBtn');
-        if(!btnVoz) return;
-        const oldHtml = btnVoz.innerHTML;
-        btnVoz.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>`;
-        pywebview.api.ouvir_e_responder_nativo().then(resp => {
-            btnVoz.innerHTML = oldHtml;
-            if(resp && resp.startsWith("Erro")) {
-                if(typeof mostrarToast !== 'undefined') mostrarToast(resp, true);
-            } else if (resp) {
-                if(typeof adicionarMensagem !== 'undefined') adicionarMensagem(resp, 'ai');
-            }
-        });
-function cancelarGravacao() {
-    if (!gravando) return;
-    gravando = false;
-    const micCircle = document.getElementById('micCircle');
-    const statusTxt = document.getElementById('voxStatus');
-    const outTxt = document.getElementById('voxTextOutput');
-    if (micCircle) micCircle.className = 'vox-mic-circle';
-    if (statusTxt) statusTxt.innerText = "Gravação cancelada. Pressione ESPAÇO para falar.";
-    if (window.pywebview && pywebview.api) {
-        if (typeof pywebview.api.cancelar_audio === 'function') pywebview.api.cancelar_audio();
-        else if (typeof pywebview.api.parar_audio === 'function') pywebview.api.parar_audio();
-    }
-}
-
-function toggleMicrofone() {
-    if (gravando) {
-        cancelarGravacao();
-        return;
-    }
-
-    // Se a IA estiver falando algo, a barra de espaco corta a fala dela
-    if (cromakAudioAtual && !cromakAudioAtual.paused) {
-        cromakAudioAtual.pause();
-        cromakAudioAtual = null;
-        document.getElementById('voxStatus').innerText = "Pressione ESPAÇO e fale (6 segundos)";
-        return;
-    }
-
-    iniciarGravacao();
-}
-
-function iniciarGravacao() {
-    gravando = true;
-    const micCircle = document.getElementById('micCircle');
-    const statusTxt = document.getElementById('voxStatus');
-    const outTxt = document.getElementById('voxTextOutput');
-
-    micCircle.className = 'vox-mic-circle listening';
-    statusTxt.innerText = "Ouvindo... (Fale agora)";
-    outTxt.innerText = "...";
-
-    pywebview.api.ouvir_e_responder_nativo().then(resp => {
-        gravando = false;
-        micCircle.className = 'vox-mic-circle';
-        
-        if(resp && resp.startsWith("Erro")) {
-            statusTxt.innerText = "Erro ao processar";
-            outTxt.innerText = resp;
-            tocarFala("Ocorreu um erro de conexão. Verifique sua chave da API nas configurações.");
-        } else if (resp) {
-            statusTxt.innerText = "Resposta recebida. Pressione ESPAÇO para falar novamente.";
-            outTxt.innerHTML = marked.parse(resp); // Converte markdown se houver
-            tocarFala(resp);
-        } else {
-            statusTxt.innerText = "Pressione ESPAÇO e fale";
-            outTxt.innerText = "Não entendi. Pode repetir?";
-            tocarFala("Não consegui ouvir. Pode repetir?");
-        }
-    }).catch(err => {
-        gravando = false;
-        micCircle.className = 'vox-mic-circle';
-        statusTxt.innerText = "Erro no sistema";
-    });
-
-    // Simulador visual de transicao para "pensando" apos 6 segundos
-    setTimeout(() => {
-        if(gravando) {
-            micCircle.className = 'vox-mic-circle thinking';
-            statusTxt.innerText = "Pensando...";
-        }
-    }, 6000);
-}
-
-function tocarFala(texto) {
-    if (cromakAudioAtual && !cromakAudioAtual.paused) {
-        cromakAudioAtual.pause();
-    }
-    
-    // Removemos markdown para ler limpo
-    let textoLimpo = texto.replace(/[*#_]/g, '');
-    
-    pywebview.api.gerar_voz_neural(textoLimpo).then(b64 => {
-        if (!b64) return;
-        cromakAudioAtual = new Audio("data:audio/mp3;base64," + b64);
-        cromakAudioAtual.play();
-    });
-}
-
-// ---- METODOS DO MODAL DE CONFIGURACOES ----
-function abrirConfiguracoes() {
-    const modal = document.getElementById('settingsModal');
-    modal.style.display = 'flex';
-    setTimeout(() => modal.style.opacity = '1', 10);
-}
-
-function fecharModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.style.opacity = '0';
-    setTimeout(() => modal.style.display = 'none', 300);
-}
-
-function fecharConfiguracoes() {
-    fecharModal('settingsModal');
-}
-
-function switchSettingsTab(event, tabId) {
-    document.querySelectorAll('.settings-tab').forEach(tab => tab.style.display = 'none');
-    document.getElementById('tab-' + tabId).style.display = 'block';
-    
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-}
-
-function mostrarAba(abaId, element) {
-    document.querySelectorAll('.settings-tab').forEach(tab => tab.style.display = 'none');
-    document.getElementById(abaId).style.display = 'block';
-    
-    document.querySelectorAll('.settings-sidebar li').forEach(li => li.classList.remove('active'));
-    element.classList.add('active');
-}
-
-function salvarConfiguracoes() {
-    const payload = {
-        language: document.getElementById('configLanguage').value,
-        interface_mode: document.getElementById('configInterfaceMode') ? document.getElementById('configInterfaceMode').value : 'vox',
-        start_with_windows: document.getElementById('configStartup').checked,
-        minimize_to_tray: document.getElementById('configTray').checked,
-        agent_mode: document.getElementById('configAgente').checked,
-        auto_tts: document.getElementById('configAutoVoz').checked,
-        always_voice: document.getElementById('configBridgeVox').checked
-    };
-
-    pywebview.api.salvar_preferencias(payload).then(() => {
-        fecharModal('settingsModal');
-        if (payload.interface_mode === 'normal' || payload.interface_mode === 'high_contrast') {
-            window.location.href = 'index.html';
-        } else {
-            window.location.reload();
-        }
-    });
-}
-
 window.addEventListener('keydown', (e) => {
     if (document.activeElement && document.activeElement.classList.contains('shortcut-input')) return;
 
@@ -494,7 +328,13 @@ window.addEventListener('keydown', (e) => {
     if (match(sc.exit)) {
         if (isTyping && keyName.length === 1) return;
         e.preventDefault();
-        pywebview.api.encerrar_sistema();
+        if (typeof window.confirmarEncerramento === 'function') {
+            window.confirmarEncerramento();
+        } else if (typeof confirmarEncerramento === 'function') {
+            confirmarEncerramento();
+        } else if (window.pywebview && pywebview.api && pywebview.api.encerrar_sistema) {
+            pywebview.api.encerrar_sistema();
+        }
         return;
     }
 
@@ -514,37 +354,11 @@ window.addEventListener('keydown', (e) => {
         e.preventDefault();
         if (input) { input.value = comando; document.getElementById('sendBtn').click(); }
         else { 
-            // In vox mode, we directly send to python? Actually vox mode doesn't have userInput.
-            // Let's call python method or emit event
             pywebview.api.enviar_comando_texto(comando);
         }
         return;
     }
 });
-        return;
-    }
-    
-    if (keyName === window.appShortcuts.stop.toUpperCase() || keyName === window.appShortcuts.stop) {
-        e.preventDefault();
-        pywebview.api.parar_audio();
-        return;
-    }
-    
-    if (keyName === window.appShortcuts.config.toUpperCase() || keyName === window.appShortcuts.config) {
-        e.preventDefault();
-        abrirConfiguracoes();
-        return;
-    }
-
-    if (keyName === window.appShortcuts.clear.toUpperCase() || keyName === window.appShortcuts.clear) {
-        e.preventDefault();
-        pywebview.api.reiniciar_conversa().then(() => mostrarToast("Conversa Reiniciada"));
-        return;
-    }
-
-    let comando = "";
-    
-    }
 
 // =========================================================================
 // LEITOR DE TELA NATIVO (TAB NAVIGATION)

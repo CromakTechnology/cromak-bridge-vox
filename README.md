@@ -15,6 +15,7 @@
   [![Compatibilidade](https://img.shields.io/badge/SO-Windows%2010%20%7C%2011%20(x64)-blue?style=for-the-badge&logo=windows11)](https://cromaktechnology.github.io/pt/bridge-vox.html)
   [![Acessibilidade](https://img.shields.io/badge/Acessibilidade-NVDA%20%7C%20Narrador%20%7C%20Alto%20Contraste-ffb703?style=for-the-badge)](https://cromaktechnology.github.io/pt/bridge-vox.html)
   [![Arquitetura](https://img.shields.io/badge/BYOK-Groq%20%7C%20Gemini%20%7C%20OpenAI%20%7C%20Claude%20%7C%20Qwen-purple?style=for-the-badge)](https://cromaktechnology.github.io/pt/bridge-vox.html)
+  [![Internacionalização](https://img.shields.io/badge/i18n-11%20Idiomas%20Nativos-00d4ff?style=for-the-badge&logo=translate)](https://cromaktechnology.github.io/pt/bridge-vox.html)
   [![Privacidade](https://img.shields.io/badge/Privacidade-Zero%20Telemetria%20%2F%20Local--First-ef4444?style=for-the-badge)](https://cromaktechnology.github.io/pt/bridge-vox.html)
 
   <br><br>
@@ -52,6 +53,8 @@ Diferente de um simples chat restrito a uma aba de navegador, o Bridge Vox atua 
 
 ### Recursos de Inclusão Nativa:
 - 🔊 **NVDA & Narrador do Windows:** Live Regions ARIA dedicadas para que cada token gerado e finalização de resposta seja anunciado ao usuário de forma imediata e fluida, sem eco.
+- 🌐 **Internacionalização em 11 Idiomas & Auto-detecção:** Detecta automaticamente o idioma do sistema operacional no primeiro uso. Toda a interface, atalhos e falas de leitor de tela se adaptam instantaneamente.
+- 🛑 **Encerramento Acessível e Seguro (F4 / Alt+F4):** Diálogo de confirmação acessível com anúncio prioritário no NVDA (Enter para fechar, Esc para cancelar), prevenindo fechamentos acidentais.
 - ⌨️ **Operação 100% por Teclado:** Foco automático contínuo na caixa de entrada e navegação em fluxo contínuo sem nunca exigir o ponteiro do mouse.
 - 🌓 **Modo Alto Contraste para Baixa Visão:** Fundo 100% preto com tipografia e bordas em amarelo vibrante, proporcionando máximo conforto ocular e zero poluição visual.
 - 🗣️ **Síntese & Reconhecimento de Voz:** Ditado por atalho global e síntese de voz nativa opcional com volume e velocidade calibrados.
@@ -119,6 +122,30 @@ Diferente de um simples chat restrito a uma aba de navegador, o Bridge Vox atua 
 
 ---
 
+---
+
+## 🌐 Internacionalização Nativa (11 Idiomas & Detecção Automática)
+
+O **Cromak Bridge Vox** foi projetado para alcançar usuários e desenvolvedores ao redor do mundo com autonomia e acessibilidade completas:
+
+- **Detecção Automática do Windows:** Na primeira execução, o software identifica a API de idioma do Windows (`GetUserDefaultUILanguage`) e já inicia automaticamente na língua nativa do usuário (sem exigir nenhuma configuração prévia).
+- **Troca Dinâmica em Tempo Real:** No painel de Configurações (<kbd>F10</kbd>), o usuário pode alternar o idioma a qualquer instante — toda a interface gráfica, botões, placeholders e anúncios sonoros do leitor de tela são atualizados em milissegundos sem fechar o programa.
+- **Ecossistema Aberto (`web/locale/`):** Qualquer desenvolvedor ou tradutor pode adicionar novos idiomas criando arquivos `.json` estruturados na pasta de idiomas.
+
+| Idioma | Código | Região | Status |
+| :--- | :---: | :--- | :---: |
+| 🇧🇷 **Português** | `pt_BR` | Brasil / Portugal | Nativo |
+| 🇺🇸 **English** | `en_US` | Global / EUA / Reino Unido | Nativo |
+| 🇪🇸 **Español** | `es_ES` | Espanha / América Latina | Nativo |
+| 🇫🇷 **Français** | `fr_FR` | França / Canadá / África | Nativo |
+| 🇩🇪 **Deutsch** | `de_DE` | Alemanha / Áustria / Suíça | Nativo |
+| 🇮🇹 **Italiano** | `it_IT` | Itália | Nativo |
+| 🇷🇺 **Русский** | `ru_RU` | Rússia / Leste Europeu | Nativo |
+| 🇨🇳 **中文 (简体)** | `zh_CN` | China / Ásia | Nativo |
+| 🇯🇵 **日本語** | `ja_JP` | Japão | Nativo |
+| 🇮🇳 **हिन्दी** | `hi_IN` | Índia | Nativo |
+| 🇸🇦 **العربية** | `ar_SA` | Oriente Médio / Norte da África | Nativo |
+
 ## 🏆 Comparativo: Por que o Cromak Bridge Vox é Único?
 
 | Critério / Recurso | Big Techs <br><small>(Copilot / Siri)</small> | Agentes Comerciais <br><small>(Claude / ChatGPT)</small> | Open Source CLI <br><small>(AutoGPT / Open Interpreter)</small> | **Cromak Bridge Vox** 🏆 |
@@ -139,12 +166,14 @@ O Bridge Vox pode ser invocado e operado de qualquer lugar do sistema operaciona
 | Tecla de Atalho | Ação Executada |
 | :--- | :--- |
 | <kbd>Alt</kbd> + <kbd>Espaço</kbd> ou <kbd>Ctrl</kbd> + <kbd>Espaço</kbd> | **Invocar / Ocultar** a janela do assistente globalmente |
-| <kbd>F2</kbd> | **Gravar Voz:** Inicia o reconhecimento de áudio por microfone |
+| <kbd>F2</kbd> | **Gravar Voz:** Inicia a gravação de áudio do microfone (ou cancela se já ativo) |
 | <kbd>F3</kbd> ou <kbd>Ctrl</kbd> + <kbd>L</kbd> | **Reler Resposta:** Envia a última resposta da IA diretamente ao NVDA/Narrador |
+| <kbd>F4</kbd> ou <kbd>Alt</kbd> + <kbd>F4</kbd> | **Encerrar com Confirmação:** Abre diálogo acessível (Enter fecha, Esc cancela) com voz no NVDA |
 | <kbd>F5</kbd> | **Nova Conversa:** Limpa o contexto atual e inicia um novo diálogo |
+| <kbd>F10</kbd> | **Configurações:** Abre o painel de preferências, seleção de idiomas e chaves de API |
 | <kbd>F11</kbd> | **Tela Cheia:** Alterna entre modo janela e tela cheia imersiva |
 | <kbd>F1</kbd> | **Central de Ajuda:** Abre o manual rápido de comandos e atalhos |
-| <kbd>Esc</kbd> | **Cancelar / Fechar:** Fecha janelas modais ou minimiza para a bandeja |
+| <kbd>Esc</kbd> | **Cancelar / Fechar:** Fecha diálogos modais ou cancela captura de voz |
 
 ---
 

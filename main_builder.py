@@ -3,11 +3,16 @@ import shutil
 import subprocess
 import sys
 
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 # =======================================================
 # CONFIGURAÇÃO DO BUILD - CROMAK BRIDGE VOX
 # =======================================================
 NOME_APP = "BridgeVox"
-ICONE = "web/cromak-bridge.ico"
+ICONE = "web/lib/cromak-bridge.ico"
 MAIN_SCRIPT = "main.py"
 VERSION_FILE = "versao_info.txt"
 
@@ -64,7 +69,6 @@ def realizar_build():
         "--add-data=web;web",
         "--add-data=plugins;plugins",
         "--add-data=docs;docs",
-        "--add-data=locale;locale",
         "--hidden-import=core.online_sync",
         "--hidden-import=openai",
         "--hidden-import=google.genai",

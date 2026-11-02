@@ -81,7 +81,7 @@ def aplicar_icone_janela(titulo_janela="Cromak Bridge"):
     def _worker():
         import time, ctypes
         try:
-            ico_path = resource_path(os.path.join("web", "cromak-bridge.ico"))
+            ico_path = resource_path(os.path.join("web", "lib", "cromak-bridge.ico"))
             if not os.path.exists(ico_path):
                 return
             user32 = ctypes.windll.user32
@@ -125,6 +125,56 @@ def aplicar_icone_janela(titulo_janela="Cromak Bridge"):
             print("Aviso ao aplicar ícone Win32:", e)
     threading.Thread(target=_worker, daemon=True).start()
 
+def detectar_idioma_sistema():
+    """Detecta automaticamente o idioma padrão do Windows / Sistema Operacional."""
+    try:
+        import ctypes
+        windll = getattr(ctypes, 'windll', None)
+        if windll and hasattr(windll, 'kernel32') and hasattr(windll.kernel32, 'GetUserDefaultUILanguage'):
+            lang_id = windll.kernel32.GetUserDefaultUILanguage() & 0x3FF
+            mapa_lang = {
+                0x16: "pt_BR", # Português
+                0x09: "en_US", # Inglês
+                0x0A: "es_ES", # Espanhol
+                0x0C: "fr_FR", # Francês
+                0x07: "de_DE", # Alemão
+                0x10: "it_IT", # Italiano
+                0x04: "zh_CN", # Chinês Simplificado
+                0x11: "ja_JP", # Japonês
+                0x19: "ru_RU", # Russo
+                0x39: "hi_IN", # Hindi
+                0x01: "ar_SA"  # Árabe
+            }
+            if lang_id in mapa_lang:
+                return mapa_lang[lang_id]
+    except Exception:
+        pass
+    try:
+        import locale
+        loc = locale.getdefaultlocale()[0]
+        if loc:
+            loc = loc.lower()
+            prefixos = {
+                "pt": "pt_BR",
+                "en": "en_US",
+                "es": "es_ES",
+                "fr": "fr_FR",
+                "de": "de_DE",
+                "it": "it_IT",
+                "zh": "zh_CN",
+                "ja": "ja_JP",
+                "ru": "ru_RU",
+                "hi": "hi_IN",
+                "ar": "ar_SA"
+            }
+            for pref, code_id in prefixos.items():
+                if loc.startswith(pref):
+                    return code_id
+    except Exception:
+        pass
+    return "pt_BR"
+
+
 class ApiBackend:
     def __init__(self):
         self.data_dir = get_data_dir() # Guarda a pasta persistente
@@ -150,8 +200,12 @@ class ApiBackend:
         try:
             cfg = ler_config_seguro(self.config_path)
             if not cfg:
-                return {"provider": "gemini", "api_key": "", "language": "pt_BR", "model": "gemini-2.5-flash"}
+                idioma_padrao = detectar_idioma_sistema()
+                return {"provider": "gemini", "api_key": "", "language": idioma_padrao, "model": "gemini-2.5-flash"}
             precisa_salvar = False
+            if "language" not in cfg or not cfg.get("language"):
+                cfg["language"] = detectar_idioma_sistema()
+                precisa_salvar = True
             if "3.6-flash" in str(cfg.get("model")) or "3.8-flash" in str(cfg.get("model")):
                 cfg["model"] = "gemini-2.5-flash"
                 precisa_salvar = True
@@ -162,7 +216,47 @@ class ApiBackend:
                 salvar_config_seguro(self.config_path, cfg)
             return cfg
         except:
-            return {"provider": "gemini", "api_key": "", "language": "pt_BR", "model": "gemini-2.5-flash"}
+            idioma_padrao = detectar_idioma_sistema()
+            return {"provider": "gemini", "api_key": "", "language": idioma_padrao, "model": "gemini-2.5-flash"}
+
+    # --- IDIOMAS E LOCALIZAÇÃO (i18n) ---
+    def detectar_idioma_sistema(self):
+        """Retorna o código do idioma detectado automaticamente no Windows."""
+        return detectar_idioma_sistema()
+
+    def listar_idiomas(self):
+        """Lista dinamicamente os idiomas presentes na pasta web/locale."""
+        pasta = resource_path(os.path.join("web", "locale"))
+        idiomas = []
+        if os.path.exists(pasta):
+            for arq in os.listdir(pasta):
+                if arq.endswith(".json"):
+                    caminho = os.path.join(pasta, arq)
+                    try:
+                        with open(caminho, "r", encoding="utf-8") as f:
+                            dados = json.load(f)
+                        codigo = dados.get("_lang_code", os.path.splitext(arq)[0])
+                        nome = dados.get("_lang_name", codigo)
+                        idiomas.append({"code": codigo, "name": nome})
+                    except Exception:
+                        pass
+        if not idiomas:
+            idiomas = [{"code": "pt_BR", "name": "Português (Brasil)"}, {"code": "en_US", "name": "English (US)"}]
+        return idiomas
+
+    def carregar_idioma(self, codigo="pt_BR"):
+        """Retorna o dicionário de tradução do idioma solicitado."""
+        pasta = resource_path(os.path.join("web", "locale"))
+        caminho = os.path.join(pasta, f"{codigo}.json")
+        if not os.path.exists(caminho):
+            caminho = os.path.join(pasta, "pt_BR.json")
+        if os.path.exists(caminho):
+            try:
+                with open(caminho, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
 
     # --- CONFIGURAÇÃO E API KEY ---
 
@@ -404,7 +498,7 @@ class ApiBackend:
         if enable:
             if hasattr(self, 'tray_icon') and self.tray_icon: return
             try:
-                icone_path = resource_path(os.path.join('web', 'cromak-bridge.ico'))
+                icone_path = resource_path(os.path.join('web', 'lib', 'cromak-bridge.ico'))
                 image = Image.open(icone_path)
                 
                 def mostrar_janela(icon, item):
@@ -1235,7 +1329,7 @@ if __name__ == '__main__':
 
     try:
         import webview.platforms.winforms as _wf
-        _wf._state['icon'] = resource_path(os.path.join('web', 'cromak-bridge.ico'))
+        _wf._state['icon'] = resource_path(os.path.join('web', 'lib', 'cromak-bridge.ico'))
     except Exception:
         pass
 
@@ -1290,7 +1384,7 @@ if __name__ == '__main__':
     if api.config.get("minimize_to_tray", False):
         api.gerenciar_tray(True)
         
-    webview.start(icon=resource_path(os.path.join('web', 'cromak-bridge.ico')))
+    webview.start(icon=resource_path(os.path.join('web', 'lib', 'cromak-bridge.ico')))
     
     # Ao fechar a janela, garante o encerramento total de todos os processos e threads (kill limpo)
     try:

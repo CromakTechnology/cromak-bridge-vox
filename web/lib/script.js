@@ -75,6 +75,69 @@ document.addEventListener('DOMContentLoaded', () => {
             resize(); init(); animate();
         })();
 
+        // --- SISTEMA DE INTERNACIONALIZAÇÃO (i18n) ---
+        window.appIdiomaAtual = 'pt_BR';
+        window.i18nDict = {};
+
+        function t(chave, fallback = '') {
+            if (window.i18nDict && window.i18nDict[chave]) return window.i18nDict[chave];
+            return fallback || chave;
+        }
+
+        function aplicarIdiomaNaTela(dict) {
+            if (!dict) return;
+            window.i18nDict = dict;
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if (dict[k]) el.innerText = dict[k];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const k = el.getAttribute('data-i18n-placeholder');
+                if (dict[k]) el.placeholder = dict[k];
+            });
+            document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                const k = el.getAttribute('data-i18n-title');
+                if (dict[k]) el.title = dict[k];
+            });
+            document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+                const k = el.getAttribute('data-i18n-aria');
+                if (dict[k]) el.setAttribute('aria-label', dict[k]);
+            });
+        }
+
+        function carregarIdioma(codigo = 'pt_BR') {
+            window.appIdiomaAtual = codigo;
+            if (window.pywebview && pywebview.api && pywebview.api.carregar_idioma) {
+                pywebview.api.carregar_idioma(codigo).then(dict => {
+                    aplicarIdiomaNaTela(dict);
+                }).catch(() => {});
+            } else {
+                fetch(`locale/${codigo}.json`).then(r => r.json()).then(dict => {
+                    aplicarIdiomaNaTela(dict);
+                }).catch(() => {});
+            }
+        }
+
+        function carregarListaIdiomas(idiomaSelecionado) {
+            if (window.pywebview && pywebview.api && pywebview.api.listar_idiomas) {
+                pywebview.api.listar_idiomas().then(lista => {
+                    const select = document.getElementById('configLanguage');
+                    if (select && lista && lista.length > 0) {
+                        const atual = idiomaSelecionado || select.value || window.appIdiomaAtual || 'pt_BR';
+                        select.innerHTML = '';
+                        lista.forEach(item => {
+                            const opt = document.createElement('option');
+                            opt.value = item.code;
+                            opt.innerText = item.name;
+                            if (item.code === atual) opt.selected = true;
+                            select.appendChild(opt);
+                        });
+                    }
+                }).catch(() => {});
+            }
+        }
+
         // --- INTEGRAÇÃO PYTHON E LÓGICA ---
         let currentSessionId = null;
         let currentRequestToken = 0;
@@ -111,6 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             pywebview.api.obter_configuracoes().then(config => {
+                const lang = (config && config.language) ? config.language : 'pt_BR';
+                carregarIdioma(lang);
+                carregarListaIdiomas(lang);
                 if (config && config.interface_mode === 'high_contrast') {
                     document.body.classList.add('high-contrast-theme');
                     const sidebarLogo = document.querySelector('.logo-icon-img');
@@ -342,14 +408,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 .trim();
         }
 
-        function anunciarAoLeitor(mensagem) {
+        function anunciarAoLeitor(mensagem, urgente = false) {
             const announcer = document.getElementById('a11yLiveAnnouncer');
             if (!announcer) return;
+            if (urgente) {
+                announcer.setAttribute('aria-live', 'assertive');
+            } else {
+                announcer.setAttribute('aria-live', 'polite');
+            }
             announcer.textContent = '';
             setTimeout(() => {
                 announcer.textContent = mensagem;
-            }, 80);
+            }, 60);
         }
+        window.anunciarAoLeitor = anunciarAoLeitor;
+        window.anunciarParaLeitorDeTela = anunciarAoLeitor;
 
         function focarCampoMensagem() {
             setTimeout(() => {
@@ -512,12 +585,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="empty-icon-glow">
                                 <img src="${document.body.classList.contains('high-contrast-theme') ? 'lib/bridge-vox.png' : 'lib/cromak-bridge.ico'}" alt="Logo do Cromak Bridge" class="empty-icon" onerror="this.style.display='none'">
                             </div>
-                            <h2>Como posso ajudar você hoje no seu computador?</h2>
-                            <p>Escolha um comando rápido abaixo ou digite sua pergunta para começar.</p>
+                            <h2>${t('welcome_title', 'Como posso ajudar você hoje no seu computador?')}</h2>
+                            <p>${t('welcome_subtitle', 'Escolha um comando rápido abaixo ou digite sua pergunta para começar.')}</p>
                             <div class="suggestions-grid" role="group" aria-label="Sugestões de comandos rápidos">
-                                <button class="suggestion-btn" onclick="usarSugestao('O que você pode fazer no meu computador? Me explique suas funções e ferramentas.')" aria-label="Comando rápido: O que você pode fazer no meu computador? Conhecer ferramentas e capacidades">O que você pode fazer no meu PC?</button>
-                                <button class="suggestion-btn" onclick="usarSugestao('Como você pode ler meus arquivos, PDFs e documentos de texto?')" aria-label="Comando rápido: Como ler documentos, holerites e arquivos PDF no meu computador">Como ler documentos e PDFs</button>
-                                <button class="suggestion-btn" onclick="usarSugestao('Quais são os principais atalhos de teclado e de voz para usar o Bridge?')" aria-label="Comando rápido: Quais são os principais atalhos de teclado e voz para usar o sistema">Atalhos de teclado e voz</button>
+                                <button class="suggestion-btn" onclick="usarSugestao('O que você pode fazer no meu computador? Me explique suas funções e ferramentas.')">${t('suggestion_pc', 'O que você pode fazer no meu PC?')}</button>
+                                <button class="suggestion-btn" onclick="usarSugestao('Como você pode ler meus arquivos, PDFs e documentos de texto?')">${t('suggestion_docs', 'Como ler documentos e PDFs')}</button>
+                                <button class="suggestion-btn" onclick="usarSugestao('Quais são os principais atalhos de teclado e de voz para usar o Bridge?')">${t('suggestion_shortcuts', 'Atalhos de teclado e voz')}</button>
                             </div>
                         </div>
                     `;
@@ -1214,6 +1287,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (config) {
                         document.getElementById('configProvider').value = config.provider || 'gemini';
                         document.getElementById('configLanguage').value = config.language || 'pt_BR';
+                        carregarListaIdiomas(config.language || 'pt_BR');
                         // Atalhos
                         if(config.shortcuts) {
                             window.appShortcuts = Object.assign(window.appShortcuts, config.shortcuts);
@@ -1301,6 +1375,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            carregarIdioma(payload.language);
             pywebview.api.salvar_preferencias(payload).then(() => {
                 document.getElementById('apiSetupOverlay').style.display = 'none';
                 
@@ -1427,6 +1502,11 @@ document.addEventListener('DOMContentLoaded', () => {
             pywebview.api.salvar_preferencias(payload).then(() => {
                 fecharConfiguracoes(); // Garante o fechamento
                 
+                // Aplica o idioma escolhido imediatamente na tela
+                if (payload.language) {
+                    carregarIdioma(payload.language);
+                }
+                
                 const mode = payload.interface_mode;
                 const isHighContrast = document.body.classList.contains('high-contrast-theme');
                 if ((mode === 'high_contrast' && !isHighContrast) || (mode === 'normal' && isHighContrast)) {
@@ -1525,11 +1605,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     inputEl.style.display = 'block';
                     inputEl.value = defaultValue;
                     confirmBtn.className = 'dialog-btn confirm';
-                    confirmBtn.innerText = 'Salvar';
+                    confirmBtn.innerText = t('btn_save', 'Salvar');
+                    cancelBtn.innerText = t('btn_cancel', 'Cancelar');
                 } else if (type === 'confirm-danger') {
                     inputEl.style.display = 'none';
                     confirmBtn.className = 'dialog-btn danger';
-                    confirmBtn.innerText = 'Excluir';
+                    confirmBtn.innerText = t('btn_delete', 'Excluir');
+                    cancelBtn.innerText = t('btn_cancel', 'Cancelar');
+                } else if (type === 'confirm-exit') {
+                    inputEl.style.display = 'none';
+                    confirmBtn.className = 'dialog-btn danger';
+                    confirmBtn.innerText = t('dialog_exit_btn_confirm', 'Fechar Programa (Enter)');
+                    cancelBtn.innerText = t('dialog_exit_btn_cancel', 'Cancelar (Esc)');
                 } else if (type === 'info') {
                     inputEl.style.display = 'none';
                     confirmBtn.className = 'dialog-btn confirm';
@@ -1541,10 +1628,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     overlay.style.opacity = '1';
                     box.style.transform = 'scale(1)';
-                    if (type === 'prompt') inputEl.focus();
+                    if (type === 'prompt') {
+                        inputEl.focus();
+                    } else if (type === 'confirm-exit') {
+                        confirmBtn.focus();
+                    } else {
+                        confirmBtn.focus();
+                    }
                 }, 10);
             });
         }
+
+        window.confirmarEncerramento = async function() {
+            const overlay = document.getElementById('customDialog');
+            if (overlay && overlay.style.display === 'flex') {
+                return;
+            }
+
+            const titulo = t('dialog_exit_title', 'Encerrar Assistente');
+            const mensagem = t('dialog_exit_msg', 'O Assistente Cromak Bridge Vox será encerrado. Deseja realmente fechar o programa? Pressione Enter para fechar ou Esc para cancelar.');
+
+            anunciarAoLeitor(`${titulo}. ${mensagem}`, true);
+
+            const confirmado = await showCustomDialog('confirm-exit', titulo, mensagem);
+            if (confirmado) {
+                anunciarAoLeitor(t('dialog_exit_confirming', 'Encerrando o Cromak Bridge Vox. Até logo!'), true);
+                setTimeout(() => {
+                    if (window.pywebview && pywebview.api && pywebview.api.encerrar_sistema) {
+                        pywebview.api.encerrar_sistema();
+                    } else {
+                        window.close();
+                    }
+                }, 180);
+            } else {
+                anunciarAoLeitor(t('dialog_exit_cancelled', 'Encerramento cancelado. Continuando no assistente.'));
+                focarCampoMensagem();
+            }
+        };
 
         function closeCustomDialog(isConfirm) {
             const overlay = document.getElementById('customDialog');
@@ -2160,7 +2280,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // MODO BRIDGE VOX (ATALHOS DE ACESSIBILIDADE FRONTEND)
 // ==========================================
 window.addEventListener('keydown', (e) => {
-    // 1. F4 ou Alt+F4: Encerramento Imediato / Kill Total do Programa (Sem atraso, fecha processos)
+    // 1. F4 ou Alt+F4: Encerramento com Confirmação e Acessibilidade (NVDA)
     const isExitKey = e.key === 'F4' || (e.altKey && e.key === 'F4') || 
                       (window.appShortcuts && window.appShortcuts.exit && e.key.toUpperCase() === window.appShortcuts.exit.toUpperCase());
     if (isExitKey) {
@@ -2169,10 +2289,10 @@ window.addEventListener('keydown', (e) => {
         
         e.preventDefault();
         e.stopPropagation();
-        if (window.pywebview && pywebview.api && pywebview.api.encerrar_sistema) {
+        if (typeof window.confirmarEncerramento === 'function') {
+            window.confirmarEncerramento();
+        } else if (window.pywebview && pywebview.api && pywebview.api.encerrar_sistema) {
             pywebview.api.encerrar_sistema();
-        } else {
-            window.close();
         }
         return;
     }
@@ -2315,6 +2435,27 @@ function toggleSidebarDesktop() {
 // ACESSIBILIDADE NATIVA (FOCUS TRAP PARA MODAIS & ISOLAMENTO PARA NVDA)
 // =========================================================================
 window.addEventListener('keydown', (e) => {
+    // 0. Tratamento para Dialog Customizado (Confirmação de Encerramento, etc.)
+    const customDialog = document.getElementById('customDialog');
+    if (customDialog && customDialog.style.display === 'flex') {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            closeCustomDialog(false);
+            return;
+        }
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            if (document.activeElement && document.activeElement.id === 'dialogCancelBtn') {
+                closeCustomDialog(false);
+            } else {
+                closeCustomDialog(true);
+            }
+            return;
+        }
+    }
+
     // 1. Fechar modal com tecla ESC
     if (e.key === 'Escape') {
         const settingsModal = document.getElementById('settingsModal');
@@ -2323,11 +2464,17 @@ window.addEventListener('keydown', (e) => {
             fecharConfiguracoes();
             return;
         }
+        const aboutModal = document.getElementById('aboutModal');
+        if (aboutModal && aboutModal.style.display === 'flex') {
+            e.preventDefault();
+            fecharSobre();
+            return;
+        }
     }
 
     // 2. Confinamento de foco (Focus Trap) dentro de modais abertos
     if (e.key === 'Tab') {
-        const modalAberto = document.querySelector('.settings-modal[style*="display: flex"], .modal-overlay[style*="display: flex"]');
+        const modalAberto = document.querySelector('.custom-dialog-overlay[style*="display: flex"], .settings-modal[style*="display: flex"], .modal-overlay[style*="display: flex"]');
         if (!modalAberto) return;
 
         // Pega todos os elementos focáveis visíveis dentro do modal

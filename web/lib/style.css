@@ -96,7 +96,7 @@
         
         /* 9. CUSTOM DIALOGS (ALERTS & PROMPTS) */
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(5px); z-index: 4000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; }
-        .custom-dialog-box { background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 16px; padding: 24px; width: 90%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: left; transform: scale(0.95); transition: transform 0.2s ease; }
+        .custom-dialog-box { background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 16px; padding: 24px; width: 90%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: left; transform: scale(0.95); transition: transform 0.2s ease; }
         .custom-dialog-box h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text-primary); }
         .custom-dialog-box p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
         .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
