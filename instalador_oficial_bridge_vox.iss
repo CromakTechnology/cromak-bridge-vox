@@ -14,7 +14,7 @@ AppUserModelID=Cromak Bridge Vox
 
 ; Pasta padrão de instalação oficial (Arquivos de Programas do Windows)
 DefaultDirName={autopf}\Cromak Technology\Bridge Vox
-DefaultGroupName=Cromak Technology
+DefaultGroupName=Bridge Vox
 
 ; Ícone oficial do instalador e desinstalador
 SetupIconFile=cromak-bridge.ico
@@ -69,9 +69,9 @@ Source: "cromak-bridge.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 ; Atalhos na Área de Trabalho e no Menu Iniciar
-Name: "{autodesktop}\Cromak Bridge Vox"; Filename: "{app}\BridgeVox.exe"; WorkingDir: "{app}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Assistente de IA Acessível Cromak Bridge Vox"; AppUserModelID: "Cromak Bridge Vox"
-Name: "{autoprograms}\Cromak Technology\Cromak Bridge Vox"; Filename: "{app}\BridgeVox.exe"; WorkingDir: "{app}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Assistente de IA Acessível Cromak Bridge Vox"; AppUserModelID: "Cromak Bridge Vox"
-Name: "{autoprograms}\Cromak Technology\Desinstalar Cromak Bridge Vox"; Filename: "{uninstallexe}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Desinstalar Cromak Bridge Vox"
+Name: "{autodesktop}\Bridge Vox"; Filename: "{app}\BridgeVox.exe"; WorkingDir: "{app}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Assistente de IA Acessível Cromak Bridge Vox"; AppUserModelID: "Cromak Bridge Vox"
+Name: "{autoprograms}\Bridge Vox\Bridge Vox"; Filename: "{app}\BridgeVox.exe"; WorkingDir: "{app}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Assistente de IA Acessível Cromak Bridge Vox"; AppUserModelID: "Cromak Bridge Vox"
+Name: "{autoprograms}\Bridge Vox\Desinstalar Bridge Vox"; Filename: "{uninstallexe}"; IconFilename: "{app}\cromak-bridge.ico"; Comment: "Desinstalar Cromak Bridge Vox"
 
 [Registry]
 Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Cromak Bridge Vox"; ValueType: string; ValueName: "DisplayName"; ValueData: "Cromak Bridge Vox"; Flags: uninsdeletekey
