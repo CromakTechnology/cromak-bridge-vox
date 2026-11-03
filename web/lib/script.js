@@ -5474,84 +5474,57 @@ window.addEventListener('keydown', (e) => {
 
 
     // F1 / Alt+H / Ctrl+H -> Ajuda
-
     const isHelp = e.key === 'F1' || match(sc.help) || ((e.altKey || e.ctrlKey) && e.key.toLowerCase() === 'h');
-
     if (isHelp) {
-
-        if (isTyping && !e.altKey && !e.ctrlKey) return;
-
+        const isSingleLetterHelp = sc.help && sc.help.length === 1 && !isFunctionKey;
+        if (isTyping && isSingleLetterHelp && !e.altKey && !e.ctrlKey) return;
         e.preventDefault();
-
+        e.stopPropagation();
         if (window.pywebview && pywebview.api && pywebview.api.abrir_janela_ajuda) {
-
             pywebview.api.abrir_janela_ajuda();
-
         }
-
         return;
-
     }
-
-
 
     // F2 / Alt+M / Ctrl+M -> Microfone (Walkie-Talkie)
-
+    // CRÍTICO PARA ACESSIBILIDADE / NVDA: F2 FUNCIONA MESMO DENTRO DA CAIXA DE TEXTO (userInput / duelInput)!
     const isMic = e.key === 'F2' || match(sc.mic) || ((e.altKey || e.ctrlKey) && e.key.toLowerCase() === 'm');
-
     if (isMic) {
-
-        if (isTyping && !e.altKey && !e.ctrlKey) return;
-
+        const isSingleLetterMic = sc.mic && sc.mic.length === 1 && !isFunctionKey;
+        if (isTyping && isSingleLetterMic && !e.altKey && !e.ctrlKey) return;
         e.preventDefault();
-
-        toggleAudio(true);
-
+        e.stopPropagation();
+        if (typeof modoAtual !== 'undefined' && modoAtual === 'duelo') {
+            if (typeof toggleAudioDuel === 'function') toggleAudioDuel(true);
+        } else {
+            if (typeof toggleAudio === 'function') toggleAudio(true);
+        }
         return;
-
     }
-
-
 
     // F5 / Ctrl+N / Alt+N -> Nova Conversa
-
     const isNewChat = e.key === 'F5' || match(sc.clear) || ((e.altKey || e.ctrlKey) && e.key.toLowerCase() === 'n');
-
     if (isNewChat) {
-
-        if (isTyping && !e.altKey && !e.ctrlKey) return;
-
+        const isSingleLetterClear = sc.clear && sc.clear.length === 1 && !isFunctionKey;
+        if (isTyping && isSingleLetterClear && !e.altKey && !e.ctrlKey) return;
         e.preventDefault();
-
+        e.stopPropagation();
         criarSessao();
-
         anunciarAoLeitor("Nova conversa iniciada.");
-
         focarCampoMensagem();
-
         return;
-
     }
-
-
 
     // F10 / Ctrl+, / Alt+S -> Configurações
-
     const isConfig = e.key === 'F10' || match(sc.config) || (e.ctrlKey && e.key === ',') || (e.altKey && e.key.toLowerCase() === 's');
-
     if (isConfig) {
-
-        if (isTyping && !e.altKey && !e.ctrlKey) return;
-
+        const isSingleLetterConfig = sc.config && sc.config.length === 1 && !isFunctionKey;
+        if (isTyping && isSingleLetterConfig && !e.altKey && !e.ctrlKey) return;
         e.preventDefault();
-
+        e.stopPropagation();
         if (typeof abrirConfiguracoes !== 'undefined') abrirConfiguracoes();
-
         return;
-
     }
-
-
 
     // WCAG 2.1.4: Se o usuário estiver digitando em campo de texto, atalhos de tecla única NUNCA disparam!
 
