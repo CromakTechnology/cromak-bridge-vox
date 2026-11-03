@@ -20,8 +20,8 @@ def criar_arquivo_versao():
     conteudo = '''# UTF-8
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 3, 5, 0),
-    prodvers=(1, 3, 5, 0),
+    filevers=(1, 3, 7, 0),
+    prodvers=(1, 3, 7, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -36,11 +36,11 @@ VSVersionInfo(
         '041604b0', # 0416 = Português do Brasil
         [StringStruct('CompanyName', 'Cromak Technology'),
         StringStruct('FileDescription', 'Cromak Bridge Vox'),
-        StringStruct('FileVersion', '1.3.5'),
+        StringStruct('FileVersion', '1.3.7'),
         StringStruct('InternalName', 'BridgeVox.exe'),
         StringStruct('LegalCopyright', 'Copyright 2026 Cromak Technology. Todos os direitos reservados.'),
         StringStruct('OriginalFilename', 'BridgeVox.exe'),
-        StringStruct('ProductVersion', '1.3.5'),
+        StringStruct('ProductVersion', '1.3.7'),
         StringStruct('ProductName', 'Cromak Bridge Vox'),
         StringStruct('Comments', 'Cromak Bridge Vox - Assistente de IA Multimodal e Acessibilidade')])
       ]),
@@ -52,7 +52,7 @@ VSVersionInfo(
         f.write(conteudo)
 
 def realizar_build():
-    print(f"🚀 Iniciando Build Oficial: {NOME_APP} v1.3.5...")
+    print(f"🚀 Iniciando Build Oficial: {NOME_APP} v1.3.7...")
     
     # 1. Cria o arquivo de metadados
     criar_arquivo_versao()

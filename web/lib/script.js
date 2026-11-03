@@ -1,4 +1,217 @@
 
+
+// =========================================================================
+// MÓDULO DE ACESSIBILIDADE AUDITIVA (EARCONS VIA WEB AUDIO API) - CROMAK VOX
+// =========================================================================
+window.earconsEnabled = true;
+
+window.playEarcon = function(soundType) {
+    if (!window.earconsEnabled) return;
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!window._earconCtx) window._earconCtx = new AudioCtx();
+        const ctx = window._earconCtx;
+        if (ctx.state === 'suspended') ctx.resume();
+
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (soundType === 'mic_start') {
+            // Tom suave ascendente (440Hz -> 660Hz) - Sinal de início do microfone
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(660, now + 0.11);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.08, now + 0.03);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.11);
+            osc.start(now);
+            osc.stop(now + 0.12);
+        } else if (soundType === 'mic_stop') {
+            // Tom suave descendente (660Hz -> 440Hz) - Sinal de fim/envio do microfone
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(660, now);
+            osc.frequency.exponentialRampToValueAtTime(440, now + 0.11);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.08, now + 0.03);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.11);
+            osc.start(now);
+            osc.stop(now + 0.12);
+        } else if (soundType === 'ai_response') {
+            // Duplo tom harmônico positivo e sutil (587Hz -> 880Hz)
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(587, now);
+            osc.frequency.setValueAtTime(880, now + 0.07);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.06, now + 0.03);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.16);
+        } else if (soundType === 'error') {
+            // Tom de atenção grave e suave (320Hz -> 220Hz)
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(320, now);
+            osc.frequency.linearRampToValueAtTime(220, now + 0.14);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.09, now + 0.02);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.14);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        }
+    } catch(e) {}
+};
+
+// =========================================================================
+// RECONHECIMENTO E REMANEJAMENTO INTELIGENTE DE CHAVES DE API
+// =========================================================================
+function identificarProvedorDaChave(k) {
+    if (!k) return { provedor: null, nome: '' };
+    k = k.trim();
+    if (k.startsWith('gsk_')) {
+        return { provedor: 'groq', nome: 'Groq (Ultra-Rápido)' };
+    }
+    if (k.startsWith('AIzaSy') || k.startsWith('AIza') || k.startsWith('AQ.')) {
+        return { provedor: 'gemini', nome: 'Google Gemini' };
+    }
+    if (k.startsWith('sk-ant-')) {
+        return { provedor: 'claude', nome: 'Anthropic Claude' };
+    }
+    if (k.startsWith('sk-ws-') || /^[a-f0-9]{32}$/i.test(k) || k.toLowerCase().startsWith('qwen-')) {
+        return { provedor: 'qwen', nome: 'Alibaba Qwen Cloud' };
+    }
+    if (k.startsWith('sk-proj-') || k.startsWith('sk-admin-') || (k.startsWith('sk-') && k.length > 35 && !k.startsWith('sk-ant-') && !k.startsWith('sk-ws-'))) {
+        return { provedor: 'openai', nome: 'OpenAI (ChatGPT)' };
+    }
+    return { provedor: 'gemini', nome: 'Google Gemini' };
+}
+
+function detectarChaveSetup() {
+    const input = document.getElementById('setupSmartKey');
+    if (!input) return;
+    const val = input.value.trim();
+    const badge = document.getElementById('setupDetectionBadge');
+    const icon = document.getElementById('setupDetectionIcon');
+    const text = document.getElementById('setupDetectionText');
+    if (!badge) return;
+
+    if (!val) {
+        badge.style.display = 'none';
+        return;
+    }
+
+    const det = identificarProvedorDaChave(val);
+    badge.style.display = 'flex';
+    if (det.provedor === 'groq') {
+        icon.innerText = '⚡';
+        text.innerHTML = 'Motor Detectado: <span style="color: var(--accent-1); font-weight: 700;">Groq (Ultra-Rápido)</span>';
+    } else if (det.provedor === 'gemini') {
+        icon.innerText = '✨';
+        text.innerHTML = 'Motor Detectado: <span style="color: var(--accent-1); font-weight: 700;">Google Gemini</span>';
+    } else if (det.provedor === 'claude') {
+        icon.innerText = '🧠';
+        text.innerHTML = 'Motor Detectado: <span style="color: var(--accent-1); font-weight: 700;">Anthropic Claude</span>';
+    } else if (det.provedor === 'openai') {
+        icon.innerText = '🤖';
+        text.innerHTML = 'Motor Detectado: <span style="color: var(--accent-1); font-weight: 700;">OpenAI (ChatGPT)</span>';
+    } else if (det.provedor === 'qwen') {
+        icon.innerText = '☁️';
+        text.innerHTML = 'Motor Detectado: <span style="color: var(--accent-1); font-weight: 700;">Alibaba Qwen Cloud</span>';
+    } else {
+        icon.innerText = '🔑';
+        text.innerHTML = 'Chave Inserida (Será salva no motor padrão)';
+    }
+}
+
+function verificarRemanejamentoChave(inputEl, provAlvo) {
+    const val = inputEl.value.trim();
+    if (!val || val.length < 10) return;
+    const det = identificarProvedorDaChave(val);
+    if (det.provedor && det.provedor !== provAlvo) {
+        const campoCorretoId = {
+            'gemini': 'keyGemini',
+            'groq': 'keyGroq',
+            'openai': 'keyOpenai',
+            'claude': 'keyClaude',
+            'qwen': 'keyQwen'
+        }[det.provedor];
+        const campoCorreto = document.getElementById(campoCorretoId);
+        if (campoCorreto) {
+            campoCorreto.value = val;
+            inputEl.value = '';
+            campoCorreto.style.boxShadow = '0 0 14px var(--accent-1)';
+            campoCorreto.style.borderColor = 'var(--accent-1)';
+            setTimeout(() => {
+                campoCorreto.style.boxShadow = '';
+                campoCorreto.style.borderColor = '';
+            }, 2500);
+
+            const cfgProv = document.getElementById('configProvider');
+            if (cfgProv) {
+                cfgProv.value = det.provedor;
+                forceUpdateCustomUI('configProvider');
+            }
+            mostrarToast(`💡 Chave reconhecida como ${det.nome}! Movida automaticamente para o campo correto.`);
+            if (typeof playEarcon === 'function') playEarcon('ai_response');
+            atualizarDisponibilidadeProvedoresLocal();
+        }
+    } else {
+        atualizarDisponibilidadeProvedoresLocal();
+    }
+}
+
+function atualizarDisponibilidadeProvedoresLocal() {
+    const chaves = {
+        gemini: document.getElementById('keyGemini') ? document.getElementById('keyGemini').value : '',
+        groq: document.getElementById('keyGroq') ? document.getElementById('keyGroq').value : '',
+        openai: document.getElementById('keyOpenai') ? document.getElementById('keyOpenai').value : '',
+        claude: document.getElementById('keyClaude') ? document.getElementById('keyClaude').value : '',
+        qwen: document.getElementById('keyQwen') ? document.getElementById('keyQwen').value : ''
+    };
+    atualizarDisponibilidadeProvedores(chaves);
+}
+
+function atualizarDisponibilidadeProvedores(chavesMap, activeProv) {
+    if (!chavesMap) chavesMap = {};
+    const provedores = [
+        { id: 'gemini', nome: 'Google Gemini', temChave: !!(chavesMap.gemini && chavesMap.gemini.trim()) },
+        { id: 'groq', nome: 'Groq (Ultra-Rápido)', temChave: !!(chavesMap.groq && chavesMap.groq.trim()) },
+        { id: 'openai', nome: 'OpenAI (ChatGPT)', temChave: !!(chavesMap.openai && chavesMap.openai.trim()) },
+        { id: 'claude', nome: 'Anthropic Claude', temChave: !!(chavesMap.claude && chavesMap.claude.trim()) },
+        { id: 'qwen', nome: 'Alibaba Qwen Cloud', temChave: !!(chavesMap.qwen && chavesMap.qwen.trim()) }
+    ];
+
+    const selectIds = ['quickProviderSelector', 'configProvider', 'duelProv1', 'duelProv2'];
+    selectIds.forEach(selId => {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        Array.from(sel.options).forEach(opt => {
+            const pInfo = provedores.find(p => p.id === opt.value);
+            if (pInfo) {
+                if (pInfo.temChave) {
+                    opt.disabled = false;
+                    opt.innerText = pInfo.nome;
+                } else {
+                    opt.disabled = true;
+                    opt.innerText = `${pInfo.nome} (Sem Chave)`;
+                }
+            }
+        });
+        
+        // Se a opção atualmente selecionada ficou desabilitada, pula para a primeira habilitada
+        if (sel.options[sel.selectedIndex] && sel.options[sel.selectedIndex].disabled) {
+            const primeiraHabilitada = Array.from(sel.options).find(o => !o.disabled);
+            if (primeiraHabilitada) {
+                sel.value = primeiraHabilitada.value;
+            }
+        }
+        forceUpdateCustomUI(selId);
+    });
+}
+
+
 function interromperDuelo() {
     const stopBtn = document.getElementById('stopBtnDuel');
     const sendBtn = document.getElementById('duelSendBtn');
@@ -610,6 +823,22 @@ window.addEventListener('focus', () => {
 
             pywebview.api.obter_configuracoes().then(config => {
 
+                if (config && config.api_keys) {
+
+                    atualizarDisponibilidadeProvedores(config.api_keys, config.provider);
+
+                }
+
+                if (config && config.earcons !== undefined) {
+
+                    window.earconsEnabled = config.earcons;
+
+                    const chkE = document.getElementById('configEarcons');
+
+                    if (chkE) chkE.checked = config.earcons;
+
+                }
+
                 const lang = (config && config.language) ? config.language : 'pt_BR';
 
                 carregarIdioma(lang);
@@ -956,9 +1185,21 @@ window.addEventListener('focus', () => {
 
                         btn.setAttribute('aria-selected', opt.selected ? 'true' : 'false');
 
+                        if (opt.disabled) {
+
+                            btn.disabled = true;
+
+                            btn.setAttribute('aria-disabled', 'true');
+
+                            btn.classList.add('option-disabled');
+
+                        }
+
                         btn.onclick = (e) => {
 
                             e.stopPropagation();
+
+                            if (opt.disabled) return;
 
                             select.value = opt.value;
 
@@ -1760,6 +2001,14 @@ window.addEventListener('focus', () => {
             const emptyState = document.getElementById('emptyState');
 
             if (emptyState) emptyState.remove();
+
+
+
+            if (sender === 'ia' && isNewResponse && typeof playEarcon === 'function') {
+
+                playEarcon('ai_response');
+
+            }
 
 
 
@@ -2665,6 +2914,8 @@ window.addEventListener('focus', () => {
 
             gravandoAudio = true;
 
+            if (typeof playEarcon === 'function') playEarcon('mic_start');
+
             mostrarOverlayVoz();
 
             anunciarParaLeitorDeTela("Microfone ativado. Fale após o bipe. Pressione F2 para cancelar.");
@@ -2676,6 +2927,8 @@ window.addEventListener('focus', () => {
                 if (!gravandoAudio) return; // Foi cancelado durante a captura
 
                 gravandoAudio = false;
+
+                if (typeof playEarcon === 'function') playEarcon('mic_stop');
 
                 esconderOverlayVoz();
 
@@ -2717,6 +2970,8 @@ window.addEventListener('focus', () => {
 
                 gravandoAudio = false;
 
+                if (typeof playEarcon === 'function') playEarcon('mic_stop');
+
                 esconderOverlayVoz();
 
                 mostrarToastErro("[Erro] Falha no microfone.");
@@ -2743,6 +2998,8 @@ window.addEventListener('focus', () => {
 
             gravandoAudio = true;
 
+            if (typeof playEarcon === 'function') playEarcon('mic_start');
+
             mostrarOverlayVoz();
 
             pywebview.api.gravar_audio().then(texto => { 
@@ -2750,6 +3007,8 @@ window.addEventListener('focus', () => {
                 if (!gravandoAudio) return;
 
                 gravandoAudio = false;
+
+                if (typeof playEarcon === 'function') playEarcon('mic_stop');
 
                 esconderOverlayVoz();
 
@@ -2772,6 +3031,8 @@ window.addEventListener('focus', () => {
                 if (!gravandoAudio) return;
 
                 gravandoAudio = false;
+
+                if (typeof playEarcon === 'function') playEarcon('mic_stop');
 
                 esconderOverlayVoz();
 
@@ -3039,6 +3300,16 @@ window.addEventListener('focus', () => {
 
                         }
 
+                        if (document.getElementById('configEarcons')) {
+
+                            document.getElementById('configEarcons').checked = (config.earcons !== undefined) ? config.earcons : true;
+
+                            window.earconsEnabled = (config.earcons !== undefined) ? config.earcons : true;
+
+                        }
+
+                        atualizarDisponibilidadeProvedores(config.api_keys || {}, config.provider);
+
                         
 
                         const chaves = config.api_keys || {};
@@ -3107,13 +3378,37 @@ window.addEventListener('focus', () => {
 
             const btn = document.querySelector('.api-setup-box .btn-new-chat');
 
+            const smartInput = document.getElementById('setupSmartKey');
+
+            const chave = smartInput ? smartInput.value.trim() : '';
+
+
+
+            if (!chave) {
+
+                mostrarToast("Por favor, cole sua chave de API para iniciar.", true);
+
+                if (typeof playEarcon === 'function') playEarcon('error');
+
+                return;
+
+            }
+
+
+
             btn.innerText = "Conectando...";
 
             btn.disabled = true;
 
 
 
-            const provider = document.getElementById('setupProvider').value;
+            const det = identificarProvedorDaChave(chave);
+
+            const provider = det.provedor || 'groq';
+
+            const payload_keys = { gemini: '', groq: '', openai: '', claude: '', qwen: '' };
+
+            payload_keys[provider] = chave;
 
             const payload = {
 
@@ -3344,6 +3639,8 @@ window.addEventListener('focus', () => {
                 auto_tts: document.getElementById('configAutoVoz').checked,
 
                 always_voice: document.getElementById('configBridgeVox') ? document.getElementById('configBridgeVox').checked : false,
+
+                earcons: document.getElementById('configEarcons') ? document.getElementById('configEarcons').checked : true,
 
                 shortcuts: {
 

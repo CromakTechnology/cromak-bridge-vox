@@ -42,3 +42,8 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+
+# Arquivos de teste e credenciais locais
+docs/api-teste*.txt
+docs/testes*.txt
+_backup*/

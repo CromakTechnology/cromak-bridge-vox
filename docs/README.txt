@@ -4,7 +4,7 @@
 ================================================================================
 Desenvolvido por: Cromak Technology & MS Digital (Marcos Souza)
 Consultoria & Validação de Acessibilidade: Gustavo Torniero
-Versão Oficial: 1.3.5 | Matrix Core
+Versão Oficial: 1.3.7 | Matrix Core
 Data de Atualização: Novembro de 2026
 Arquitetura: 64-bits Nativo (Windows 10 e Windows 11)
 Motores de IA (BYOK): Groq (LPU Ultra-Rápido), Google Gemini, OpenAI, Claude, Qwen

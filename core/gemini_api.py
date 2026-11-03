@@ -1078,7 +1078,7 @@ def obter_system_prompt_groq(nome_usuario="Usuário", data_atual="", avisos_agen
     """Gera um prompt ultracompacto para a Groq preservando 100% da governança e economizando ~3.000 tokens."""
     aviso_agenda_txt = f"\n[AGENDA HOJE]: Lembre educadamente ao final: {avisos_agenda}" if avisos_agenda else ""
     return (
-        f"Você é o Cromak Bridge Vox v1.3.5, assistente de IA multimodal e acessibilidade da Cromak Technology "
+        f"Você é o Cromak Bridge Vox v1.3.7, assistente de IA multimodal e acessibilidade da Cromak Technology "
         f"(MS Digital, fundado e concebido por Marcos Souza). Hoje é {data_atual}. Usuário: {nome_usuario}.\n\n"
         "[ACESSIBILIDADE WCAG & LEITORES DE TELA]:\n"
         "- Totalmente adaptado para NVDA, JAWS e Narrador. role='application'. Alternar foco: NVDA + Barra de Espaço.\n"
@@ -1403,6 +1403,30 @@ Você tem conhecimento integral e nativo sobre a arquitetura, limites, seguranç
                 
             except Exception as e:
                 erro_str = str(e).upper()
+
+                # SMART FAILOVER: Se o provedor primário falhar por limite/cota, e houver Groq configurado, comuta na hora!
+                if ("429" in erro_str or "RESOURCE_EXHAUSTED" in erro_str or "QUOTA" in erro_str or "RATE_LIMIT" in erro_str or "FREE QUOTA" in erro_str) and self.provider_name.lower() != "groq":
+                    try:
+                        from .seguranca import ler_config_seguro, get_appdata_dir
+                        import os
+                        cp = os.path.join(get_appdata_dir(), 'config.json')
+                        if os.path.exists(cp):
+                            cfg_fo = ler_config_seguro(cp)
+                            chaves_fo = cfg_fo.get("api_keys", {})
+                            groq_k = chaves_fo.get("groq", "").strip()
+                            if groq_k:
+                                print(f"[Smart Failover] Motor {self.provider_name.upper()} em limite. Alternando automaticamente para Groq...")
+                                nome_u = cfg_fo.get("user_name") or os.getenv("USERNAME") or "Usuário"
+                                prompt_g = obter_system_prompt_groq(nome_usuario=nome_u, data_atual=data_atual, avisos_agenda=_aviso_str if '_aviso_str' in locals() else '')
+                                groq_eng = GroqProvider(groq_k, "openai/gpt-oss-120b", self.historico if hasattr(self, 'historico') else None, prompt_g)
+                                resp_fo = groq_eng.enviar_prompt(texto, caminho_arquivo)
+                                aviso_topo = (
+                                    f"> ⚡ **[Smart Failover]:** *O servidor do {self.provider_name.title()} atingiu o limite de cota temporário. "
+                                    f"Sua resposta foi concluída em tempo recorde pelo Groq (Ultra-Rápido):*\n\n"
+                                )
+                                return aviso_topo + resp_fo
+                    except Exception as err_fo:
+                        print(f"[Smart Failover Error]: {err_fo}")
                 if "API_KEY_INVALID" in erro_str or "API KEY NOT VALID" in erro_str or "INVALID_API_KEY" in erro_str or "INCORRECT API KEY" in erro_str or "INVALID X-API-KEY" in erro_str or "AUTHENTICATIONERROR" in erro_str or "UNAUTHENTICATED" in erro_str or ("401" in erro_str and "UNAUTHORIZED" in erro_str):
                     nome_prov = "Google Gemini" if self.provider_name.lower() == "gemini" else ("Groq" if self.provider_name.lower() == "groq" else self.provider_name.title())
                     return f"🔑 **Chave de API Inválida ({nome_prov}):** A chave de API configurada para este motor não é válida, expirou ou foi digitada incorretamente. Por favor, acesse **Configurações (F10) > Chaves de API** para atualizar sua chave ou selecione outro motor (como o **Groq (Ultra-Rápido)**) no topo da tela."

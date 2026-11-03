@@ -40,62 +40,32 @@
                 <option value="high_contrast">Bridge Vox Alto Contraste (Para Baixa Visão - Cores em Preto e Amarelo)</option>
             </select>
             
-            <label class="settings-label" id="lblSetupProvider">Provedor Principal de Inteligência Artificial</label>
-            <select id="setupProvider" class="settings-input" onchange="atualizarProvedorSetup()" aria-labelledby="lblSetupProvider" aria-label="Selecione o motor de inteligência artificial principal: Google Gemini, OpenAI ChatGPT, Anthropic Claude ou Alibaba Qwen">
-                <option value="gemini">Google Gemini (Gratuito e Rápido)</option>
-                <option value="groq">Groq (Ultra-Rápido / LPU Instantâneo)</option>
-                <option value="openai">OpenAI (ChatGPT)</option>
-                <option value="claude">Anthropic Claude</option>
-                <option value="qwen">Alibaba Qwen Cloud</option>
-            </select>
+            <label class="settings-label" id="lblSetupSmartKey">Chave de API (Reconhecimento Automático de Motor)</label>
+            <div style="position: relative; margin-bottom: 8px;">
+                <input type="password" id="setupSmartKey" class="settings-input" 
+                       placeholder="Cole sua chave aqui (Groq, Gemini, Claude, OpenAI ou Qwen)..." 
+                       oninput="detectarChaveSetup()"
+                       style="margin-bottom: 0; padding-right: 44px;" 
+                       aria-label="Campo para colar a chave de API de qualquer inteligência artificial. O sistema identificará automaticamente seu motor.">
+                <button type="button" class="inline-icon-btn" onclick="alternarVisibilidade('setupSmartKey')" title="Mostrar/Ocultar" style="position: absolute; right: 8px; top: 10px;" aria-label="Mostrar ou ocultar chave de API">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+            </div>
 
-            <div id="setupKeysContainer" style="margin-top: 16px;">
-                <div id="setupBox_gemini">
-                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Google Gemini API Key</span> 
-                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('gemini')" aria-label="Abrir site oficial do Google AI Studio no navegador para gerar sua chave de API gratuita">Gerar nova API...</button>
-                    </label>
-                    <input type="password" id="setupKeyGemini" class="settings-input" placeholder="AIzaSy..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API do Google Gemini. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
-                </div>
-                <div id="setupBox_openai" style="display: none;">
-                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>OpenAI API Key</span> 
-                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('openai')" aria-label="Abrir plataforma da OpenAI no navegador para gerar sua chave de API do ChatGPT">Gerar nova API...</button>
-                    </label>
-                    <input type="password" id="setupKeyOpenai" class="settings-input" placeholder="sk-..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API da OpenAI ChatGPT. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
-                </div>
-                <div id="setupBox_claude" style="display: none;">
-                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Anthropic Claude API Key</span> 
-                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('claude')" aria-label="Abrir console da Anthropic no navegador para gerar sua chave de API do Claude">Gerar nova API...</button>
-                    </label>
-                    <input type="password" id="setupKeyClaude" class="settings-input" placeholder="sk-ant-..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API da Anthropic Claude. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
-                </div>
-                <div id="setupBox_qwen" style="display: none;">
-                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Alibaba Qwen API Key</span> 
-                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('qwen')" aria-label="Abrir console da Alibaba Qwen no navegador para gerar sua chave de API">Gerar nova API...</button>
-                    </label>
-                    <input type="password" id="setupKeyQwen" class="settings-input" placeholder="sk-..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API da Alibaba Qwen. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
-                </div>
-                <div id="setupBox_groq" style="display: none;">
-                    <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Groq API Key</span> 
-                        <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('groq')" aria-label="Abrir console da Groq no navegador para gerar sua chave de API gratuita">Gerar nova API...</button>
-                    </label>
-                    <input type="password" id="setupKeyGroq" class="settings-input" placeholder="gsk_..." style="margin-bottom: 0;" aria-label="Campo de texto para colar a chave de API da Groq. Se não tiver chave, pressione Tab para ir ao botão Gerar nova API">
+            <!-- Badge de reconhecimento dinâmico -->
+            <div id="setupDetectionBadge" style="display: none; align-items: center; gap: 8px; font-size: 0.88rem; margin-bottom: 14px; padding: 10px 14px; border-radius: 8px; background: rgba(99,102,241,0.12); border: 1px solid var(--accent-1); color: var(--text-primary);">
+                <span id="setupDetectionIcon" style="font-size: 1.15rem;">⚡</span>
+                <span id="setupDetectionText" style="font-weight: 600;">Motor Detectado: Groq (Ultra-Rápido)</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; margin-bottom: 20px;">
+                <span style="font-size: 0.82rem; color: var(--text-secondary);">Precisa de uma chave gratuita?</span>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('groq')" style="font-size: 0.82rem;" aria-label="Abrir site oficial do Groq para gerar chave gratuita">Groq (Grátis)</button>
+                    <span style="color: var(--text-secondary); font-size: 0.82rem;">•</span>
+                    <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('gemini')" style="font-size: 0.82rem;" aria-label="Abrir site oficial do Google AI Studio para gerar chave gratuita">Gemini (Grátis)</button>
                 </div>
             </div>
-            
-            <script>
-                function atualizarProvedorSetup() {
-                    const provider = document.getElementById('setupProvider').value;
-                    const boxes = ['gemini', 'openai', 'claude', 'qwen'];
-                    boxes.forEach(b => {
-                        document.getElementById('setupBox_' + b).style.display = (b === provider) ? 'block' : 'none';
-                    });
-                }
-            </script>
 
             <button class="btn-new-chat" onclick="salvarConfiguracaoInicial()" style="margin-top: 24px; height: 50px; font-size: 1.05rem;">
                 Conectar e Iniciar
@@ -494,6 +464,10 @@
                         <input type="checkbox" id="configBridgeVox" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
                         Modo Always-Voice (Escuta o microfone diretamente)
                     </label>
+                    <label class="settings-label" style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                        <input type="checkbox" id="configEarcons" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+                        Sinais Sonoros Acessíveis (Bips distintos para microfone e respostas da IA)
+                    </label>
                 </div>
 
                 <!-- GRUPO: COMPORTAMENTO -->
@@ -529,7 +503,7 @@
             
             <!-- ABA 2: CHAVES DE API -->
             <div id="tab-apis" class="settings-tab" style="display: none;">
-                <label class="settings-label">Provedor de IA Ativo</label>
+                <label class="settings-label">Provedor Primário da Sessão (Carrega automaticamente)</label>
                 <select id="configProvider" class="settings-input" style="margin-bottom: 20px; border-color: var(--accent-1);">
                     <option value="gemini">Google Gemini</option>
                     <option value="groq">Groq (Ultra-Rápido)</option>
@@ -541,7 +515,7 @@
                 <!-- Gemini -->
                 <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Google Gemini API Key</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('gemini')" aria-label="Abrir site oficial do Google AI Studio para gerar sua chave de API do Gemini">Gerar nova API...</button></label>
                 <div class="api-input-group">
-                    <input type="password" id="keyGemini" class="settings-input" placeholder="AIzaSy...">
+                    <input type="password" id="keyGemini" class="settings-input" placeholder="AIzaSy..." oninput="verificarRemanejamentoChave(this, 'gemini')">
                     <div class="api-actions">
                         <button type="button" class="inline-icon-btn" onclick="colarTexto('keyGemini')" title="Colar Área de Transferência">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -555,7 +529,7 @@
                 <!-- Qwen -->
                 <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Alibaba Qwen API Key</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('qwen')" aria-label="Abrir console da Alibaba Qwen para gerar sua chave de API">Gerar nova API...</button></label>
                 <div class="api-input-group">
-                    <input type="password" id="keyQwen" class="settings-input" placeholder="sk-...">
+                    <input type="password" id="keyQwen" class="settings-input" placeholder="sk-..." oninput="verificarRemanejamentoChave(this, 'qwen')">
                     <div class="api-actions">
                         <button type="button" class="inline-icon-btn" onclick="colarTexto('keyQwen')">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -569,7 +543,7 @@
                 <!-- OpenAI -->
                 <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>OpenAI API Key</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('openai')" aria-label="Abrir site da OpenAI para gerar sua chave de API do ChatGPT">Gerar nova API...</button></label>
                 <div class="api-input-group">
-                    <input type="password" id="keyOpenai" class="settings-input" placeholder="sk-...">
+                    <input type="password" id="keyOpenai" class="settings-input" placeholder="sk-..." oninput="verificarRemanejamentoChave(this, 'openai')">
                     <div class="api-actions">
                         <button type="button" class="inline-icon-btn" onclick="colarTexto('keyOpenai')">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -583,7 +557,7 @@
                 <!-- Groq -->
                 <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Groq API Key (Ultra-Rápido)</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('groq')" aria-label="Abrir console da Groq para gerar sua chave de API">Gerar nova API...</button></label>
                 <div class="api-input-group">
-                    <input type="password" id="keyGroq" class="settings-input" placeholder="gsk_...">
+                    <input type="password" id="keyGroq" class="settings-input" placeholder="gsk_..." oninput="verificarRemanejamentoChave(this, 'groq')">
                     <div class="api-actions">
                         <button type="button" class="inline-icon-btn" onclick="colarTexto('keyGroq')">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -597,7 +571,7 @@
                 <!-- Claude -->
                 <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Anthropic Claude API Key</span> <button type="button" class="btn-api-link" onclick="abrirLinkGerarApi('claude')" aria-label="Abrir console da Anthropic para gerar sua chave de API do Claude">Gerar nova API...</button></label>
                 <div class="api-input-group">
-                    <input type="password" id="keyClaude" class="settings-input" placeholder="sk-ant-...">
+                    <input type="password" id="keyClaude" class="settings-input" placeholder="sk-ant-..." oninput="verificarRemanejamentoChave(this, 'claude')">
                     <div class="api-actions">
                         <button type="button" class="inline-icon-btn" onclick="colarTexto('keyClaude')">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -800,7 +774,7 @@
                     <!-- Info -->
                     <div style="flex: 1;">
                         <h2 style="margin: 0 0 6px 0; font-size: 1.9rem; color: var(--text-primary); font-weight: 600; letter-spacing: -0.5px;">CROMAK Bridge</h2>
-                        <p id="aboutAppVersion" style="margin: 0 0 22px 0; color: var(--text-secondary); font-size: 0.92rem;">Version 1.3.5 (build 2026.10) | Matrix Core</p>
+                        <p id="aboutAppVersion" style="margin: 0 0 22px 0; color: var(--text-secondary); font-size: 0.92rem;">Version 1.3.7 (build 2026.10) | Matrix Core</p>
                         
                         <div style="display: grid; grid-template-columns: 140px 1fr; gap: 10px; margin-bottom: 22px; font-size: 0.92rem; align-items: center;">
                             <div style="color: var(--text-secondary);">License:</div>
