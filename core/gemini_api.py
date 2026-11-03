@@ -1403,7 +1403,10 @@ Você tem conhecimento integral e nativo sobre a arquitetura, limites, seguranç
                 
             except Exception as e:
                 erro_str = str(e).upper()
-                if "FREE QUOTA" in erro_str or "FREETIERONLY" in erro_str or "INSUFFICIENT_QUOTA" in erro_str or "QUOTA_EXCEEDED" in erro_str:
+                if "API_KEY_INVALID" in erro_str or "API KEY NOT VALID" in erro_str or "INVALID_API_KEY" in erro_str or "INCORRECT API KEY" in erro_str or "INVALID X-API-KEY" in erro_str or "AUTHENTICATIONERROR" in erro_str or "UNAUTHENTICATED" in erro_str or ("401" in erro_str and "UNAUTHORIZED" in erro_str):
+                    nome_prov = "Google Gemini" if self.provider_name.lower() == "gemini" else ("Groq" if self.provider_name.lower() == "groq" else self.provider_name.title())
+                    return f"🔑 **Chave de API Inválida ({nome_prov}):** A chave de API configurada para este motor não é válida, expirou ou foi digitada incorretamente. Por favor, acesse **Configurações (F10) > Chaves de API** para atualizar sua chave ou selecione outro motor (como o **Groq (Ultra-Rápido)**) no topo da tela."
+                elif "FREE QUOTA" in erro_str or "FREETIERONLY" in erro_str or "INSUFFICIENT_QUOTA" in erro_str or "QUOTA_EXCEEDED" in erro_str:
                     return "🚫 <strong>Cota Gratuita Esgotada:</strong> O limite de uso gratuito desta API (Google/Qwen/OpenAI) chegou ao fim. Por favor, aguarde a renovação da cota ou insira uma chave de API com saldo disponível nas Preferências."
                 elif "429" in erro_str or "RESOURCE_EXHAUSTED" in erro_str or "503" in erro_str or "UNAVAILABLE" in erro_str or "RATE_LIMIT" in erro_str:
                     m_seg = re.search(r"try again in\s+(\d+(?:\.\d+)?)s", str(e), re.IGNORECASE)
