@@ -4243,7 +4243,7 @@ window.addEventListener('focus', () => {
 
                     const el = document.getElementById('aboutAppVersion');
 
-                    if (el && info && info.full) el.innerText = info.full;
+                    if (el && info && info.version) el.innerText = `${info.version} (Build ${info.build || '2026.11'})`;
 
                 } catch (e) {}
 

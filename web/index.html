@@ -770,33 +770,35 @@
             <div style="padding: 36px 40px; display: flex; flex-direction: column; gap: 20px;">
                 <button onclick="document.getElementById('aboutModal').style.display='none'" aria-label="Fechar janela Sobre" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-secondary)'"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                 
-                <!-- Cabeçalho Superior: Título + Metadados à esquerda, Card do Logo à direita -->
+                <!-- Cabeçalho Superior: Título + Metadados à esquerda, Logo à direita -->
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-glass);">
                     <div style="flex: 1;">
-                        <h2 style="margin: 0 0 14px 0; font-size: 2.3rem; font-weight: 700; letter-spacing: -0.5px; background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Bridge Vox</h2>
+                        <h2 style="margin: 0 0 14px 0; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+                            <span style="font-size: 2.3rem; font-weight: 700; letter-spacing: -0.5px; background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Bridge Vox</span>
+                            <span style="font-size: 1.05rem; font-weight: 500; color: #71717a; letter-spacing: 0.3px;">| Matrix Core</span>
+                        </h2>
                         
                         <div style="display: grid; grid-template-columns: 85px auto; gap: 10px 16px; font-size: 0.95rem; align-items: center;">
                             <div style="color: var(--text-secondary); font-weight: 500;">Licença:</div>
                             <div><span id="aboutStatusLicenca" style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: 0.84rem; border: 1px solid rgba(34, 197, 94, 0.35); display: inline-flex; align-items: center; gap: 6px;">Grátis para Usar</span></div>
                             
                             <div style="color: var(--text-secondary); font-weight: 500;">Versão:</div>
-                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                <span id="aboutAppVersion" style="font-weight: 600; color: var(--text-primary); font-size: 1rem;">1.3.7</span>
-                                <span id="aboutVersionBadge" onclick="verificarAtualizacaoOnline()" title="Clique para verificar atualizações online" style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: 0.82rem; border: 1px solid rgba(34, 197, 94, 0.35); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                            <div style="font-weight: 600; color: var(--text-primary); font-size: 0.96rem;">
+                                <span id="aboutAppVersion">1.3.7 (Build 2026.11)</span>
+                            </div>
+                            
+                            <div style="color: var(--text-secondary); font-weight: 500;">Status:</div>
+                            <div>
+                                <span id="aboutVersionBadge" onclick="verificarAtualizacaoOnline()" title="Clique para verificar ou baixar atualizações" style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: 0.82rem; border: 1px solid rgba(34, 197, 94, 0.35); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
                                     <span id="aboutVersionBadgeDot" style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #22c55e;"></span>
                                     <span id="aboutVersionBadgeText">Versão Mais Recente</span>
                                 </span>
                             </div>
-                            
-                            <div style="color: var(--text-secondary); font-weight: 500;">Build:</div>
-                            <div style="color: #a1a1aa; font-family: monospace; font-weight: 600; font-size: 0.92rem;">2026.11</div>
                         </div>
                     </div>
                     
-                    <!-- Logo Card Top-Right -->
-                    <div style="width: 112px; height: 112px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.02); border: 1.5px solid rgba(139, 92, 246, 0.35); border-radius: 20px; padding: 14px; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <img src="lib/cromak-bridge.png" alt="Bridge Vox" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>
+                    <!-- Logo Top-Right sem caixa dupla (borda direta no contorno do ícone) -->
+                    <img src="lib/cromak-bridge.png" alt="Bridge Vox" style="width: 96px; height: 96px; flex-shrink: 0; border-radius: 22px; border: 1.5px solid rgba(139, 92, 246, 0.5); box-shadow: 0 8px 24px rgba(0,0,0,0.4); object-fit: cover;">
                 </div>
 
                 <!-- Conteúdo Descritivo -->
