@@ -99,11 +99,12 @@ class CromakOnlineSync:
         slug_underline = slug_hifen.replace('-', '_')
         slug_sem_espaco = slug_hifen.replace('-', '')
         
-        candidatos = [slug_hifen, slug_underline, slug_sem_espaco]
+        candidatos = []
+        if "bridge" in slug_hifen or "vox" in slug_hifen:
+            candidatos.extend(["cromak-bridge", "bridge-vox", "cromak-bridge-vox", "bridge"])
+        candidatos.extend([slug_hifen, slug_underline, slug_sem_espaco])
         if "suite" in slug_hifen:
             candidatos.append(slug_hifen.replace("-suite", ""))
-        if "bridge" in slug_hifen or "vox" in slug_hifen:
-            candidatos.extend(["bridge-vox", "cromak-bridge", "cromak-bridge-vox", "bridge"])
         return list(dict.fromkeys(candidatos))
 
     def _obter_caminho_cache(self):
@@ -171,7 +172,7 @@ class CromakOnlineSync:
                             pass
 
         # 2. Tentativa via rede (Raw GitHub e GitHub Pages)
-        bases_remotas = [self.RAW_GITHUB_BASE, self.PAGES_GITHUB_BASE]
+        bases_remotas = [self.PAGES_GITHUB_BASE, self.RAW_GITHUB_BASE]
         for base_url in bases_remotas:
             url_dir = f"{base_url}/{subpasta}" if subpasta else base_url
             for nome_arq in nomes_arquivos:
@@ -290,8 +291,21 @@ class CromakOnlineSync:
             nova_versao = str(versao_atual)
             url_down = self.site_fallback
 
-            # 1. Tenta a pasta software-update
-            linhas_update = self._ler_arquivo_texto_multi_fonte("software-update", sufixos_especificos=["-update", "_update"])
+            linhas_update = None
+            # 0. Se URL de update direta foi definida, checa com prioridade máxima (0.1s)
+            if self.url_update:
+                try:
+                    req_up = urllib.request.Request(self.url_update, headers={'User-Agent': self.user_agent})
+                    with urllib.request.urlopen(req_up, timeout=3) as resp_up:
+                        if resp_up.status == 200:
+                            raw_up = resp_up.read().decode('utf-8', 'ignore').strip()
+                            linhas_update = [l.strip() for l in raw_up.splitlines() if l.strip()]
+                except Exception:
+                    pass
+
+            # 1. Tenta a pasta software-update se não leu da URL direta
+            if not linhas_update:
+                linhas_update = self._ler_arquivo_texto_multi_fonte('software-update', sufixos_especificos=['-update', '_update'])
             if linhas_update:
                 nova_versao = linhas_update[0].strip()
                 if len(linhas_update) > 1 and linhas_update[1].startswith("http"):
