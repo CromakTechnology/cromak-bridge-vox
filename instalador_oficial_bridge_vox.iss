@@ -22,7 +22,6 @@ AppSupportURL=https://cromaktechnology.github.io/pt/suporte.html
 
 AppUpdatesURL=https://cromaktechnology.github.io/pt/bridge-vox.html
 
-AppUserModelID=Cromak Bridge Vox
 
 
 
