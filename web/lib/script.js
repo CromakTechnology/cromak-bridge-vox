@@ -5946,6 +5946,22 @@ function verificarAtualizacaoOnline(silencioso = false) {
             btn.innerText = textoOriginal;
         }
 
+        if (res && res.erro) {
+            if (badge) {
+                badge.style.background = 'rgba(239, 68, 68, 0.15)';
+                badge.style.color = '#ef4444';
+                badge.style.borderColor = 'rgba(239, 68, 68, 0.35)';
+                badge.title = 'Falha ao verificar atualizações: ' + res.erro + '. Clique para tentar novamente.';
+                badge.onclick = () => verificarAtualizacaoOnline(false);
+            }
+            if (badgeDot) badgeDot.style.background = '#ef4444';
+            if (badgeText) badgeText.innerText = 'Falhou';
+            if (!silencioso) {
+                mostrarToast("Não foi possível verificar atualizações no momento. Tente novamente mais tarde.", true);
+            }
+            return;
+        }
+
         if (res && res.tem_update) {
             if (badge) {
                 badge.style.background = 'rgba(56, 189, 248, 0.2)';
@@ -6003,7 +6019,15 @@ function verificarAtualizacaoOnline(silencioso = false) {
             btn.disabled = false;
             btn.innerText = textoOriginal;
         }
-        if (badgeText) badgeText.innerText = 'Verificação Falhou';
+        if (badge) {
+            badge.style.background = 'rgba(239, 68, 68, 0.15)';
+            badge.style.color = '#ef4444';
+            badge.style.borderColor = 'rgba(239, 68, 68, 0.35)';
+            badge.title = 'Falha na conexão com o servidor de atualizações. Clique para tentar novamente.';
+            badge.onclick = () => verificarAtualizacaoOnline(false);
+        }
+        if (badgeDot) badgeDot.style.background = '#ef4444';
+        if (badgeText) badgeText.innerText = 'Falhou';
         if (!silencioso) {
             const msgErro = "Não foi possível verificar atualizações no momento. Tente novamente mais tarde.";
             mostrarToast(msgErro, true);

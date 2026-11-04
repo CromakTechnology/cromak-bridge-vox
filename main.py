@@ -422,7 +422,7 @@ class ApiBackend:
                 versao_atual=f"{APP_VERSION} (Build {APP_BUILD})",
                 callback=_cb
             )
-            evento.wait(timeout=4.0)
+            evento.wait(timeout=8.0)
         except Exception as e:
             resultado["erro"] = str(e)
 
