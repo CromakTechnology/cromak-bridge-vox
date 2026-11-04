@@ -4250,6 +4250,7 @@ window.addEventListener('focus', () => {
             }
 
             document.getElementById('aboutModal').style.display = 'flex';
+            if (typeof verificarAtualizacaoOnline === 'function') verificarAtualizacaoOnline(true);
 
         }
 
@@ -5913,100 +5914,103 @@ window.addEventListener('keydown', (e) => {
 
 // ==========================================
 
-function verificarAtualizacaoOnline() {
-
+function verificarAtualizacaoOnline(silencioso = false) {
     const btn = document.getElementById('btnVerificarUpdate');
-
-    const textoOriginal = btn ? btn.innerText : 'Verificar Atualizações';
+    const badge = document.getElementById('aboutVersionBadge');
+    const badgeText = document.getElementById('aboutVersionBadgeText');
+    const badgeDot = document.getElementById('aboutVersionBadgeDot');
+    const textoOriginal = btn ? 'Verificar Atualizações' : 'Verificar Atualizações';
 
     if (btn) {
-
         btn.disabled = true;
-
         btn.innerText = 'Verificando...';
-
     }
-
-    anunciarAoLeitor("Verificando atualizações online no repositório da Cromak Technology. Aguarde...");
-
-
+    if (badgeText) {
+        badgeText.innerText = 'Verificando...';
+    }
+    if (!silencioso) {
+        anunciarAoLeitor("Verificando atualizações online no repositório da Cromak Technology. Aguarde...");
+    }
 
     if (!window.pywebview || !pywebview.api || !pywebview.api.verificar_atualizacoes) {
-
         if (btn) {
-
             btn.disabled = false;
-
             btn.innerText = textoOriginal;
-
         }
-
         return;
-
     }
 
-
-
     pywebview.api.verificar_atualizacoes().then(res => {
-
         if (btn) {
-
             btn.disabled = false;
-
             btn.innerText = textoOriginal;
-
         }
 
         if (res && res.tem_update) {
+            if (badge) {
+                badge.style.background = 'rgba(56, 189, 248, 0.2)';
+                badge.style.color = '#38bdf8';
+                badge.style.borderColor = 'rgba(56, 189, 248, 0.5)';
+                badge.title = 'Clique para abrir o link e baixar a versão ' + res.versao_online;
+                badge.onclick = () => {
+                    if (pywebview.api.abrir_link && res.url_download) {
+                        pywebview.api.abrir_link(res.url_download);
+                    }
+                };
+            }
+            if (badgeDot) badgeDot.style.background = '#38bdf8';
+            if (badgeText) badgeText.innerText = 'Nova Versão Disponível';
 
-            const msg = `🎉 Nova versão encontrada: ${res.versao_online}! Abrindo página oficial...`;
+            if (btn) {
+                btn.innerText = '⬇️ Baixar Nova Versão (' + res.versao_online + ')';
+                btn.onclick = () => {
+                    if (pywebview.api.abrir_link && res.url_download) {
+                        pywebview.api.abrir_link(res.url_download);
+                    }
+                };
+            }
 
+            const msg = '🎉 Nova versão encontrada: ' + res.versao_online + '! Abrindo página de download...';
             mostrarToast(msg, false);
-
             anunciarAoLeitor(msg);
 
             setTimeout(() => {
-
                 if (pywebview.api.abrir_link && res.url_download) {
-
                     pywebview.api.abrir_link(res.url_download);
-
                 }
-
             }, 1200);
 
         } else {
+            const vAtual = (res && res.versao_atual) ? res.versao_atual : '1.3.7';
+            if (badge) {
+                badge.style.background = 'rgba(34, 197, 94, 0.15)';
+                badge.style.color = '#22c55e';
+                badge.style.borderColor = 'rgba(34, 197, 94, 0.35)';
+                badge.title = 'Você já está utilizando a versão mais recente!';
+                badge.onclick = () => verificarAtualizacaoOnline(false);
+            }
+            if (badgeDot) badgeDot.style.background = '#22c55e';
+            if (badgeText) badgeText.innerText = 'Versão Mais Recente';
 
-            const vAtual = (res && res.versao_atual) ? res.versao_atual : '1.3.5';
-
-            const msg = `✅ Você já está utilizando a versão mais recente do Cromak Bridge (${vAtual}).`;
-
-            mostrarToast(msg, false);
-
-            anunciarAoLeitor(msg);
-
+            if (!silencioso) {
+                const msg = '✅ Você já está utilizando a versão mais recente do Bridge Vox (' + vAtual + ').';
+                mostrarToast(msg, false);
+                anunciarAoLeitor(msg);
+            }
         }
-
     }).catch(err => {
-
         if (btn) {
-
             btn.disabled = false;
-
             btn.innerText = textoOriginal;
-
         }
-
-        const msgErro = "Não foi possível verificar atualizações no momento. Tente novamente mais tarde.";
-
-        mostrarToast(msgErro, true);
-
-        anunciarAoLeitor(msgErro);
-
+        if (badgeText) badgeText.innerText = 'Verificação Falhou';
+        if (!silencioso) {
+            const msgErro = "Não foi possível verificar atualizações no momento. Tente novamente mais tarde.";
+            mostrarToast(msgErro, true);
+            anunciarAoLeitor(msgErro);
+        }
     });
-
 }
-
 // ============================================================
 // MONITOR DINÂMICO DE REDE E STATUS DA API (CROMAK BRIDGE VOX)
 // ============================================================
@@ -6138,3 +6142,13 @@ window.addEventListener('pywebviewready', () => {
     setTimeout(atualizarStatusConexao, 600);
     setInterval(atualizarStatusConexao, 10000);
 });
+
+
+// Checagem automática silenciosa de atualizações 5 segundos após a inicialização
+setTimeout(() => {
+    try {
+        if (typeof verificarAtualizacaoOnline === 'function') {
+            verificarAtualizacaoOnline(true);
+        }
+    } catch(e) {}
+}, 5000);

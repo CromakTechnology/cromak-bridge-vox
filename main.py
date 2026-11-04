@@ -52,7 +52,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 APP_VERSION = "1.3.7"
-APP_BUILD = "2026.10"
+APP_BUILD = "2026.11"
 APP_NOME = "Cromak Bridge Vox"
 
 from core.gemini_api import AICore

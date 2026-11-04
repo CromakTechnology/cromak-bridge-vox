@@ -102,6 +102,8 @@ class CromakOnlineSync:
         candidatos = [slug_hifen, slug_underline, slug_sem_espaco]
         if "suite" in slug_hifen:
             candidatos.append(slug_hifen.replace("-suite", ""))
+        if "bridge" in slug_hifen or "vox" in slug_hifen:
+            candidatos.extend(["bridge-vox", "cromak-bridge", "cromak-bridge-vox", "bridge"])
         return list(dict.fromkeys(candidatos))
 
     def _obter_caminho_cache(self):

@@ -17,7 +17,7 @@
         .sidebar { width: 280px; background: var(--bg-glass); backdrop-filter: blur(6px); border: 1px solid var(--border-glass); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .sidebar.desktop-hidden { width: 0 !important; padding-left: 0 !important; padding-right: 0 !important; border-width: 0 !important; margin-right: -16px; opacity: 0; overflow: hidden; }
         .logo-icon { display: none; }
-        .logo-icon-img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); flex-shrink: 0; }
+        .logo-icon-img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; border: 1.5px solid rgba(255, 255, 255, 0.22); box-shadow: none; flex-shrink: 0; }
         .logo { display: flex; align-items: center; gap: 10px; font-size: 1.4rem; font-weight: 700; background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-new-chat { background: var(--accent-gradient); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
         .btn-new-chat:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5); }
@@ -522,4 +522,76 @@
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
+}
+
+
+/* BOTÕES DO MODAL SOBRE (EFEITO HOVER) */
+.about-btn {
+    flex: 1;
+    min-width: 190px;
+    padding: 12px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    text-decoration: none;
+    outline: none;
+}
+.about-btn-donate {
+    background: rgba(234, 179, 8, 0.08);
+    color: #eab308;
+    border: 1px solid rgba(234, 179, 8, 0.35);
+}
+.about-btn-donate:hover {
+    background: rgba(234, 179, 8, 0.2);
+    border-color: #facc15;
+    color: #fef08a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(234, 179, 8, 0.3);
+}
+.about-btn-donate:active {
+    transform: translateY(0);
+}
+.about-btn-update {
+    background: rgba(99, 102, 241, 0.12);
+    color: #e0e7ff;
+    border: 1px solid rgba(99, 102, 241, 0.35);
+}
+.about-btn-update:hover {
+    background: rgba(99, 102, 241, 0.28);
+    border-color: var(--accent-1);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(99, 102, 241, 0.4);
+}
+.about-btn-update:active {
+    transform: translateY(0);
+}
+.about-btn-update:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+.about-btn-support {
+    background: rgba(168, 85, 247, 0.1);
+    color: #f3e8ff;
+    border: 1px solid rgba(168, 85, 247, 0.35);
+}
+.about-btn-support:hover {
+    background: rgba(168, 85, 247, 0.24);
+    border-color: var(--accent-2);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.35);
+}
+.about-btn-support:active {
+    transform: translateY(0);
 }
