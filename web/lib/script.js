@@ -1788,7 +1788,7 @@ window.addEventListener('focus', () => {
 
                             <div class="empty-icon-glow">
 
-                                <img src="${document.body.classList.contains('high-contrast-theme') ? 'lib/bridge-vox.png' : 'lib/cromak-bridge.ico'}" alt="Logo do Cromak Bridge" class="empty-icon" onerror="this.style.display='none'">
+                                <img src="${document.body.classList.contains('high-contrast-theme') ? 'lib/bridge-vox.png' : 'lib/cromak-bridge.png'}" alt="Bridge Vox" class="empty-icon">
 
                             </div>
 

@@ -174,8 +174,8 @@
         
         /* TELA INICIAL (EMPTY STATE NOVA CONVERSA) */
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; animation: fadeIn 0.5s ease; }
-        .empty-icon-glow { width: 100px; height: 100px; background: var(--accent-gradient); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: 0 0 40px rgba(99, 102, 241, 0.25); }
-        .empty-icon-glow img { width: 98px; height: 98px; object-fit: contain; }
+        .empty-icon-glow { width: 96px; height: 96px; background: transparent; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+        .empty-icon-glow img, .empty-icon { width: 96px; height: 96px; border-radius: 22px; border: 1.5px solid rgba(139, 92, 246, 0.5); box-shadow: 0 8px 32px rgba(139, 92, 246, 0.25); object-fit: cover; }
         .empty-state h2 { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
         .empty-state p { font-size: 1rem; color: var(--text-secondary); margin-bottom: 32px; }
         .suggestions-grid { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 800px; }
