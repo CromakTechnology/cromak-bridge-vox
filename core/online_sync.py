@@ -101,7 +101,7 @@ class CromakOnlineSync:
         
         candidatos = []
         if "bridge" in slug_hifen or "vox" in slug_hifen:
-            candidatos.extend(["cromak-bridge", "bridge-vox", "cromak-bridge-vox", "bridge"])
+            candidatos.extend(["bridge-vox", "cromak-bridge-vox", "cromak-bridge", "bridge"])
         candidatos.extend([slug_hifen, slug_underline, slug_sem_espaco])
         if "suite" in slug_hifen:
             candidatos.append(slug_hifen.replace("-suite", ""))

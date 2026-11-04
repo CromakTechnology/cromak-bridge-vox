@@ -180,6 +180,7 @@ class ApiBackend:
         self.versao_completa = f"{APP_VERSION} (Build {APP_BUILD})"
         self.sync_engine = CromakOnlineSync(
             nome_programa=APP_NOME,
+            url_update="https://cromaktechnology.github.io/projetos/software-update/bridge-vox.txt",
             site_fallback="https://cromaktechnology.github.io/pt/bridge-vox.html"
         )
 
