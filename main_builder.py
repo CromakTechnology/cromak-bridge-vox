@@ -73,7 +73,6 @@ def realizar_build():
         f"--icon={ICONE}",
         "--add-data=web;web",
         "--add-data=plugins;plugins",
-        "--add-data=docs;docs",
         "--hidden-import=core.online_sync",
         "--collect-all=google.genai",
         "--collect-all=groq",
@@ -111,28 +110,25 @@ def realizar_build():
         dist_dir = os.path.join("dist", NOME_APP)
         print(f"\n📁 Organizando e finalizando a pasta '{dist_dir}'...")
 
-        # Garante que os arquivos públicos de docs estejam na raiz da pasta de distribuição
+        # Garante que APENAS os documentos oficiais do cliente estejam na pasta 'docs'
         docs_dest = os.path.join(dist_dir, "docs")
+        if os.path.exists(docs_dest):
+            shutil.rmtree(docs_dest, ignore_errors=True)
         os.makedirs(docs_dest, exist_ok=True)
+
         for doc_nome in ["EULA.txt", "PRIVACY.txt", "README.txt"]:
             src_doc = os.path.join("docs", doc_nome)
             if os.path.exists(src_doc):
                 shutil.copy2(src_doc, os.path.join(docs_dest, doc_nome))
 
-        # Remove chave de teste sensível caso tenha sido copiada para o dist
-        teste_copia = os.path.join(docs_dest, "api-teste.txt")
-        if os.path.exists(teste_copia):
+        # Remove completamente qualquer pasta docs de dentro de _internal (evita vazamento de roteiros de teste)
+        internal_docs = os.path.join(dist_dir, "_internal", "docs")
+        if os.path.exists(internal_docs):
             try:
-                os.remove(teste_copia)
-            except:
-                pass
-
-        internal_docs_teste = os.path.join(dist_dir, "_internal", "docs", "api-teste.txt")
-        if os.path.exists(internal_docs_teste):
-            try:
-                os.remove(internal_docs_teste)
-            except:
-                pass
+                shutil.rmtree(internal_docs, ignore_errors=True)
+                print("   [OK] Removida pasta 'docs' de dentro de '_internal'.")
+            except Exception as e:
+                print(f"   [AVISO] Falha ao remover _internal/docs: {e}")
 
         print(f"✅ Executável e arquivos organizados com sucesso em '{dist_dir}'.")
 

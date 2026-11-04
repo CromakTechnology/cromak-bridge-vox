@@ -130,7 +130,7 @@ brazilianportuguese.ButtonFinish=Concluir
 
 ; ATENÇÃO: NÃO excluir *.zip pois o PyInstaller necessita do base_library.zip em _internal!
 
-Source: "*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.iss,Output\*,config*.json,config*\*.*,*.tmp,*.log,*.rar"
+Source: "*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.iss,Output\*,config*.json,config*\*.*,*.tmp,*.log,*.rar,*roteiro*,*teste*,api-teste*.txt"
 
 Source: "cromak-bridge.ico"; DestDir: "{app}"; Flags: ignoreversion
 
