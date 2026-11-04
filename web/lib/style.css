@@ -17,7 +17,7 @@
         .sidebar { width: 280px; background: var(--bg-glass); backdrop-filter: blur(6px); border: 1px solid var(--border-glass); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .sidebar.desktop-hidden { width: 0 !important; padding-left: 0 !important; padding-right: 0 !important; border-width: 0 !important; margin-right: -16px; opacity: 0; overflow: hidden; }
         .logo-icon { display: none; }
-        .logo-icon-img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; border: 1.5px solid rgba(255, 255, 255, 0.22); box-shadow: none; flex-shrink: 0; }
+        .logo-icon-img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; border: 1.5px solid rgba(139, 92, 246, 0.55); box-shadow: none; flex-shrink: 0; }
         .logo { display: flex; align-items: center; gap: 10px; font-size: 1.4rem; font-weight: 700; background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-new-chat { background: var(--accent-gradient); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
         .btn-new-chat:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5); }

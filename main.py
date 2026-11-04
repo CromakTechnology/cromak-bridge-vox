@@ -395,7 +395,7 @@ class ApiBackend:
         return {
             "version": APP_VERSION,
             "build": APP_BUILD,
-            "full": f"Version {APP_VERSION} (build {APP_BUILD}) | Matrix Core"
+            "full": f"{APP_VERSION} (Build {APP_BUILD})"
         }
 
     def verificar_atualizacoes(self):
